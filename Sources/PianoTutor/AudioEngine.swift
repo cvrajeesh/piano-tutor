@@ -1,0 +1,129 @@
+import Foundation
+import AVFoundation
+import AudioToolbox
+
+/// Plays piano notes and metronome clicks using the General MIDI sound bank that ships with macOS.
+final class AudioEngine {
+    private let engine = AVAudioEngine()
+    private let piano = AVAudioUnitSampler()
+    private let percussion = AVAudioUnitSampler()
+    private var started: Bool = false
+
+    var volume: Double = 0.8 {
+        didSet {
+            engine.mainMixerNode.outputVolume = Float(volume)
+        }
+    }
+
+    func start() {
+        guard !started else { return }
+        started = true
+
+        engine.attach(piano)
+        engine.attach(percussion)
+        engine.connect(piano, to: engine.mainMixerNode, format: nil)
+        engine.connect(percussion, to: engine.mainMixerNode, format: nil)
+        engine.mainMixerNode.outputVolume = Float(volume)
+
+        do {
+            try engine.start()
+        } catch {
+            NSLog("Piano Tutor: could not start audio (%@)", error.localizedDescription)
+            return
+        }
+
+        // If the bank cannot be loaded the samplers fall back to a plain tone, which still works.
+        let bank = URL(fileURLWithPath: "/System/Library/Components/CoreAudio.component/Contents/Resources/gs_instruments.dls")
+        if FileManager.default.fileExists(atPath: bank.path) {
+            try? piano.loadSoundBankInstrument(
+                at: bank,
+                program: 0,
+                bankMSB: UInt8(kAUSampler_DefaultMelodicBankMSB),
+                bankLSB: UInt8(kAUSampler_DefaultBankLSB)
+            )
+            try? percussion.loadSoundBankInstrument(
+                at: bank,
+                program: 0,
+                bankMSB: UInt8(kAUSampler_DefaultPercussionBankMSB),
+                bankLSB: UInt8(kAUSampler_DefaultBankLSB)
+            )
+        }
+    }
+
+    func noteOn(_ midi: Int, velocity: Int = 90) {
+        guard started, midi >= 0, midi <= 127 else { return }
+        piano.startNote(UInt8(midi), withVelocity: UInt8(min(max(velocity, 1), 127)), onChannel: 0)
+    }
+
+    func noteOff(_ midi: Int) {
+        guard started, midi >= 0, midi <= 127 else { return }
+        piano.stopNote(UInt8(midi), onChannel: 0)
+    }
+
+    /// A wood-block tick; the accented one marks the first beat of a measure.
+    func click(accent: Bool) {
+        guard started else { return }
+        percussion.startNote(accent ? 76 : 77, withVelocity: accent ? 115 : 85, onChannel: 0)
+    }
+
+    func allNotesOff() {
+        guard started else { return }
+        for note in 21...108 {
+            piano.stopNote(UInt8(note), onChannel: 0)
+        }
+    }
+}
+
+/// Fires closures at precise host-clock times from a high-priority timer,
+/// so metronome clicks do not depend on the screen refresh.
+final class EventScheduler {
+    private struct Item {
+        let time: TimeInterval
+        let action: () -> Void
+    }
+
+    private var items: [Item] = []
+    private let lock = NSLock()
+    private let queue = DispatchQueue(label: "pianotutor.scheduler", qos: .userInteractive)
+    private var timer: DispatchSourceTimer?
+
+    func start() {
+        guard timer == nil else { return }
+        let source = DispatchSource.makeTimerSource(queue: queue)
+        source.schedule(deadline: .now(), repeating: .milliseconds(3), leeway: .milliseconds(1))
+        source.setEventHandler { [weak self] in
+            self?.fire()
+        }
+        source.resume()
+        timer = source
+    }
+
+    func schedule(_ batch: [(TimeInterval, () -> Void)]) {
+        lock.lock()
+        for entry in batch {
+            items.append(Item(time: entry.0, action: entry.1))
+        }
+        items.sort { $0.time < $1.time }
+        lock.unlock()
+    }
+
+    func cancelAll() {
+        lock.lock()
+        items.removeAll()
+        lock.unlock()
+    }
+
+    private func fire() {
+        let now: TimeInterval = HostClock.now
+        var due: [Item] = []
+        lock.lock()
+        while let first = items.first, first.time <= now {
+            due.append(first)
+            items.removeFirst()
+        }
+        lock.unlock()
+        for item in due {
+            item.action()
+        }
+    }
+}
