@@ -1,0 +1,86 @@
+name: Website
+
+# Publishes the website at https://middlec.liskovlabs.com. The pages live in site/;
+# the images are made from docs/screenshots and the app icon by
+# scripts/site-images.sh, so changing any of those on main redeploys the site.
+# Pull requests that touch them build the site without deploying it, as a check.
+#
+# One-time setup: Settings → Pages → Source: "GitHub Actions", then set the custom
+# domain to middlec.liskovlabs.com and tick "Enforce HTTPS" once the certificate is
+# issued. The DNS needs a CNAME record: middlec.liskovlabs.com → cvrajeesh.github.io.
+
+on:
+  push:
+    branches: [main]
+    paths: &site-paths
+      - "site/**"
+      - "docs/screenshots/**"
+      - "Support/Icon/icon.svg"
+      - "Support/iOS/Assets.xcassets/AppIcon.appiconset/AppIcon.png"
+      - "scripts/site-images.sh"
+      - ".github/workflows/pages.yml"
+  pull_request:
+    paths: *site-paths
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deployment at a time; let a running one finish rather than cancel it halfway.
+concurrency:
+  group: pages-${{ github.event_name == 'pull_request' && github.ref || 'deploy' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install image tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends webp imagemagick
+
+      - name: Make the images
+        run: ./scripts/site-images.sh
+
+      - name: Check that every linked file exists
+        run: |
+          missing=0
+          for page in site/*.html; do
+            for ref in $(grep -oE '(src|href)="[^"#:?]+"' "$page" | sed -E 's/^[a-z]+="//; s/"$//'); do
+              case "$ref" in
+                ./|/) continue ;;
+                /*) target="site$ref" ;;
+                *) target="site/$ref" ;;
+              esac
+              if [ ! -e "$target" ]; then
+                echo "::error file=$page::Missing file: $ref"
+                missing=1
+              fi
+            done
+          done
+          exit $missing
+
+      - uses: actions/configure-pages@v5
+        if: github.event_name != 'pull_request'
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

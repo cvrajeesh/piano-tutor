@@ -172,7 +172,38 @@ screams mixed in, rather than against recordings of real rooms.
 | `scripts/build-app.sh` | Builds the macOS `.app` bundle |
 | `project.yml`, `Support/iOS`, `Support/macOS` | XcodeGen definition and resources for the iPhone, iPad and Mac App Store apps |
 | `fastlane`, `Gemfile` | Build, signing and App Store upload lanes |
-| `.github/workflows` | `ci.yml` builds and tests every push; `release.yml` publishes |
+| `.github/workflows` | `ci.yml` builds and tests every push; `release.yml` publishes; `pages.yml` deploys the website |
+| `site` | The website, [middlec.liskovlabs.com](https://middlec.liskovlabs.com) |
+
+## Website
+
+`site/` is a static site with no build step: the home page, a support page and
+the privacy policy (use those two URLs in App Store Connect). Its images are
+made from the app icon and `docs/screenshots` by `scripts/site-images.sh`, and
+aren't committed.
+
+Publishing is automatic: `.github/workflows/pages.yml` makes the images, checks
+that every linked file exists, and deploys to GitHub Pages whenever `main`
+changes `site/`, the screenshots or the app icon. A pull request that touches
+them runs the same build without deploying. Run the Website workflow by hand
+from the Actions tab to redeploy at any time.
+
+To preview locally (needs `brew install webp imagemagick`):
+
+```bash
+./scripts/site-images.sh
+python3 -m http.server -d site    # then open http://localhost:8000
+```
+
+One-time setup:
+
+1. **DNS.** Add a CNAME record `middlec.liskovlabs.com` → `cvrajeesh.github.io`.
+2. **GitHub.** Under Settings → Pages, set Source to **GitHub Actions** and
+   Custom domain to `middlec.liskovlabs.com`. Tick **Enforce HTTPS** once
+   GitHub has issued the certificate.
+
+When the app is on the App Store, swap the "Coming soon" badge at the end of
+`site/index.html` for Apple's official App Store badge, linked to the app.
 
 ## Adding your own music
 
