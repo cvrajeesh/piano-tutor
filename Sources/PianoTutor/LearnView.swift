@@ -4,6 +4,7 @@ import PianoTutorCore
 /// The course map: every unit and its lessons.
 struct LearnView: View {
     @EnvironmentObject var model: AppModel
+    @Environment(\.screenLayout) private var screen
 
     var body: some View {
         ScrollView {
@@ -16,7 +17,7 @@ struct LearnView: View {
                     UnitSection(number: index + 1, unit: unit)
                 }
             }
-            .padding(32)
+            .padding(screen.compact ? 16 : 32)
             .frame(maxWidth: 1000, alignment: .leading)
             .frame(maxWidth: .infinity)
         }
@@ -31,21 +32,31 @@ struct LearnView: View {
                 Text("Work through the lessons in order. Each one takes a few minutes.")
                     .font(.system(size: 14, design: .rounded))
                     .foregroundColor(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            Spacer()
+            Spacer(minLength: 8)
             if let next = model.nextLesson, model.isUnlocked(next) {
                 Button {
                     model.activeLesson = next
                 } label: {
                     Label(model.progress.lessonStars.isEmpty ? "Start" : "Continue", systemImage: "play.fill")
                 }
-                .buttonStyle(PrimaryButtonStyle())
+                .buttonStyle(PrimaryButtonStyle(small: screen.compact))
+                .fixedSize()
             }
         }
     }
 }
 
 struct ConnectHint: View {
+    static var message: String {
+        if Platform.hasComputerKeys {
+            return "Plug the USB port on the back of your keyboard into your Mac and switch the keyboard on. It is recognised automatically; no driver is needed. Until then you can click the on-screen keys or use the A S D F G H J K row of your computer keyboard."
+        }
+        return "Connect the USB port on the back of your keyboard to your " + Platform.deviceName
+            + " (you may need a USB-C or Lightning adapter) and switch the keyboard on. It is recognised automatically. Until then you can play the on-screen keys."
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
             Image(systemName: "cable.connector")
@@ -55,7 +66,7 @@ struct ConnectHint: View {
                 Text("Connect your keyboard")
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundColor(Theme.textPrimary)
-                Text("Plug the USB port on the back of your keyboard into your Mac and switch the keyboard on. It is recognised automatically; no driver is needed. Until then you can click the on-screen keys or use the A S D F G H J K row of your computer keyboard.")
+                Text(ConnectHint.message)
                     .font(.system(size: 13, design: .rounded))
                     .foregroundColor(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -73,7 +84,7 @@ struct UnitSection: View {
     let number: Int
     let unit: CourseUnit
 
-    private let columns: [GridItem] = [GridItem(.adaptive(minimum: 210, maximum: 320), spacing: 14)]
+    private let columns: [GridItem] = [GridItem(.adaptive(minimum: 150, maximum: 320), spacing: 14)]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

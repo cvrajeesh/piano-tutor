@@ -5,6 +5,7 @@ import PianoTutorCore
 struct FreePlayView: View {
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var input: InputHub
+    @Environment(\.screenLayout) private var screen
 
     @State private var source = StaticStaffSource(beat: -1.2)
 
@@ -35,52 +36,79 @@ struct FreePlayView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Free Play")
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
-                Text("Play anything. The notes you hold appear on the staff with their names.")
-                    .font(.system(size: 14, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 32)
-            .padding(.top, 32)
-            .padding(.bottom, 16)
-
-            HStack(spacing: 18) {
-                StaffView(layout: layout, source: source, showNoteNames: true, showPlayhead: false, animated: false)
-                    .background(Theme.paper)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-
-                VStack(spacing: 10) {
-                    Text(heldPitches.isEmpty ? "–" : heldPitches.map { $0.name }.joined(separator: "  "))
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
+            if !screen.short {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Free Play")
+                        .font(.system(size: 30, weight: .bold, design: .rounded))
                         .foregroundColor(Theme.textPrimary)
-                        .minimumScaleFactor(0.4)
-                        .lineLimit(1)
-                    Text(heldPitches.isEmpty ? "Press a key" : heldPitches.map { $0.fullName }.joined(separator: " "))
-                        .font(.system(size: 13, design: .rounded))
+                    Text("Play anything. The notes you hold appear on the staff with their names.")
+                        .font(.system(size: 14, design: .rounded))
                         .foregroundColor(Theme.textSecondary)
-                    if !model.midi.isConnected {
-                        Text("Computer keys: A S D F G H J K play the white keys from Middle C, W E T Y U the black keys. Z and X shift the octave" + octaveNote + ".")
-                            .font(.system(size: 12, design: .rounded))
-                            .foregroundColor(Theme.textSecondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.top, 10)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, screen.compact ? 16 : 32)
+                .padding(.top, screen.compact ? 16 : 32)
+                .padding(.bottom, 16)
+            }
+
+            GeometryReader { proxy in
+                if proxy.size.height > proxy.size.width {
+                    // Upright iPhone or iPad: names above the staff.
+                    VStack(spacing: 12) {
+                        names
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 110)
+                            .background(Theme.panel)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                        staff
+                    }
+                } else {
+                    HStack(spacing: screen.short ? 10 : 18) {
+                        staff
+                        names
+                            .frame(width: screen.short ? 200 : 280)
+                            .frame(maxHeight: .infinity)
+                            .background(Theme.panel)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
                     }
                 }
-                .padding(20)
-                .frame(width: 280)
-                .frame(maxHeight: .infinity)
-                .background(Theme.panel)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
             }
-            .padding(.horizontal, 32)
-            .padding(.bottom, 18)
+            .padding(.horizontal, screen.compact ? 10 : 32)
+            .padding(.top, screen.short ? 8 : 0)
+            .padding(.bottom, screen.compact ? 8 : 18)
 
             KeyboardPanel()
         }
+    }
+
+    private var staff: some View {
+        StaffView(layout: layout, source: source, showNoteNames: true, showPlayhead: false, animated: false)
+            .background(Theme.paper)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private var names: some View {
+        VStack(spacing: screen.compact ? 6 : 10) {
+            Text(heldPitches.isEmpty ? "–" : heldPitches.map { $0.name }.joined(separator: "  "))
+                .font(.system(size: screen.compact ? 32 : 40, weight: .bold, design: .rounded))
+                .foregroundColor(Theme.textPrimary)
+                .minimumScaleFactor(0.4)
+                .lineLimit(1)
+            Text(heldPitches.isEmpty ? "Press a key" : heldPitches.map { $0.fullName }.joined(separator: " "))
+                .font(.system(size: 13, design: .rounded))
+                .foregroundColor(Theme.textSecondary)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+            if Platform.hasComputerKeys && !model.midi.isConnected {
+                Text("Computer keys: A S D F G H J K play the white keys from Middle C, W E T Y U the black keys. Z and X shift the octave" + octaveNote + ".")
+                    .font(.system(size: 12, design: .rounded))
+                    .foregroundColor(Theme.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 10)
+            }
+        }
+        .padding(screen.compact ? 12 : 20)
     }
 
     private var octaveNote: String {

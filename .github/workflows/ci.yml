@@ -3,6 +3,7 @@ name: Build
 on:
   push:
     branches: [main, "claude/**"]
+  pull_request:
   workflow_dispatch:
 
 concurrency:
@@ -36,3 +37,22 @@ jobs:
           name: PianoTutor-app
           path: build/PianoTutor.zip
           retention-days: 14
+
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate Xcode project
+        run: |
+          which xcodegen || brew install xcodegen
+          xcodegen generate
+
+      - name: Build for the iOS Simulator
+        run: |
+          xcodebuild build \
+            -project PianoTutor.xcodeproj \
+            -scheme PianoTutor-iOS \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO

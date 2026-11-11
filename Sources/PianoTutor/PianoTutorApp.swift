@@ -1,6 +1,7 @@
 import SwiftUI
-import AppKit
 import PianoTutorCore
+#if os(macOS)
+import AppKit
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -13,13 +14,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 }
+#endif
 
 @main
 struct PianoTutorApp: App {
+    #if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    #endif
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var model = AppModel()
 
     var body: some Scene {
+        #if os(macOS)
+        window
+            .defaultSize(width: 1280, height: 820)
+            .commands {
+                CommandGroup(replacing: .newItem) {}
+            }
+        #else
+        window
+        #endif
+    }
+
+    private var window: some Scene {
         WindowGroup("Piano Tutor") {
             RootView()
                 .environmentObject(model)
@@ -27,10 +44,12 @@ struct PianoTutorApp: App {
                 .onAppear {
                     model.start()
                 }
-        }
-        .defaultSize(width: 1280, height: 820)
-        .commands {
-            CommandGroup(replacing: .newItem) {}
+                .onChange(of: scenePhase) { phase in
+                    // iOS stops the audio engine in the background and after a phone call.
+                    if phase == .active {
+                        model.audio.resume()
+                    }
+                }
         }
     }
 }
@@ -39,40 +58,66 @@ struct RootView: View {
     @EnvironmentObject var model: AppModel
 
     var body: some View {
-        ZStack {
-            Theme.background.ignoresSafeArea()
-            if let lesson = model.activeLesson {
-                LessonView(lesson: lesson)
-                    .id(lesson.id)
-            } else if let song = model.activeSong {
-                SongSessionView(song: song)
-                    .id(song.id)
-            } else {
-                MainView()
+        GeometryReader { proxy in
+            ZStack {
+                if let lesson = model.activeLesson {
+                    LessonView(lesson: lesson)
+                        .id(lesson.id)
+                } else if let song = model.activeSong {
+                    SongSessionView(song: song)
+                        .id(song.id)
+                } else {
+                    MainView()
+                }
             }
+            .frame(width: proxy.size.width, height: proxy.size.height)
+            .environment(\.screenLayout, ScreenLayout(size: proxy.size))
         }
+        .background(Theme.background.ignoresSafeArea())
+        #if os(macOS)
         .frame(minWidth: 1080, minHeight: 720)
+        #else
+        // Keeps a swipe along the bottom keys from sending the app to the Home Screen.
+        .defersSystemGestures(on: .bottom)
+        #endif
         .preferredColorScheme(.dark)
     }
 }
 
-/// Sidebar plus the selected section.
+/// The selected section with its navigation: a sidebar on a Mac or iPad,
+/// an icon rail on an iPhone held sideways and a tab bar on an upright iPhone.
 struct MainView: View {
     @EnvironmentObject var model: AppModel
+    @Environment(\.screenLayout) private var screen
 
     var body: some View {
-        HStack(spacing: 0) {
-            sidebar
-            Group {
-                switch model.section {
-                case .learn: LearnView()
-                case .songs: SongsView()
-                case .freePlay: FreePlayView()
-                case .settings: SettingsView()
-                }
+        if screen.narrow {
+            VStack(spacing: 0) {
+                content
+                tabBar
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            HStack(spacing: 0) {
+                if screen.short {
+                    rail
+                } else {
+                    sidebar
+                }
+                content
+            }
         }
+    }
+
+    private var content: some View {
+        Group {
+            switch model.section {
+            case .learn: LearnView()
+            case .songs: SongsView()
+            case .freePlay: FreePlayView()
+            case .settings: SettingsView()
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var sidebar: some View {
@@ -116,17 +161,82 @@ struct MainView: View {
         .frame(maxHeight: .infinity)
         .background(Theme.panel)
     }
+
+    private var rail: some View {
+        VStack(spacing: 6) {
+            ForEach(SidebarSection.allCases) { section in
+                Button {
+                    model.section = section
+                } label: {
+                    Image(systemName: section.symbol)
+                        .font(.system(size: 17, weight: .medium))
+                        .foregroundColor(model.section == section ? Theme.ink : Theme.textPrimary)
+                        .frame(width: 44, height: 40)
+                        .background(model.section == section ? Theme.accent : Color.clear)
+                        .clipShape(RoundedRectangle(cornerRadius: 9))
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(section.title)
+            }
+            Spacer(minLength: 0)
+            ConnectionBadge(dotOnly: true)
+        }
+        .padding(.vertical, 10)
+        .frame(width: 60)
+        .frame(maxHeight: .infinity)
+        .background(Theme.panel)
+    }
+
+    private var tabBar: some View {
+        HStack(spacing: 0) {
+            ForEach(SidebarSection.allCases) { section in
+                Button {
+                    model.section = section
+                } label: {
+                    VStack(spacing: 3) {
+                        Image(systemName: section.symbol)
+                            .font(.system(size: 18, weight: .medium))
+                            .frame(height: 22)
+                        Text(section.title)
+                            .font(.system(size: 10, weight: .medium, design: .rounded))
+                    }
+                    .foregroundColor(model.section == section ? Theme.accent : Theme.textSecondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 8)
+                    .padding(.bottom, 4)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .background(Theme.panel)
+    }
 }
 
 /// Shows whether a MIDI keyboard is plugged in.
 struct ConnectionBadge: View {
     @EnvironmentObject var model: AppModel
+    var dotOnly: Bool = false
 
     var body: some View {
+        if dotOnly {
+            dot
+                .accessibilityLabel(model.midi.isConnected ? "Keyboard connected" : "No keyboard")
+        } else {
+            full
+        }
+    }
+
+    private var dot: some View {
+        Circle()
+            .fill(model.midi.isConnected ? Theme.good : Color(white: 0.45))
+            .frame(width: 9, height: 9)
+    }
+
+    private var full: some View {
         HStack(alignment: .top, spacing: 8) {
-            Circle()
-                .fill(model.midi.isConnected ? Theme.good : Color(white: 0.45))
-                .frame(width: 9, height: 9)
+            dot
                 .padding(.top, 4)
             VStack(alignment: .leading, spacing: 2) {
                 Text(model.midi.isConnected ? "Keyboard connected" : "No keyboard")

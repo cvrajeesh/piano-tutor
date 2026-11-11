@@ -1,0 +1,50 @@
+# Xcode project for the iPhone and iPad app. Generate it with XcodeGen:
+#
+#   brew install xcodegen
+#   xcodegen generate
+#   open PianoTutor.xcodeproj
+#
+# The macOS app does not need this; it is built by SwiftPM (see scripts/build-app.sh).
+name: PianoTutor
+options:
+  bundleIdPrefix: com.pianotutor
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+packages:
+  PianoTutor:
+    path: .
+targets:
+  PianoTutor-iOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources/PianoTutor
+      - path: Support/iOS
+    dependencies:
+      - package: PianoTutor
+        product: PianoTutorCore
+    settings:
+      base:
+        PRODUCT_NAME: PianoTutor
+        PRODUCT_BUNDLE_IDENTIFIER: com.pianotutor.app
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Piano Tutor
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.education
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        # The app is always dark, which also keeps the launch screen from flashing white.
+        INFOPLIST_KEY_UIUserInterfaceStyle: Dark
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+schemes:
+  PianoTutor-iOS:
+    build:
+      targets:
+        PianoTutor-iOS: all
+    run:
+      config: Debug

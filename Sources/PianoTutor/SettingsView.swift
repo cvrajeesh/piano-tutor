@@ -3,6 +3,7 @@ import PianoTutorCore
 
 struct SettingsView: View {
     @EnvironmentObject var model: AppModel
+    @Environment(\.screenLayout) private var screen
     @State private var confirmReset: Bool = false
 
     var body: some View {
@@ -17,7 +18,7 @@ struct SettingsView: View {
                 timingSection
                 progressSection
             }
-            .padding(32)
+            .padding(screen.compact ? 16 : 32)
             .frame(maxWidth: 720, alignment: .leading)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -48,7 +49,7 @@ struct SettingsView: View {
             if model.midi.sourceNames.isEmpty {
                 Label("No MIDI keyboard found", systemImage: "exclamationmark.circle")
                     .foregroundColor(Theme.textPrimary)
-                note("Connect the keyboard's USB port to your Mac with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two.")
+                note("Connect the keyboard's USB port to your " + Platform.deviceName + " with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two.")
             } else {
                 ForEach(model.midi.sourceNames, id: \.self) { name in
                     Label(name, systemImage: "checkmark.circle.fill")
@@ -71,14 +72,14 @@ struct SettingsView: View {
                 Slider(value: $model.volume, in: 0...1)
                     .frame(maxWidth: 280)
             }
-            Picker("Hear my playing through the Mac", selection: $model.monitorMode) {
+            Picker("Hear my playing through the " + Platform.deviceName, selection: $model.monitorMode) {
                 ForEach(MonitorMode.allCases) { mode in
                     Text(mode.title).tag(mode)
                 }
             }
             .pickerStyle(.segmented)
             .frame(maxWidth: 460)
-            note("Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen and computer keys. The metronome and accompaniment always come from the Mac.")
+            note("Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen" + (Platform.hasComputerKeys ? " and computer" : "") + " keys. The metronome and accompaniment always come from the " + Platform.deviceName + ".")
         }
     }
 

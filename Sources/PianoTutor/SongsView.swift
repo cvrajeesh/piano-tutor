@@ -4,6 +4,7 @@ import PianoTutorCore
 /// The song library, grouped by difficulty.
 struct SongsView: View {
     @EnvironmentObject var model: AppModel
+    @Environment(\.screenLayout) private var screen
 
     var body: some View {
         ScrollView {
@@ -20,7 +21,7 @@ struct SongsView: View {
                     levelSection(level)
                 }
             }
-            .padding(32)
+            .padding(screen.compact ? 16 : 32)
             .frame(maxWidth: 1000, alignment: .leading)
             .frame(maxWidth: .infinity)
         }
@@ -58,11 +59,13 @@ struct SongRow: View {
                     Text(song.title)
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundColor(Theme.textPrimary)
+                        .multilineTextAlignment(.leading)
                     Text(song.credit)
                         .font(.system(size: 12, design: .rounded))
                         .foregroundColor(Theme.textSecondary)
+                        .lineLimit(1)
                 }
-                Spacer()
+                Spacer(minLength: 0)
                 Text(song.score.hands.count > 1 ? "Both hands" : "Right hand")
                     .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundColor(Theme.textSecondary)
@@ -70,6 +73,7 @@ struct SongRow: View {
                     .padding(.vertical, 4)
                     .background(Theme.panelRaised)
                     .clipShape(Capsule())
+                    .fixedSize()
                 StarsView(stars: model.stars(forSong: song.id), size: 13)
             }
             .padding(.horizontal, 14)
@@ -109,6 +113,7 @@ enum HandChoice: String, CaseIterable, Identifiable {
 /// Plays one song with adjustable mode, hands and speed.
 struct SongSessionView: View {
     @EnvironmentObject var model: AppModel
+    @Environment(\.screenLayout) private var screen
     let song: Song
 
     @State private var perform: Bool = false
@@ -149,8 +154,17 @@ struct SongSessionView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            SessionTopBar(title: song.credit, stepCount: 0, stepIndex: 0, onClose: { model.activeSong = nil })
-            options
+            if screen.short {
+                // Not enough height for a row of its own, so the options share the top bar.
+                SessionTopBar(title: song.credit, stepCount: 0, stepIndex: 0, onClose: { model.activeSong = nil }) {
+                    options
+                }
+            } else {
+                SessionTopBar(title: song.credit, stepCount: 0, stepIndex: 0, onClose: { model.activeSong = nil })
+                options
+                    .padding(.vertical, 10)
+                    .background(Theme.panel.opacity(0.6))
+            }
             ExerciseView(
                 title: song.title,
                 instruction: perform
@@ -175,47 +189,48 @@ struct SongSessionView: View {
         return allHands && speed >= 0.99
     }
 
+    /// The row of options. It scrolls sideways when the screen is too narrow to show them all.
     private var options: some View {
-        HStack(spacing: 18) {
-            Picker("Mode", selection: $perform) {
-                Text("Practice").tag(false)
-                Text("In time").tag(true)
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .frame(width: 190)
-
-            if twoHanded {
-                Picker("Hands", selection: $handChoice) {
-                    ForEach(HandChoice.allCases) { choice in
-                        Text(choice.title).tag(choice)
-                    }
+        let pickerWidth: CGFloat = screen.compact ? 160 : 190
+        return ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: screen.compact ? 10 : 18) {
+                Picker("Mode", selection: $perform) {
+                    Text("Practice").tag(false)
+                    Text("In time").tag(true)
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
-                .frame(width: 190)
-            }
+                .frame(width: pickerWidth)
 
-            Picker("Speed", selection: $speed) {
-                Text("60%").tag(0.6)
-                Text("80%").tag(0.8)
-                Text("100%").tag(1.0)
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .frame(width: 190)
-            .disabled(!perform)
+                if twoHanded {
+                    Picker("Hands", selection: $handChoice) {
+                        ForEach(HandChoice.allCases) { choice in
+                            Text(choice.title).tag(choice)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .frame(width: pickerWidth)
+                }
 
-            Toggle("Metronome", isOn: $metronome)
+                Picker("Speed", selection: $speed) {
+                    Text("60%").tag(0.6)
+                    Text("80%").tag(0.8)
+                    Text("100%").tag(1.0)
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .frame(width: pickerWidth)
                 .disabled(!perform)
-            Toggle("Note names", isOn: $noteNames)
-            Toggle("Key hints", isOn: $keyHints)
-            Spacer()
+
+                Toggle("Metronome", isOn: $metronome)
+                    .disabled(!perform)
+                Toggle("Note names", isOn: $noteNames)
+                Toggle("Key hints", isOn: $keyHints)
+            }
+            .toggleStyle(.button)
+            .font(.system(size: 12, design: .rounded))
+            .padding(.horizontal, screen.short ? 0 : (screen.narrow ? 12 : 20))
         }
-        .toggleStyle(.button)
-        .font(.system(size: 12, design: .rounded))
-        .padding(.horizontal, 20)
-        .padding(.vertical, 10)
-        .background(Theme.panel.opacity(0.6))
     }
 }

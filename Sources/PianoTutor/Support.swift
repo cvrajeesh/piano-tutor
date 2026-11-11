@@ -19,6 +19,68 @@ enum HostClock {
     }
 }
 
+/// Names the device in instructions ("Connect the keyboard to your iPad").
+enum Platform {
+    static var deviceName: String {
+        #if os(macOS)
+        return "Mac"
+        #else
+        return UIDevice.current.userInterfaceIdiom == .phone ? "iPhone" : "iPad"
+        #endif
+    }
+
+    static var hasComputerKeys: Bool {
+        #if os(macOS)
+        return true
+        #else
+        return false
+        #endif
+    }
+}
+
+/// How much room the window has. Set once by `RootView` so that every screen can adapt:
+/// `narrow` is an iPhone held upright or a slim iPad split view, `short` an iPhone on its side.
+struct ScreenLayout: Equatable {
+    var narrow: Bool = false
+    var short: Bool = false
+
+    init(size: CGSize) {
+        narrow = size.width < 700
+        short = size.height < 500
+    }
+
+    init() {}
+
+    var compact: Bool { return narrow || short }
+}
+
+private struct ScreenLayoutKey: EnvironmentKey {
+    static let defaultValue = ScreenLayout()
+}
+
+extension EnvironmentValues {
+    var screenLayout: ScreenLayout {
+        get { return self[ScreenLayoutKey.self] }
+        set { self[ScreenLayoutKey.self] = newValue }
+    }
+}
+
+extension Score {
+    /// The lowest and highest key the given hands play, used to place a cut-down keyboard.
+    func keyRange(hands: Set<Hand>) -> ClosedRange<Int>? {
+        var low: Int? = nil
+        var high: Int? = nil
+        for note in notes where hands.contains(note.hand) {
+            for pitch in note.pitches {
+                low = min(low ?? pitch.midi, pitch.midi)
+                high = max(high ?? pitch.midi, pitch.midi)
+            }
+        }
+        guard let low = low, let high = high else { return nil }
+        return low...high
+    }
+}
+
 enum Theme {
     static let background = Color(red: 0.07, green: 0.09, blue: 0.14)
     static let panel = Color(red: 0.12, green: 0.15, blue: 0.22)
@@ -55,24 +117,29 @@ struct StarsView: View {
 }
 
 struct PrimaryButtonStyle: ButtonStyle {
+    /// Tighter padding for small screens.
+    var small: Bool = false
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 15, weight: .semibold, design: .rounded))
+            .font(.system(size: small ? 14 : 15, weight: .semibold, design: .rounded))
             .foregroundColor(Theme.ink)
-            .padding(.horizontal, 22)
-            .padding(.vertical, 10)
+            .padding(.horizontal, small ? 14 : 22)
+            .padding(.vertical, small ? 7 : 10)
             .background(Theme.accent.opacity(configuration.isPressed ? 0.7 : 1.0))
             .clipShape(Capsule())
     }
 }
 
 struct SecondaryButtonStyle: ButtonStyle {
+    var small: Bool = false
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 15, weight: .medium, design: .rounded))
+            .font(.system(size: small ? 14 : 15, weight: .medium, design: .rounded))
             .foregroundColor(Theme.textPrimary)
-            .padding(.horizontal, 18)
-            .padding(.vertical, 10)
+            .padding(.horizontal, small ? 12 : 18)
+            .padding(.vertical, small ? 7 : 10)
             .background(Theme.panelRaised.opacity(configuration.isPressed ? 0.6 : 1.0))
             .clipShape(Capsule())
     }

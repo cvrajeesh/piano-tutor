@@ -110,7 +110,9 @@ struct StaffRenderer {
 
         let twoStaves: Bool = layout.clefs.count > 1
         let neededSpaces: CGFloat = twoStaves ? 27 : 15
-        let space: CGFloat = min(max(size.height / neededSpaces, 6), 17)
+        // On a narrow screen the staff also shrinks with the width, so that a few beats stay in view.
+        let widthLimit: CGFloat = max(size.width / 45, 6)
+        let space: CGFloat = min(max(size.height / neededSpaces, 6), 17, widthLimit)
         self.sp = space
 
         var lines: [Clef: CGFloat] = [:]
