@@ -1,0 +1,243 @@
+import XCTest
+@testable import PianoTutorCore
+
+final class PitchTests: XCTestCase {
+    func testParsingAndMIDINumbers() {
+        XCTAssertEqual(Pitch("C4")?.midi, 60)
+        XCTAssertEqual(Pitch("F#4")?.midi, 66)
+        XCTAssertEqual(Pitch("Bb3")?.midi, 58)
+        XCTAssertEqual(Pitch("B3")?.midi, 59)
+        XCTAssertEqual(Pitch("C2")?.midi, KeyboardRange.lowest)
+        XCTAssertEqual(Pitch("C7")?.midi, KeyboardRange.highest)
+        XCTAssertNil(Pitch("H4"))
+        XCTAssertNil(Pitch("C"))
+    }
+
+    func testNames() {
+        XCTAssertEqual(Pitch("F#4")?.name, "F♯")
+        XCTAssertEqual(Pitch("Bb3")?.fullName, "B♭3")
+        XCTAssertEqual(Pitch.fromMIDI(60).fullName, "C4")
+        XCTAssertEqual(Pitch.fromMIDI(61).name, "C♯")
+        XCTAssertEqual(Pitch.fromMIDI(61, preferFlats: true).name, "D♭")
+    }
+
+    func testStaffPositions() {
+        XCTAssertEqual(Clef.treble.staffPosition(of: Pitch("E4")!), 0)
+        XCTAssertEqual(Clef.treble.staffPosition(of: Pitch("C4")!), -2)
+        XCTAssertEqual(Clef.treble.staffPosition(of: Pitch("F5")!), 8)
+        XCTAssertEqual(Clef.bass.staffPosition(of: Pitch("G2")!), 0)
+        XCTAssertEqual(Clef.bass.staffPosition(of: Pitch("C4")!), 10)
+    }
+
+    func testBlackKeys() {
+        XCTAssertTrue(KeyboardRange.isBlack(61))
+        XCTAssertTrue(KeyboardRange.isBlack(70))
+        XCTAssertFalse(KeyboardRange.isBlack(60))
+        XCTAssertFalse(KeyboardRange.isBlack(65))
+    }
+}
+
+final class NotationTests: XCTestCase {
+    func testSimpleMelody() throws {
+        let score = try Score(right: "C4 D4 E4/h | C4/w")
+        XCTAssertEqual(score.notes.count, 4)
+        XCTAssertEqual(score.totalBeats, 8)
+        XCTAssertEqual(score.notes[2].start, 2)
+        XCTAssertEqual(score.notes[2].duration, 2)
+        XCTAssertEqual(score.barlines, [4])
+        XCTAssertEqual(score.hands, [.right])
+    }
+
+    func testMeasureLengthIsChecked() {
+        XCTAssertThrowsError(try Score(right: "C4 D4 E4 | C4/w"))
+        XCTAssertThrowsError(try Score(right: "C4 D4 E4 F4 G4 | C4/w"))
+        XCTAssertThrowsError(try Score(right: "C4/x"))
+        XCTAssertThrowsError(try Score(right: "X4"))
+    }
+
+    func testPickupMeasure() throws {
+        let score = try Score(right: "C4 | D4 E4 F4 | G4/h", time: .threeFour, pickup: 1)
+        XCTAssertEqual(score.barlines, [1, 4])
+        XCTAssertEqual(score.measureIndex(at: 0), 0)
+        XCTAssertEqual(score.measureIndex(at: 1), 1)
+        XCTAssertEqual(score.measureIndex(at: 4), 2)
+    }
+
+    func testTiesMergeIntoOneEvent() throws {
+        let score = try Score(right: "G4/w~ | G4/q C4 E4 F4")
+        XCTAssertEqual(score.notes.count, 4)
+        XCTAssertEqual(score.notes[0].duration, 5)
+        XCTAssertEqual(score.notes[0].segments.count, 2)
+        XCTAssertThrowsError(try Score(right: "G4/w~ | A4/q C4 E4 F4"))
+        XCTAssertThrowsError(try Score(right: "G4/w~"))
+    }
+
+    func testChordsAndFingers() throws {
+        let score = try Score(left: "G3+C3+E3/w:5-3-1")
+        XCTAssertEqual(score.notes[0].midiNotes, [48, 52, 55])
+        XCTAssertEqual(score.notes[0].fingers, [5, 3, 1])
+        XCTAssertThrowsError(try Score(left: "C3+E3+G3/w:5-3"))
+    }
+
+    func testPositionFingering() throws {
+        let score = try Score(right: "C4 E4 G4 A4", left: "C3 E3 G3 B2", rightPosition: "C4", leftPosition: "C3")
+        let right = score.notes.filter { $0.hand == .right }
+        let left = score.notes.filter { $0.hand == .left }
+        XCTAssertEqual(right.map { $0.fingers[0] }, [1, 3, 5, nil])
+        XCTAssertEqual(left.map { $0.fingers[0] }, [5, 3, 1, nil])
+    }
+
+    func testGroupsCombineHands() throws {
+        let score = try Score(right: "C4 D4 E4/h", left: "C3/w")
+        let both = score.groups(for: [.right, .left])
+        XCTAssertEqual(both.count, 3)
+        XCTAssertEqual(both[0].midiNotes, [48, 60])
+        XCTAssertEqual(score.groups(for: [.left]).count, 1)
+    }
+}
+
+final class LayoutTests: XCTestCase {
+    func testAccidentalsLastForTheMeasure() throws {
+        let score = try Score(right: "F#4 F#4 F4 F4 | F#4/w")
+        let layout = StaffLayout(score: score)
+        let shown = layout.notes.map { $0.heads[0].accidental }
+        XCTAssertEqual(shown, [1, nil, 0, nil, 1])
+    }
+
+    func testKeySignatureHidesAccidentals() throws {
+        let score = try Score(right: "F#4 G4 F4 F#4", key: 1)
+        let layout = StaffLayout(score: score)
+        let shown = layout.notes.map { $0.heads[0].accidental }
+        XCTAssertEqual(shown, [nil, nil, 0, 1])
+    }
+
+    func testEighthNotesAreBeamedInPairs() throws {
+        let score = try Score(right: "C4/e D4/e E4 F4/e G4/e A4")
+        let layout = StaffLayout(score: score)
+        XCTAssertEqual(layout.beams.count, 2)
+        XCTAssertEqual(layout.notes[0].beamGroup, 0)
+        XCTAssertEqual(layout.notes[1].beamGroup, 0)
+        XCTAssertNil(layout.notes[2].beamGroup)
+    }
+
+    func testStavesFollowHands() throws {
+        XCTAssertEqual(StaffLayout(score: try Score(right: "C4/w")).clefs, [.treble])
+        XCTAssertEqual(StaffLayout(score: try Score(left: "C3/w")).clefs, [.bass])
+        XCTAssertEqual(StaffLayout(score: try Score(right: "C4/w", left: "C3/w")).clefs, [.treble, .bass])
+    }
+
+    func testStemDirection() throws {
+        let layout = StaffLayout(score: try Score(right: "C4 C5 B4 A4"))
+        XCTAssertEqual(layout.notes.map { $0.stemUp }, [true, false, false, true])
+    }
+}
+
+final class EngineTests: XCTestCase {
+    func testStepTrainerWaitsForRightNotes() throws {
+        let score = try Score(right: "C4 D4 C4+E4/h")
+        let trainer = StepTrainer(score: score, hands: [.right])
+        XCTAssertEqual(trainer.noteOn(62), .wrong)
+        XCTAssertEqual(trainer.noteOn(60), .advanced)
+        XCTAssertEqual(trainer.noteOn(62), .advanced)
+        XCTAssertEqual(trainer.noteOn(60), .partial)
+        XCTAssertEqual(trainer.noteOn(64), .finished)
+        XCTAssertTrue(trainer.isFinished)
+        XCTAssertEqual(trainer.mistakes, 1)
+        XCTAssertEqual(trainer.noteOn(60), .ignored)
+    }
+
+    func testChordNeedsAllKeysHeldTogether() throws {
+        let score = try Score(right: "C4+E4/h C4/h")
+        let trainer = StepTrainer(score: score, hands: [.right])
+        XCTAssertEqual(trainer.noteOn(60), .partial)
+        trainer.noteOff(60)
+        XCTAssertEqual(trainer.noteOn(64), .partial)
+        XCTAssertEqual(trainer.noteOn(60), .advanced)
+    }
+
+    func testJudgeGradesTiming() throws {
+        let score = try Score(right: "C4 D4 E4 F4")
+        let judge = PerformanceJudge(score: score, hands: [.right], secondsPerBeat: 1)
+        XCTAssertEqual(judge.noteOn(60, at: 0.02), .hit(eventID: 0, grade: .perfect, offset: 0.02))
+        if case .hit(_, let grade, _) = judge.noteOn(62, at: 0.85) {
+            XCTAssertEqual(grade, .early)
+        } else {
+            XCTFail("Expected an early hit")
+        }
+        if case .hit(_, let grade, _) = judge.noteOn(64, at: 2.2) {
+            XCTAssertEqual(grade, .late)
+        } else {
+            XCTFail("Expected a late hit")
+        }
+        XCTAssertEqual(judge.noteOn(61, at: 2.5), .stray)
+        XCTAssertEqual(judge.advance(to: 5), [3])
+        XCTAssertEqual(judge.state(ofEvent: 3), .missed)
+
+        let summary = judge.summary
+        XCTAssertEqual(summary.total, 4)
+        XCTAssertEqual(summary.perfect, 1)
+        XCTAssertEqual(summary.early, 1)
+        XCTAssertEqual(summary.late, 1)
+        XCTAssertEqual(summary.missed, 1)
+        XCTAssertEqual(summary.strays, 1)
+    }
+
+    func testJudgeIgnoresNotesFarFromTheBeat() throws {
+        let score = try Score(right: "C4 C4")
+        let judge = PerformanceJudge(score: score, hands: [.right], secondsPerBeat: 1)
+        XCTAssertEqual(judge.noteOn(60, at: 0.5), .stray)
+        if case .hit(let eventID, let grade, let offset) = judge.noteOn(60, at: 0.9) {
+            XCTAssertEqual(eventID, 1)
+            XCTAssertEqual(grade, .early)
+            XCTAssertEqual(offset, -0.1, accuracy: 0.0001)
+        } else {
+            XCTFail("Expected the second note to be matched")
+        }
+    }
+
+    func testStars() {
+        let perfect = PerformanceSummary(total: 10, perfect: 10, early: 0, late: 0, missed: 0, strays: 0, timed: true)
+        XCTAssertEqual(perfect.stars, 3)
+        let shaky = PerformanceSummary(total: 10, perfect: 4, early: 2, late: 1, missed: 3, strays: 2, timed: true)
+        XCTAssertEqual(shaky.stars, 1)
+        let poor = PerformanceSummary(total: 10, perfect: 2, early: 1, late: 0, missed: 7, strays: 0, timed: true)
+        XCTAssertEqual(poor.stars, 0)
+        XCTAssertFalse(poor.passed)
+        let practice = PerformanceSummary(total: 10, perfect: 10, early: 0, late: 0, missed: 0, strays: 1, timed: false)
+        XCTAssertEqual(practice.stars, 3)
+    }
+}
+
+final class ContentTests: XCTestCase {
+    func testCourseLoadsWithoutErrors() {
+        let lessons = Curriculum.allLessons
+        XCTAssertEqual(Curriculum.units.count, 8)
+        XCTAssertGreaterThan(lessons.count, 20)
+        XCTAssertEqual(Set(lessons.map { $0.id }).count, lessons.count, "Lesson ids must be unique")
+
+        for lesson in lessons {
+            XCTAssertFalse(lesson.steps.isEmpty, lesson.id)
+            for exercise in lesson.exercises {
+                XCTAssertFalse(exercise.score.isEmpty, "\(lesson.id): \(exercise.title)")
+                XCTAssertFalse(exercise.score.groups(for: exercise.hands).isEmpty, "\(lesson.id): \(exercise.title)")
+                for note in exercise.score.notes {
+                    for midi in note.midiNotes {
+                        XCTAssertTrue((KeyboardRange.lowest...KeyboardRange.highest).contains(midi), "\(lesson.id): \(exercise.title)")
+                    }
+                }
+            }
+        }
+        XCTAssertEqual(ContentLog.errors, [])
+    }
+
+    func testSongsLoadWithoutErrors() {
+        let songs = SongLibrary.songs
+        XCTAssertGreaterThan(songs.count, 12)
+        XCTAssertEqual(Set(songs.map { $0.id }).count, songs.count, "Song ids must be unique")
+        for song in songs {
+            XCTAssertFalse(song.score.isEmpty, song.id)
+            XCTAssertTrue((1...3).contains(song.level), song.id)
+        }
+        XCTAssertEqual(ContentLog.errors, [])
+    }
+}

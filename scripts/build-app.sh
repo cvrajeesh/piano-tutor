@@ -1,0 +1,23 @@
+#!/bin/bash
+# Builds "Piano Tutor.app" into ./build using only the Swift toolchain
+# (Xcode or the Xcode Command Line Tools).
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+swift build -c release
+BIN_DIR="$(swift build -c release --show-bin-path)"
+
+APP="build/Piano Tutor.app"
+rm -rf "$APP"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+
+cp "$BIN_DIR/PianoTutor" "$APP/Contents/MacOS/PianoTutor"
+cp Support/Info.plist "$APP/Contents/Info.plist"
+cp Sources/PianoTutor/Resources/Bravura.otf "$APP/Contents/Resources/Bravura.otf"
+cp Sources/PianoTutor/Resources/Bravura-LICENSE.txt "$APP/Contents/Resources/Bravura-LICENSE.txt"
+
+# Ad-hoc signature so the app runs on Apple silicon.
+codesign --force --sign - "$APP"
+
+echo "Built $APP"
+echo "Open it with:  open \"$APP\""
