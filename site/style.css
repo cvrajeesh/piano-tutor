@@ -296,6 +296,7 @@ main section { padding: clamp(72px, 10vw, 120px) 0; scroll-margin-top: 64px; }
 .cta img { width: 96px; height: 96px; border-radius: 22px; margin: 0 auto 28px; box-shadow: 0 20px 40px -16px rgba(0, 0, 0, 0.8); }
 .cta p { margin: 16px auto 0; max-width: 560px; color: var(--text-dim); font-size: 1.12rem; }
 .cta .actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+.cta .tip { margin-top: 28px; font-size: 0.98rem; color: var(--text-faint); }
 
 /* ---------- Footer ---------- */
 
@@ -319,3 +320,5 @@ main section { padding: clamp(72px, 10vw, 120px) 0; scroll-margin-top: 64px; }
 .page strong { color: var(--text); }
 .callout { margin-top: 32px; background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 26px; }
 .callout p:first-child { margin-top: 0; }
+.page .callout .btn { color: var(--bg); }
+.page .callout .btn svg { width: 18px; height: 18px; }

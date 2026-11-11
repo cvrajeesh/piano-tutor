@@ -19,6 +19,11 @@ enum HostClock {
     }
 }
 
+/// Web pages the app links to.
+enum Links {
+    static let buyMeACoffee = URL(string: "https://buymeacoffee.com/liskovlabs")!
+}
+
 /// Names the device in instructions ("Connect the keyboard to your iPad").
 enum Platform {
     static var deviceName: String {

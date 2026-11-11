@@ -18,6 +18,7 @@ struct SettingsView: View {
                 soundSection
                 timingSection
                 progressSection
+                supportSection
             }
             .padding(screen.compact ? 16 : 32)
             .frame(maxWidth: 720, alignment: .leading)
@@ -155,6 +156,16 @@ struct SettingsView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             }
+        }
+    }
+
+    private var supportSection: some View {
+        section("Support Middle C") {
+            note("Middle C has no ads and no tracking. If it helps you learn, you can say thanks with a coffee. It goes towards new lessons and songs.")
+            Link(destination: Links.buyMeACoffee) {
+                Label("Buy me a coffee", systemImage: "cup.and.saucer.fill")
+            }
+            .buttonStyle(PrimaryButtonStyle())
         }
     }
 }
