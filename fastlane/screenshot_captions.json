@@ -1,0 +1,77 @@
+{
+  "screens": ["lesson-practice", "song", "lesson-in-time", "learn", "songs", "free-play"],
+  "captions": {
+    "en-US": {
+      "lesson-practice": ["Piano lessons that listen", "Plug in your keyboard. Middle C hears every note."],
+      "song": ["The music waits for you", "The next key lights up, with the finger to use."],
+      "lesson-in-time": ["Then play it in time", "A count-in, a moving staff, and every note judged."],
+      "learn": ["27 short lessons", "From finding Middle C to chords in your left hand."],
+      "songs": ["18 songs to learn", "Either hand or both, at 60%, 80% or full speed."],
+      "free-play": ["See what you play", "Every note appears on the staff, with its name."]
+    },
+    "fr-FR": {
+      "lesson-practice": ["Des cours de piano qui écoutent", "Branchez votre clavier. Middle C entend chaque note."],
+      "song": ["La musique vous attend", "La touche suivante s'allume, avec le doigt à utiliser."],
+      "lesson-in-time": ["Puis jouez en mesure", "Un décompte, une portée qui défile, chaque note jugée."],
+      "learn": ["27 courtes leçons", "Du do central aux accords à la main gauche."],
+      "songs": ["18 morceaux à apprendre", "Une main ou les deux, à 60 %, 80 % ou pleine vitesse."],
+      "free-play": ["Voyez ce que vous jouez", "Chaque note s'affiche sur la portée, avec son nom."]
+    },
+    "de-DE": {
+      "lesson-practice": ["Klavierunterricht, der zuhört", "Keyboard anschließen. Middle C hört jede Note."],
+      "song": ["Die Musik wartet auf dich", "Die nächste Taste leuchtet auf, mit dem passenden Finger."],
+      "lesson-in-time": ["Dann im Takt spielen", "Einzählen, mitlaufende Noten, jede Note bewertet."],
+      "learn": ["27 kurze Lektionen", "Vom mittleren C bis zu Akkorden in der linken Hand."],
+      "songs": ["18 Lieder zum Lernen", "Eine Hand oder beide, mit 60 %, 80 % oder vollem Tempo."],
+      "free-play": ["Sieh, was du spielst", "Jede Note erscheint im Notensystem, mit ihrem Namen."]
+    },
+    "es-ES": {
+      "lesson-practice": ["Clases de piano que escuchan", "Conecta tu teclado. Middle C oye cada nota."],
+      "song": ["La música te espera", "La siguiente tecla se ilumina, con el dedo que debes usar."],
+      "lesson-in-time": ["Después, toca a tempo", "Cuenta de entrada, pentagrama en movimiento y cada nota valorada."],
+      "learn": ["27 lecciones cortas", "Del do central a los acordes con la mano izquierda."],
+      "songs": ["18 canciones para aprender", "Con una mano o con las dos, al 60 %, 80 % o a velocidad normal."],
+      "free-play": ["Mira lo que tocas", "Cada nota aparece en el pentagrama, con su nombre."]
+    },
+    "it": {
+      "lesson-practice": ["Lezioni di piano che ascoltano", "Collega la tastiera. Middle C sente ogni nota."],
+      "song": ["La musica ti aspetta", "Il tasto successivo si illumina, con il dito da usare."],
+      "lesson-in-time": ["Poi suona a tempo", "L'attacco, il pentagramma che scorre, ogni nota valutata."],
+      "learn": ["27 brevi lezioni", "Dal do centrale agli accordi con la mano sinistra."],
+      "songs": ["18 brani da imparare", "Una mano o entrambe, al 60%, all'80% o a piena velocità."],
+      "free-play": ["Guarda cosa suoni", "Ogni nota compare sul pentagramma, con il suo nome."]
+    },
+    "pt-BR": {
+      "lesson-practice": ["Aulas de piano que escutam", "Conecte seu teclado. O Middle C ouve cada nota."],
+      "song": ["A música espera por você", "A próxima tecla se acende, com o dedo a usar."],
+      "lesson-in-time": ["Depois, toque no tempo", "Contagem, pauta em movimento e cada nota avaliada."],
+      "learn": ["27 aulas curtas", "Do dó central aos acordes na mão esquerda."],
+      "songs": ["18 músicas para aprender", "Uma mão ou as duas, a 60%, 80% ou velocidade normal."],
+      "free-play": ["Veja o que você toca", "Cada nota aparece na pauta, com o nome dela."]
+    },
+    "ja": {
+      "lesson-practice": ["あなたの演奏を聴く|ピアノレッスン", "キーボードをつなげば、|すべての音を聴き取ります。"],
+      "song": ["音楽が|あなたを待ちます", "次の鍵盤が、|使う指とともに光ります。"],
+      "lesson-in-time": ["次は|リズムに合わせて", "カウント、流れる譜面、|一音ずつの判定。"],
+      "learn": ["27の|短いレッスン", "真ん中のドから、|左手の和音まで。"],
+      "songs": ["自分のペースで|18曲", "片手でも両手でも、|60%・80%・100%の速さで。"],
+      "free-play": ["弾いた音が|見える", "弾いた音が音名とともに|五線譜に表示されます。"]
+    },
+    "ko": {
+      "lesson-practice": ["내 연주를 들어 주는 피아노 레슨", "키보드를 연결하면 모든 음을 들어요."],
+      "song": ["음악이 기다려 줘요", "다음 건반이 사용할 손가락과 함께 켜져요."],
+      "lesson-in-time": ["이제 박자에 맞춰", "카운트, 흘러가는 악보, 한 음 한 음 판정."],
+      "learn": ["27개의 짧은 레슨", "가운데 도부터 왼손 코드까지."],
+      "songs": ["내 속도로 18곡", "한 손 또는 양손, 60%, 80%, 원래 속도로."],
+      "free-play": ["연주한 음을 눈으로", "모든 음이 이름과 함께 악보에 나타나요."]
+    },
+    "zh-Hans": {
+      "lesson-practice": ["会听你弹奏的|钢琴课", "接上键盘，|每个音都听得到。"],
+      "song": ["音乐|会等你", "下一个琴键会亮起，|并提示用哪根手指。"],
+      "lesson-in-time": ["再跟着|节奏弹", "数拍、滚动的五线谱，|每个音都有判定。"],
+      "learn": ["27 节|简短课程", "从中央C|到左手和弦。"],
+      "songs": ["按自己的速度|弹 18 首曲子", "单手或双手，|60%、80% 或原速。"],
+      "free-play": ["看见|你弹的音", "每个音都会连同音名|出现在五线谱上。"]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Keyboard anschließen und losspielen. Middle C hört jede Note, wartet, während du die Tasten suchst, und zählt dich ein, wenn du bereit bist, im Takt zu spielen.

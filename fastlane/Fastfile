@@ -20,7 +20,12 @@ PROJECT = File.join(ROOT, "PianoTutor.xcodeproj")
 OUTPUT_DIR = File.join(ROOT, "build", "fastlane")
 METADATA_DIR = File.join(__dir__, "metadata")
 SCREENSHOTS_DIR = File.join(__dir__, "screenshots")
-LOCALE = "en-US"
+# The store languages: one folder each in fastlane/metadata.
+LOCALES = Dir.children(METADATA_DIR)
+             .select { |name| File.directory?(File.join(METADATA_DIR, name)) }
+             .reject { |name| name == "review_information" }
+             .sort
+             .freeze
 
 PLATFORMS = {
   ios: { scheme: "PianoTutor-iOS", match: "ios", asc: "ios", screenshots: "ios" },
@@ -150,7 +155,8 @@ end
 
 # What's New for this version: its section of CHANGELOG.md, without the links and
 # commit hashes. nil when there is none. App Store Connect has no What's New for an
-# app's first version, and deliver leaves it out then.
+# app's first version, and deliver leaves it out then. The changelog is in English,
+# and every language gets it: App Store Connect needs What's New in each one.
 def release_notes
   path = File.join(ROOT, "CHANGELOG.md")
   return nil unless File.exist?(path)
@@ -212,7 +218,7 @@ def upload_store(platform, file: nil, submit: false)
     overwrite_screenshots: true,
     app_rating_config_path: File.join(__dir__, "age_rating.json"),
     app_review_information: review_contact,
-    release_notes: notes ? { LOCALE => notes } : nil,
+    release_notes: notes ? LOCALES.to_h { |locale| [locale, notes] } : nil,
     force: true, # no HTML preview to confirm
     # Checks the text for things App Review rejects. In-app purchases can't be
     # checked with an API key, and the app has none.

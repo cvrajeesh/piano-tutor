@@ -14,28 +14,76 @@ For how builds get to TestFlight and the App Store, see the
 
 | File | App Store Connect field | Limit |
 | --- | --- | --- |
-| `fastlane/metadata/en-US/name.txt` | App name | 30 characters |
-| `fastlane/metadata/en-US/subtitle.txt` | Subtitle | 30 characters |
-| `fastlane/metadata/en-US/promotional_text.txt` | Promotional text | 170 characters |
-| `fastlane/metadata/en-US/description.txt` | Description | 4000 characters |
-| `fastlane/metadata/en-US/keywords.txt` | Keywords, comma-separated | 100 bytes |
-| `fastlane/metadata/en-US/support_url.txt` | Support URL | |
-| `fastlane/metadata/en-US/marketing_url.txt` | Marketing URL | |
-| `fastlane/metadata/en-US/privacy_url.txt` | Privacy Policy URL | |
+| `fastlane/metadata/<locale>/name.txt` | App name | 30 characters |
+| `fastlane/metadata/<locale>/subtitle.txt` | Subtitle | 30 characters |
+| `fastlane/metadata/<locale>/promotional_text.txt` | Promotional text | 170 characters |
+| `fastlane/metadata/<locale>/description.txt` | Description | 4000 characters |
+| `fastlane/metadata/<locale>/keywords.txt` | Keywords, comma-separated | 100 bytes |
+| `fastlane/metadata/<locale>/support_url.txt` | Support URL | |
+| `fastlane/metadata/<locale>/marketing_url.txt` | Marketing URL | |
+| `fastlane/metadata/<locale>/privacy_url.txt` | Privacy Policy URL | |
 | `fastlane/metadata/copyright.txt` | Copyright | |
 | `fastlane/metadata/primary_category.txt`, `secondary_category.txt` | Categories (Education, Music) | |
 | `fastlane/metadata/review_information/notes.txt` | App Review notes | 4000 characters |
 | `fastlane/age_rating.json` | Age rating questionnaire | |
 | `fastlane/app_privacy_details.json` | App Privacy ("Data Not Collected") | |
-| `scripts/store-assets.py` | Screenshots and their captions | |
+| `fastlane/screenshot_captions.json` | The screenshots, their order and their captions | |
+| `scripts/store-assets.py` | Makes the screenshots | |
 | `CHANGELOG.md` | What's New in This Version | 4000 characters |
 
-The same text is used for the iPhone/iPad app and the Mac app. The listing is in
-English (U.S.), App Store Connect's default primary language, written in the same
-British English as the app and the website. If the app record's primary language is
-something else, such as English (U.K.), rename `fastlane/metadata/en-US` and change
-`LOCALE` in the Fastfile and the `en-US` folders in `scripts/store-assets.py` to match.
-Otherwise deliver adds the text as a second language and the primary one stays empty.
+The same text is used for the iPhone/iPad app and the Mac app.
+
+## Languages
+
+The listing is in nine languages, one folder each in `fastlane/metadata`:
+
+| Folder | App Store Connect language |
+| --- | --- |
+| `en-US` | English (U.S.), the primary language |
+| `fr-FR` | French |
+| `de-DE` | German |
+| `es-ES` | Spanish (Spain) |
+| `it` | Italian |
+| `pt-BR` | Portuguese (Brazil) |
+| `ja` | Japanese |
+| `ko` | Korean |
+| `zh-Hans` | Chinese (Simplified) |
+
+The English text uses the same British English as the app and the website. The
+translations follow the English, with a few choices worth keeping when they change:
+
+- **The name stays "Middle C"** in every language, as a brand. The text explains it
+  the first time with the local name for the note: *do central* (French, Spanish),
+  *do centrale* (Italian), *dó central* (Portuguese), *mittleres C* (German),
+  真ん中のド (Japanese), 가운데 도 (Korean), 中央C (Chinese).
+- **German speaks to the reader as *du***, which is usual for apps. French, Italian,
+  Spanish and Portuguese use the form usual in those stores (*vous*, *tu*, *tú*,
+  *você*).
+- **Song titles** are given their usual local names where they have one (*Hymne à la
+  joie*, エリーゼのために, 欢乐颂). Traditional English tunes keep their English names.
+- **Keywords** are chosen per language, not translated word for word, and leave out
+  words already in the subtitle. Keywords are limited to 100 **bytes**, and Chinese,
+  Japanese and Korean characters take 3 bytes each, so those lists are short.
+
+**What's New** comes from the English changelog for every language (see
+[What's New](#whats-new)); App Store Connect needs it in each language the version
+has, and accepts English text in any of them.
+
+To add a language, copy a folder in `fastlane/metadata`, name it with the
+[App Store Connect locale code](https://developer.apple.com/help/app-store-connect/reference/app-store-localizations)
+(deliver's list is in `fastlane_core/languages.rb`), translate the files, and add the
+same code to `fastlane/screenshot_captions.json`. `scripts/store-assets.py --check`
+fails until both are there. To have the store show a language in another region too
+(Spanish (Mexico), Portuguese (Portugal), French (Canada), Chinese (Traditional)), copy
+the nearest folder and adapt it.
+
+If the app record's primary language isn't English (U.S.), rename `en-US` (and its
+key in `screenshot_captions.json`) to match it; otherwise deliver adds the English
+text as one more language and the primary one stays empty.
+
+This is the store listing only. The app itself is localised separately, in its
+String Catalog; until it is, the screenshots show the English app with translated
+captions (see [Screenshots](#screenshots)).
 
 ## The text
 
@@ -73,21 +121,25 @@ touches the listing, so an over-long description fails the PR rather than the re
 
 `scripts/store-assets.py` makes the App Store screenshots from the captures in
 `docs/screenshots`, so the store, the website and the README all show the same screens.
-Each one puts a capture on the app's navy background with a caption above it:
+Each one puts a capture on the app's navy background with a caption above it. There is
+one set per language:
 
 | Set | Size | Made from | Folder |
 | --- | --- | --- | --- |
-| iPhone 6.9" | 1320 × 2868 | `docs/screenshots/iphone/*-portrait.png` | `fastlane/screenshots/ios/en-US/iphone-*.png` |
-| iPad 13" | 2752 × 2064 | `docs/screenshots/ipad/*-landscape.png` | `fastlane/screenshots/ios/en-US/ipad-*.png` |
-| Mac | 2880 × 1800 | `docs/screenshots/macos/*.png` | `fastlane/screenshots/mac/en-US/mac-*.png` |
+| iPhone 6.9" | 1320 × 2868 | `docs/screenshots/iphone/*-portrait.png` | `fastlane/screenshots/ios/<locale>/iphone-*.png` |
+| iPad 13" | 2752 × 2064 | `docs/screenshots/ipad/*-landscape.png` | `fastlane/screenshots/ios/<locale>/ipad-*.png` |
+| Mac | 2880 × 1800 | `docs/screenshots/macos/*.png` | `fastlane/screenshots/mac/<locale>/mac-*.png` |
 
 App Store Connect only needs the largest iPhone and iPad sizes; it scales them down
 for smaller devices. deliver works out the device from the image size, and uploads
 each set in file-name order.
 
-The six screens and their captions are the `CAPTIONS` list at the top of the script,
-in the order they appear in the store. The first two or three show in search results,
-so they carry the main idea:
+### Screens and captions
+
+`fastlane/screenshot_captions.json` lists the six screens in the order they appear in
+the store (`screens`), and each language's headline and caption for every screen
+(`captions`). The first two or three show in search results, so they carry the main
+idea:
 
 1. Practice exercise: *Piano lessons that listen*
 2. Song in practice mode: *The music waits for you*
@@ -96,9 +148,28 @@ so they carry the main idea:
 5. Song library: *18 songs to learn*
 6. Free play: *See what you play*
 
-To change a caption or the order, edit `CAPTIONS`. To show a different screen, add
-its captures to `docs/screenshots` (all three devices, with the same names) and name
-it in `CAPTIONS`.
+To change a caption, edit it there. To show a different screen, add its captures to
+`docs/screenshots` (all three devices, with the same names), add its name to
+`screens` and give it a caption in every language.
+
+Captions wrap onto two lines when they need to, with the lines kept even, and
+"Middle C" is never split. Japanese and Chinese have no spaces to break at, so their
+captions mark the places a line may break with `|`, which isn't drawn:
+`"あなたの演奏を聴く|ピアノレッスン"`. Without one, a long line breaks between any two
+characters, which can split a word.
+
+Each language has its own fonts: San Francisco, as in the app, and for Japanese,
+Korean and Chinese the system fonts Hiragino Sans, Apple SD Gothic Neo and Hiragino
+Sans GB.
+
+### Screenshots of the translated app
+
+Until the app itself is translated, every language uses the English captures, under
+translated captions; App Store Connect accepts that. When the app is translated, take
+each language's captures with the same names as the English ones and put them in
+`docs/screenshots/<locale>/<device>/`, for example
+`docs/screenshots/ja/iphone/song-portrait.png`. The script uses a language's own
+capture whenever there is one, screen by screen, and the English one otherwise.
 
 The screenshots aren't committed (`fastlane/screenshots` is ignored by git). The
 `release` and `metadata` lanes make them before every upload, and the Store listing
@@ -106,16 +177,17 @@ workflow attaches them to its run as the `store-screenshots` artifact so you can
 at them in a pull request. To make them on your Mac:
 
 ```bash
-uv run scripts/store-assets.py
+uv run scripts/store-assets.py                 # every language
+uv run scripts/store-assets.py --locale ja     # one language
 open fastlane/screenshots
 ```
 
-The captions are set in San Francisco, which the script finds on macOS. Elsewhere it
-falls back to another font, which is fine for a preview but not for the store, so
-uploads always run on macOS.
+The fonts are found in macOS. Elsewhere the script falls back to another font, which
+can't draw Japanese, Korean or Chinese, so screenshots are only made on macOS:
+uploads and the Store listing workflow both run there.
 
 Each upload replaces all the screenshots for that platform (`overwrite_screenshots`),
-so ones removed from `CAPTIONS` disappear from the store too.
+so screens taken out of `screens` disappear from the store too.
 
 ## What's New
 
@@ -136,6 +208,10 @@ So PR titles are also store copy: write them for the person reading the App Stor
 page. To word it differently for one release, edit the changelog in a `docs:` PR
 before running the `release` lane. App Store Connect has no What's New for an app's
 first version, and deliver leaves it out then.
+
+The changelog is in English, and every language gets the English text. To give a
+language its own What's New for a release, run the `release` lane without
+**Submit for review**, edit What's New in App Store Connect, then submit there.
 
 ## App Review
 

@@ -11,6 +11,7 @@ on:
     branches: [main]
     paths: &listing-paths
       - "fastlane/metadata/**"
+      - "fastlane/screenshot_captions.json"
       - "docs/screenshots/**"
       - "scripts/store-assets.py"
       - ".github/workflows/store-listing.yml"

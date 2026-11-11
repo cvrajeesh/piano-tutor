@@ -1,0 +1,1 @@
+Conecte seu teclado e toque. O Middle C ouve cada nota, espera enquanto você encontra as teclas e faz a contagem quando você está pronto para tocar no tempo.

@@ -112,7 +112,7 @@ Actions. See [`docs/release-process.md`](docs/release-process.md) for the whole
 process, and [`docs/app-store-setup.md`](docs/app-store-setup.md) for the
 one-time setup.
 
-The App Store page is kept in the repository too: the text in `fastlane/metadata`,
+The App Store page is kept in the repository too: the text, in nine languages, in `fastlane/metadata`,
 and screenshots that `scripts/store-assets.py` makes from `docs/screenshots` with
 captions. fastlane uploads them with each release. See
 [`docs/app-store-listing.md`](docs/app-store-listing.md).

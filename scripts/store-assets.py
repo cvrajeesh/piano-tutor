@@ -5,22 +5,30 @@
 """Checks the App Store text in fastlane/metadata and makes the App Store screenshots
 in fastlane/screenshots from the captures in docs/screenshots.
 
-    uv run scripts/store-assets.py            # check the text, then make the screenshots
-    uv run scripts/store-assets.py --check    # only check the text
+    uv run scripts/store-assets.py               # check the text, then make the screenshots
+    uv run scripts/store-assets.py --check       # only check the text
+    uv run scripts/store-assets.py --locale ja   # make one language's screenshots
 
 Each screenshot is a capture from docs/screenshots on the app's navy background, with
-a caption above it, at a size App Store Connect accepts:
+a caption from fastlane/screenshot_captions.json above it, at a size App Store Connect
+accepts. One set per language:
 
-    fastlane/screenshots/ios/en-US   iPhone 6.9" (1320x2868) and iPad 13" (2752x2064)
-    fastlane/screenshots/mac/en-US   Mac (2880x1800)
+    fastlane/screenshots/ios/<locale>   iPhone 6.9" (1320x2868) and iPad 13" (2752x2064)
+    fastlane/screenshots/mac/<locale>   Mac (2880x1800)
+
+A language uses its own captures from docs/screenshots/<locale>/<device> when they
+exist, and the English ones in docs/screenshots/<device> until then.
 
 Apple scales these down for the smaller devices. The screenshots aren't committed: the
-Release workflow runs this before it uploads them. It needs macOS for the San Francisco
-font; elsewhere it falls back to a font Pillow can find, which is fine for a preview.
+Release workflow runs this before it uploads them. It needs macOS for the San Francisco,
+Hiragino and Apple SD Gothic Neo fonts; elsewhere it falls back to a font Pillow can
+find, which is fine for checking the text but not for the store.
 See docs/app-store-listing.md.
 """
 
 import argparse
+import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -29,6 +37,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 ROOT = Path(__file__).resolve().parent.parent
 SHOTS = ROOT / "docs" / "screenshots"
 METADATA = ROOT / "fastlane" / "metadata"
+CAPTIONS_FILE = ROOT / "fastlane" / "screenshot_captions.json"
 OUT = ROOT / "fastlane" / "screenshots"
 
 # Colours from the app and site/style.css.
@@ -37,16 +46,9 @@ BG_BOTTOM = (0x12, 0x17, 0x24)
 TEXT = (0xF4, 0xF1, 0xEA)
 TEXT_DIM = (0xA9, 0xAF, 0xC2)
 
-# The story the screenshots tell, in order. The first two or three are the ones
-# people see in search results, so they carry the main idea.
-CAPTIONS = [
-    ("lesson-practice", "Piano lessons that listen", "Plug in your keyboard. Middle C hears every note."),
-    ("song", "The music waits for you", "The next key lights up, with the finger to use."),
-    ("lesson-in-time", "Then play it in time", "A count-in, a moving staff, and every note judged."),
-    ("learn", "27 short lessons", "From finding Middle C to chords in your left hand."),
-    ("songs", "18 songs to learn", "Either hand or both, at 60%, 80% or full speed."),
-    ("free-play", "See what you play", "Every note appears on the staff, with its name."),
-]
+# The screens, in store order, and each language's captions for them.
+CAPTIONS = json.loads(CAPTIONS_FILE.read_text(encoding="utf-8"))
+SCREENS = CAPTIONS["screens"]
 
 # (folder in fastlane/screenshots, file prefix, folder in docs/screenshots,
 #  suffix of the capture's name, canvas size, headline size, caption size,
@@ -56,6 +58,21 @@ TARGETS = [
     ("ios", "ipad", "ipad", "-landscape", (2752, 2064), 112, 56, 0.025),
     ("mac", "mac", "macos", "", (2880, 1800), 96, 48, 0.012),
 ]
+
+# Fonts for the languages San Francisco doesn't cover: (bold, regular), each a
+# (file, index in the collection). Their Latin letters and digits are close enough.
+SYSTEM_FONTS = Path("/System/Library/Fonts")
+CJK_FONTS = {
+    "ja": (("ヒラギノ角ゴシック W6.ttc", 0), ("ヒラギノ角ゴシック W3.ttc", 0)),
+    "ko": (("AppleSDGothicNeo.ttc", 6), ("AppleSDGothicNeo.ttc", 0)),
+    "zh-Hans": (("Hiragino Sans GB.ttc", 2), ("Hiragino Sans GB.ttc", 0)),
+}
+# Languages written without spaces between words, which wrap between characters.
+NO_SPACES = {"ja", "zh-Hans", "zh-Hant"}
+# The app's name, which a caption never splits across two lines.
+KEEP_TOGETHER = "Middle C"
+# Characters that mustn't start a line in Chinese and Japanese.
+NO_LINE_START = set("、。，．・：；？！）」』】〉》”’%％ー々ぁぃぅぇぉっゃゅょァィゥェォッャュョ")
 
 # Limits from App Store Connect. Keywords are counted in bytes.
 LIMITS = {
@@ -113,14 +130,32 @@ def check_metadata() -> list:
             if path.exists() and not path.read_text(encoding="utf-8").strip().startswith("https://"):
                 problems.append(f"{path.relative_to(ROOT)}: not an https:// URL")
 
+    # Every language on the store has screenshot captions, and the other way round.
+    captions_file = CAPTIONS_FILE.relative_to(ROOT)
+    store_locales = {p.name for p in locales}
+    for locale in sorted(store_locales - CAPTIONS["captions"].keys()):
+        problems.append(f"{captions_file}: no captions for {locale}")
+    for locale, captions in sorted(CAPTIONS["captions"].items()):
+        if locale not in store_locales:
+            problems.append(f"{captions_file}: {locale} has captions but no fastlane/metadata/{locale}")
+        for screen in SCREENS:
+            pair = captions.get(screen)
+            if not (isinstance(pair, list) and len(pair) == 2 and all(t.strip() for t in pair)):
+                problems.append(f"{captions_file}: {locale} needs a headline and a caption for {screen}")
+        for screen in sorted(captions.keys() - set(SCREENS)):
+            problems.append(f"{captions_file}: {locale} has a caption for {screen}, which isn't in screens")
+
     return problems
 
 
 # --- Screenshots -------------------------------------------------------------
 
-def font(size: int, bold: bool):
+def font(locale: str, size: int, bold: bool):
     try:
-        face = ImageFont.truetype("/System/Library/Fonts/SFNS.ttf", size)
+        if locale in CJK_FONTS:
+            name, index = CJK_FONTS[locale][0 if bold else 1]
+            return ImageFont.truetype(str(SYSTEM_FONTS / name), size, index=index)
+        face = ImageFont.truetype(str(SYSTEM_FONTS / "SFNS.ttf"), size)
         face.set_variation_by_name("Bold" if bold else "Regular")
         return face
     except OSError:
@@ -133,26 +168,65 @@ def font(size: int, bold: bool):
     return ImageFont.load_default(size)
 
 
-def wrap(draw: ImageDraw.ImageDraw, text: str, face, width: int) -> list:
-    """Splits text into lines no wider than width, keeping the lines even."""
-    words = text.split()
+def characters(text: str) -> list:
+    """Splits text without spaces into the characters a line may break between."""
+    pieces = []
+    for char in text:
+        # Keep closing punctuation with the character before it, and Latin words and
+        # numbers ("Middle C", "60%") in one piece.
+        if pieces and (char in NO_LINE_START or char == " "
+                       or (char.isascii() and pieces[-1][-1:].isascii())):
+            pieces[-1] += char
+        else:
+            pieces.append(char)
+    return pieces
+
+
+def units(draw: ImageDraw.ImageDraw, text: str, locale: str, face, width: int) -> tuple:
+    """The pieces a line may break between, and what joins them back together.
+
+    Languages with spaces break between words, and never inside "Middle C". Chinese
+    and Japanese break where the caption has a "|", which isn't drawn; a piece too
+    long for a line breaks between characters as a last resort.
+    """
+    if locale not in NO_SPACES:
+        text = text.replace("|", "").replace(KEEP_TOGETHER, KEEP_TOGETHER.replace(" ", "\0"))
+        return [word.replace("\0", " ") for word in text.split()], " "
+    pieces = []
+    for piece in text.split("|"):
+        if draw.textlength(piece, font=face) <= width:
+            pieces.append(piece)
+        else:
+            pieces.extend(characters(piece))
+    return pieces, ""
+
+
+def greedy(draw: ImageDraw.ImageDraw, pieces: list, joiner: str, face, width: float) -> list:
     lines, line = [], ""
-    for word in words:
-        candidate = f"{line} {word}".strip()
-        if draw.textlength(candidate, font=face) <= width or not line:
+    for piece in pieces:
+        candidate = f"{line}{joiner}{piece}" if line else piece
+        if draw.textlength(candidate.strip(), font=face) <= width or not line:
             line = candidate
         else:
-            lines.append(line)
-            line = word
-    lines.append(line)
-    # Avoid a single word on the last line.
-    if len(lines) > 1 and " " not in lines[-1]:
-        last_two = " ".join(lines[-2:]).split()
-        middle = len(last_two) // 2 + 1
-        first, second = " ".join(last_two[:middle]), " ".join(last_two[middle:])
-        if second and draw.textlength(first, font=face) <= width:
-            lines[-2:] = [first, second]
+            lines.append(line.strip())
+            line = piece
+    lines.append(line.strip())
     return lines
+
+
+def wrap(draw: ImageDraw.ImageDraw, text: str, locale: str, face, width: int) -> list:
+    """Splits text into as few lines as fit in width, as even in length as they can be."""
+    pieces, joiner = units(draw, text, locale, face, width)
+    lines = greedy(draw, pieces, joiner, face, width)
+    # The narrowest width that still needs no more lines balances them.
+    low, high = width / len(lines), width
+    while high - low > 4:
+        middle = (low + high) / 2
+        if len(greedy(draw, pieces, joiner, face, middle)) <= len(lines):
+            high = middle
+        else:
+            low = middle
+    return greedy(draw, pieces, joiner, face, high)
 
 
 def background(size: tuple) -> Image.Image:
@@ -174,36 +248,42 @@ def padding(size: tuple) -> int:
     return round(min(size) * 0.06)
 
 
-def draw_caption(draw: ImageDraw.ImageDraw, size: tuple, headline: str, caption: str,
-                 h1: int, h2: int) -> int:
+def draw_caption(draw: ImageDraw.ImageDraw, size: tuple, locale: str, headline: str,
+                 caption: str, h1: int, h2: int) -> int:
     """Draws the caption centred at the top and returns the y where it ends."""
     width, pad = size[0], padding(size)
-    head_face, sub_face = font(h1, True), font(h2, False)
+    head_face, sub_face = font(locale, h1, True), font(locale, h2, False)
     text_width = width - 2 * pad
     y = round(pad * 1.3)
-    for line in wrap(draw, headline, head_face, text_width):
+    for line in wrap(draw, headline, locale, head_face, text_width):
         draw.text((width / 2, y), line, font=head_face, fill=TEXT, anchor="ma")
         y += round(h1 * 1.18)
     y += round(h2 * 0.5)
-    for line in wrap(draw, caption, sub_face, round(text_width * 0.9)):
+    for line in wrap(draw, caption, locale, sub_face, round(text_width * 0.9)):
         draw.text((width / 2, y), line, font=sub_face, fill=TEXT_DIM, anchor="ma")
         y += round(h2 * 1.3)
     return y
 
 
-def caption_height(size: tuple, h1: int, h2: int) -> int:
+def caption_height(size: tuple, locale: str, h1: int, h2: int) -> int:
     """The space the longest caption needs, so every capture in a set sits at the same place."""
     scratch = ImageDraw.Draw(Image.new("RGB", size))
-    return max(draw_caption(scratch, size, headline, caption, h1, h2)
-               for _, headline, caption in CAPTIONS)
+    return max(draw_caption(scratch, size, locale, headline, caption, h1, h2)
+               for headline, caption in CAPTIONS["captions"][locale].values())
 
 
-def compose(source: Path, size: tuple, headline: str, caption: str,
+def capture(locale: str, device: str, name: str) -> Path:
+    """The language's own capture of a screen if there is one, otherwise the English one."""
+    localised = SHOTS / locale / device / name
+    return localised if localised.exists() else SHOTS / device / name
+
+
+def compose(source: Path, size: tuple, locale: str, headline: str, caption: str,
             h1: int, h2: int, corner: float, caption_bottom: int) -> Image.Image:
     width, height = size
     pad = padding(size)
     canvas = background(size)
-    draw_caption(ImageDraw.Draw(canvas), size, headline, caption, h1, h2)
+    draw_caption(ImageDraw.Draw(canvas), size, locale, headline, caption, h1, h2)
 
     # The capture, as large as fits below the caption.
     top = caption_bottom + round(pad * 0.7)
@@ -232,29 +312,31 @@ def compose(source: Path, size: tuple, headline: str, caption: str,
     return canvas
 
 
-def make_screenshots() -> int:
+def make_screenshots(locales: list) -> int:
     count = 0
-    for folder in {target[0] for target in TARGETS}:
-        out = OUT / folder / "en-US"
-        out.mkdir(parents=True, exist_ok=True)
-        for old in out.glob("*.png"):
-            old.unlink()
+    for locale in locales:
+        # Start each language afresh, so a screen taken out of the list doesn't linger.
+        for folder in {target[0] for target in TARGETS}:
+            shutil.rmtree(OUT / folder / locale, ignore_errors=True)
+            (OUT / folder / locale).mkdir(parents=True)
 
-    for folder, prefix, shots, suffix, size, h1, h2, corner in TARGETS:
-        out = OUT / folder / "en-US"
-        caption_bottom = caption_height(size, h1, h2)
-        for index, (name, headline, caption) in enumerate(CAPTIONS, start=1):
-            source = SHOTS / shots / f"{name}{suffix}.png"
-            image = compose(source, size, headline, caption, h1, h2, corner, caption_bottom)
-            # No alpha channel: App Store Connect rejects screenshots that have one.
-            image.convert("RGB").save(out / f"{prefix}-{index:02d}-{name}.png", optimize=True)
-            count += 1
+        for folder, prefix, device, suffix, size, h1, h2, corner in TARGETS:
+            out = OUT / folder / locale
+            caption_bottom = caption_height(size, locale, h1, h2)
+            for index, name in enumerate(SCREENS, start=1):
+                headline, caption = CAPTIONS["captions"][locale][name]
+                source = capture(locale, device, f"{name}{suffix}.png")
+                image = compose(source, size, locale, headline, caption, h1, h2, corner, caption_bottom)
+                # No alpha channel: App Store Connect rejects screenshots that have one.
+                image.convert("RGB").save(out / f"{prefix}-{index:02d}-{name}.png", optimize=True)
+                count += 1
     return count
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n\n")[0])
     parser.add_argument("--check", action="store_true", help="only check the text in fastlane/metadata")
+    parser.add_argument("--locale", action="append", help="only make this language's screenshots (repeatable)")
     args = parser.parse_args()
 
     problems = check_metadata()
@@ -265,8 +347,12 @@ def main() -> None:
     print("App Store text is within the limits")
 
     if not args.check:
-        count = make_screenshots()
-        print(f"Wrote {count} screenshots to {OUT.relative_to(ROOT)}")
+        locales = args.locale or sorted(CAPTIONS["captions"])
+        unknown = [locale for locale in locales if locale not in CAPTIONS["captions"]]
+        if unknown:
+            sys.exit(f"error: no captions for {', '.join(unknown)} in {CAPTIONS_FILE.relative_to(ROOT)}")
+        count = make_screenshots(locales)
+        print(f"Wrote {count} screenshots in {len(locales)} languages to {OUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
