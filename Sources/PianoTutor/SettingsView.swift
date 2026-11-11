@@ -39,10 +39,7 @@ struct SettingsView: View {
     }
 
     private func note(_ text: String) -> some View {
-        Text(text)
-            .font(.system(size: 12, design: .rounded))
-            .foregroundColor(Theme.textSecondary)
-            .fixedSize(horizontal: false, vertical: true)
+        SettingsNote(text: text)
     }
 
     private var keyboardSection: some View {
@@ -56,7 +53,7 @@ struct SettingsView: View {
                     Label(name, systemImage: "checkmark.circle.fill")
                         .foregroundColor(Theme.good)
                 }
-                note("Play a key to check the connection. Last note received: " + (model.lastMIDINote ?? "none yet") + ".")
+                LastNoteText(notes: model.lastNotes, source: .midi)
             }
             Button("Look again") {
                 model.midi.refreshSources()
@@ -91,7 +88,7 @@ struct SettingsView: View {
             case .listening:
                 Label("Listening", systemImage: "mic.fill")
                     .foregroundColor(Theme.good)
-                note("Play a key to check. Last note heard: " + (model.lastHeardNote ?? "none yet") + ".")
+                LastNoteText(notes: model.lastNotes, source: .microphone)
             case .asking:
                 Label("Waiting for permission to use the microphone", systemImage: "mic")
                     .foregroundColor(Theme.textPrimary)
@@ -158,6 +155,39 @@ struct SettingsView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             }
+        }
+    }
+}
+
+/// A line of small explanatory text under a setting.
+private struct SettingsNote: View {
+    let text: String
+
+    var body: some View {
+        Text(text)
+            .font(.system(size: 12, design: .rounded))
+            .foregroundColor(Theme.textSecondary)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+/// The last note an input picked up. It observes `LastNotes` on its own, so that each note
+/// played refreshes only this line rather than every view that watches `AppModel`.
+private struct LastNoteText: View {
+    enum Source {
+        case midi
+        case microphone
+    }
+
+    @ObservedObject var notes: LastNotes
+    let source: Source
+
+    var body: some View {
+        switch source {
+        case .midi:
+            SettingsNote(text: "Play a key to check the connection. Last note received: " + (notes.midi ?? "none yet") + ".")
+        case .microphone:
+            SettingsNote(text: "Play a key to check. Last note heard: " + (notes.heard ?? "none yet") + ".")
         }
     }
 }

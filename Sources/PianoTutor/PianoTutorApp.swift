@@ -151,6 +151,7 @@ struct MainView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityAddTraits(model.section == section ? .isSelected : [])
             }
 
             Spacer()
@@ -178,6 +179,7 @@ struct MainView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(section.title)
+                .accessibilityAddTraits(model.section == section ? .isSelected : [])
             }
             Spacer(minLength: 0)
             ConnectionBadge(dotOnly: true)
@@ -208,6 +210,7 @@ struct MainView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityAddTraits(model.section == section ? .isSelected : [])
             }
         }
         .background(Theme.panel)

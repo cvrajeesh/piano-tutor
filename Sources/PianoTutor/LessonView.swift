@@ -226,6 +226,16 @@ struct FindStepView: View {
         .onReceive(input.events) { note in
             handle(note)
         }
+        .task(id: done) {
+            // A short pause on "That's it!" before moving on. Cancelled if the lesson is closed meanwhile.
+            guard done else { return }
+            do {
+                try await Task.sleep(nanoseconds: 900_000_000)
+            } catch {
+                return
+            }
+            onDone()
+        }
     }
 
     private func handle(_ note: NoteInput) {
@@ -256,9 +266,6 @@ struct FindStepView: View {
             if index >= task.targets.count {
                 done = true
                 message = "That's it!"
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
-                    onDone()
-                }
             }
         } else if note.source == .microphone && model.micRightNotesOnly {
             return

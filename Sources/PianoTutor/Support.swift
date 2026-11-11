@@ -113,6 +113,8 @@ struct StarsView: View {
                     .foregroundColor(index < stars ? Theme.accent : Color(white: 0.4))
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(stars) + " of 3 stars")
     }
 }
 
