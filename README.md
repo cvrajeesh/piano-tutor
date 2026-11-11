@@ -179,7 +179,7 @@ screams mixed in, rather than against recordings of real rooms.
 
 `site/` is a static site with no build step: the home page, a support page and
 the privacy policy (use those two URLs in App Store Connect). Its images are
-made from the app icon and `docs/screenshots` by `scripts/site-images.sh`, and
+made from the app icon and `docs/screenshots` by `scripts/site-images.py`, and
 aren't committed.
 
 Publishing is automatic: `.github/workflows/pages.yml` makes the images, checks
@@ -188,10 +188,11 @@ changes `site/`, the screenshots or the app icon. A pull request that touches
 them runs the same build without deploying. Run the Website workflow by hand
 from the Actions tab to redeploy at any time.
 
-To preview locally (needs `brew install webp imagemagick`):
+To preview locally (needs [uv](https://docs.astral.sh/uv/), which fetches Pillow
+for the script; or `pip install pillow` and use `python3` instead of `uv run`):
 
 ```bash
-./scripts/site-images.sh
+uv run scripts/site-images.py
 python3 -m http.server -d site    # then open http://localhost:8000
 ```
 

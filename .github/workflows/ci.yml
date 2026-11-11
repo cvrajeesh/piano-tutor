@@ -11,7 +11,7 @@ on:
       - "**.md"
       - "docs/**"
       - "site/**"
-      - "scripts/site-images.sh"
+      - "scripts/site-images.py"
       - "fastlane/**"
       - "Gemfile"
       - "Gemfile.lock"

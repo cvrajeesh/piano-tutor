@@ -13,7 +13,7 @@ fastlane/screenshots
 fastlane/test_output
 *.p8
 
-# Website images, made by scripts/site-images.sh
+# Website images, made by scripts/site-images.py
 site/images/
 site/favicon.svg
 site/apple-touch-icon.png

@@ -2,7 +2,7 @@ name: Website
 
 # Publishes the website at https://middlec.liskovlabs.com. The pages live in site/;
 # the images are made from docs/screenshots and the app icon by
-# scripts/site-images.sh, so changing any of those on main redeploys the site.
+# scripts/site-images.py, so changing any of those on main redeploys the site.
 # Pull requests that touch them build the site without deploying it, as a check.
 #
 # One-time setup: Settings → Pages → Source: "GitHub Actions", then set the custom
@@ -17,7 +17,7 @@ on:
       - "docs/screenshots/**"
       - "Support/Icon/icon.svg"
       - "Support/iOS/Assets.xcassets/AppIcon.appiconset/AppIcon.png"
-      - "scripts/site-images.sh"
+      - "scripts/site-images.py"
       - ".github/workflows/pages.yml"
   pull_request:
     paths: *site-paths
@@ -38,13 +38,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install image tools
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq --no-install-recommends webp imagemagick
+      # Pillow comes from PyPI, so the build doesn't depend on Ubuntu's package mirrors.
+      - uses: astral-sh/setup-uv@v6
 
       - name: Make the images
-        run: ./scripts/site-images.sh
+        run: uv run scripts/site-images.py
 
       - name: Check that every linked file exists
         run: |
