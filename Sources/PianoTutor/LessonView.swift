@@ -146,6 +146,7 @@ struct InfoStepView: View {
 
 /// "Find this key" drill.
 struct FindStepView: View {
+    @EnvironmentObject var model: AppModel
     @EnvironmentObject var input: InputHub
     @Environment(\.screenLayout) private var screen
     let task: FindTask
@@ -259,6 +260,8 @@ struct FindStepView: View {
                     onDone()
                 }
             }
+        } else if note.source == .microphone && model.micRightNotesOnly {
+            return
         } else {
             wrong.insert(note.midi)
             let played: String = Pitch.fromMIDI(note.midi).name

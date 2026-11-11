@@ -241,3 +241,199 @@ final class ContentTests: XCTestCase {
         XCTAssertEqual(ContentLog.errors, [])
     }
 }
+
+final class NoteDetectorTests: XCTestCase {
+    private let sampleRate: Double = 44100
+
+    private struct Strike {
+        let time: Double
+        let notes: [Int]
+        var length: Double = 0.4
+    }
+
+    /// A rough piano: a handful of partials that start at once, fade (the high ones faster)
+    /// and are cut off when the key is released, over a little background noise.
+    private func audio(_ strikes: [Strike], seconds: Double) -> [Float] {
+        var samples = [Float](repeating: 0, count: Int(seconds * sampleRate))
+        var seed: UInt64 = 42
+        for index in 0..<samples.count {
+            seed = seed &* 6364136223846793005 &+ 1442695040888963407
+            samples[index] = (Float(seed >> 40) / Float(1 << 24) - 0.5) * 0.002
+        }
+        for strike in strikes {
+            for note in strike.notes {
+                let pitch: Double = 440 * pow(2, Double(note - 69) / 12)
+                let first: Int = Int(strike.time * sampleRate)
+                let count: Int = min(Int((strike.length + 0.3) * sampleRate), samples.count - first)
+                for partial in 1...8 {
+                    let frequency: Double = pitch * Double(partial) * (1 + 0.0002 * Double(partial * partial))
+                    if frequency > 0.45 * sampleRate { break }
+                    let strength: Double = 0.12 / pow(Double(partial), 1.3)
+                    let fade: Double = 1.5 + 0.8 * Double(partial)
+                    for index in 0..<count {
+                        let t: Double = Double(index) / sampleRate
+                        var envelope: Double = min(t / 0.004, 1) * exp(-fade * t)
+                        if t > strike.length {
+                            envelope *= exp(-(t - strike.length) / 0.03)
+                        }
+                        samples[first + index] += Float(strength * envelope * sin(2 * Double.pi * frequency * t))
+                    }
+                }
+            }
+        }
+        return samples
+    }
+
+    private struct Heard: Equatable {
+        let midi: Int
+        let time: Double
+    }
+
+    /// Feeds the audio in small pieces, as the microphone does, and collects the note-ons.
+    private func listen(
+        _ samples: [Float],
+        expected: Set<Int> = [],
+        mode: NoteDetector.Mode = .normal
+    ) -> [Heard] {
+        let detector = NoteDetector(sampleRate: sampleRate)
+        detector.expected = expected
+        var heard: [Heard] = []
+        var offset: Int = 0
+        while offset < samples.count {
+            let end: Int = min(offset + 441, samples.count)
+            for event in detector.process(Array(samples[offset..<end]), mode: mode) where event.kind == .on {
+                heard.append(Heard(midi: event.midi, time: Double(event.position) / sampleRate))
+            }
+            offset = end
+        }
+        return heard
+    }
+
+    func testSingleNotesAcrossTheKeyboard() {
+        let keys: [Int] = Array(stride(from: KeyboardRange.lowest, through: KeyboardRange.highest, by: 5))
+        let strikes: [Strike] = keys.enumerated().map { Strike(time: 0.3 + Double($0.offset) * 0.6, notes: [$0.element]) }
+        let heard = listen(audio(strikes, seconds: 0.6 * Double(keys.count) + 0.6))
+        XCTAssertEqual(heard.map { $0.midi }, keys)
+        // The reported time is when the key went down, not when it was recognised.
+        for (strike, note) in zip(strikes, heard) {
+            XCTAssertEqual(note.time, strike.time, accuracy: 0.04)
+        }
+    }
+
+    func testRepeatedNoteIsHeardEachTime() {
+        let strikes: [Strike] = (0..<4).map { Strike(time: 0.3 + Double($0) * 0.5, notes: [67]) }
+        let heard = listen(audio(strikes, seconds: 2.6))
+        XCTAssertEqual(heard.map { $0.midi }, [67, 67, 67, 67])
+    }
+
+    func testHeldNoteIsHeardOnce() {
+        let heard = listen(audio([Strike(time: 0.3, notes: [60], length: 3)], seconds: 4))
+        XCTAssertEqual(heard.map { $0.midi }, [60])
+    }
+
+    func testNoteEndsWhenTheSoundDoes() {
+        let detector = NoteDetector(sampleRate: sampleRate)
+        var kinds: [NoteDetector.Event.Kind] = []
+        for event in detector.process(audio([Strike(time: 0.3, notes: [60])], seconds: 1.5)) {
+            kinds.append(event.kind)
+        }
+        XCTAssertEqual(kinds, [.on, .off])
+        XCTAssertTrue(detector.sounding.isEmpty)
+    }
+
+    func testSilenceAndNoiseAreNotNotes() {
+        XCTAssertEqual(listen(audio([], seconds: 2)), [])
+    }
+
+    func testExpectedChordIsRecognised() {
+        let samples = audio([Strike(time: 0.5, notes: [60, 64, 67], length: 1)], seconds: 2)
+        XCTAssertEqual(listen(samples, expected: [60, 64, 67]).map { $0.midi }, [60, 64, 67])
+    }
+
+    func testMissingChordNoteIsNotReported() {
+        let samples = audio([Strike(time: 0.5, notes: [60, 67], length: 1)], seconds: 2)
+        XCTAssertEqual(listen(samples, expected: [60, 64, 67]).map { $0.midi }, [60, 67])
+    }
+
+    func testWrongKeyInsteadOfChord() {
+        let samples = audio([Strike(time: 0.5, notes: [62], length: 1)], seconds: 2)
+        XCTAssertEqual(listen(samples, expected: [60, 64, 67]).map { $0.midi }, [62])
+    }
+
+    func testLowerOctaveIsNotMistakenForTheChordAboveIt() {
+        // C3 contains the pitches of C4 and G4 as partials.
+        let samples = audio([Strike(time: 0.5, notes: [48], length: 1)], seconds: 2)
+        XCTAssertEqual(listen(samples, expected: [60, 67]).map { $0.midi }, [48])
+    }
+
+    func testGuardedAndMutedModes() {
+        let samples = audio([Strike(time: 0.4, notes: [62]), Strike(time: 1.0, notes: [60])], seconds: 1.8)
+        XCTAssertEqual(listen(samples, expected: [60]).map { $0.midi }, [62, 60])
+        XCTAssertEqual(listen(samples, expected: [60], mode: .guarded).map { $0.midi }, [60])
+        XCTAssertEqual(listen(samples, expected: [60], mode: .muted), [])
+    }
+
+    func testOtherSampleRates() {
+        for rate in [16000.0, 48000.0] {
+            let detector = NoteDetector(sampleRate: rate)
+            var samples = [Float](repeating: 0, count: Int(rate))
+            for index in Int(0.3 * rate)..<samples.count {
+                let t: Double = Double(index) / rate - 0.3
+                samples[index] = Float(0.1 * exp(-2 * t) * (sin(2 * Double.pi * 440 * t) + 0.5 * sin(2 * Double.pi * 880 * t)))
+            }
+            let notes: [Int] = detector.process(samples).filter { $0.kind == .on }.map { $0.midi }
+            XCTAssertEqual(notes, [69], "at \(rate) Hz")
+        }
+    }
+}
+
+extension NoteDetectorTests {
+    /// Something like a voice: a pitch that slides and wavers, and swells instead of being struck.
+    private func voice(from start: Double, pitch: Double, seconds: Double, into samples: inout [Float]) {
+        var phase: Double = 0
+        let first: Int = Int(start * sampleRate)
+        for index in 0..<Int(seconds * sampleRate) where first + index < samples.count {
+            let t: Double = Double(index) / sampleRate
+            let frequency: Double = pitch * (1 + 0.03 * sin(2 * Double.pi * 5 * t) + 0.1 * t)
+            phase += 2 * Double.pi * frequency / sampleRate
+            let envelope: Double = min(t / 0.12, 1) * min((seconds - t) / 0.05, 1)
+            let wave: Double = sin(phase) + 0.6 * sin(2 * phase) + 0.4 * sin(3 * phase) + 0.3 * sin(4 * phase)
+            samples[first + index] += Float(0.08 * envelope * wave)
+        }
+    }
+
+    func testVoicesAreNotNotes() {
+        var samples = audio([], seconds: 5)
+        for (index, pitch) in [180.0, 240, 300, 520, 1400, 1900].enumerated() {
+            voice(from: 0.3 + Double(index) * 0.75, pitch: pitch, seconds: 0.5, into: &samples)
+        }
+        XCTAssertEqual(listen(samples, expected: [64]), [])
+        XCTAssertEqual(listen(samples), [])
+    }
+
+    func testExpectedNoteIsHeardOverAVoice() {
+        var samples = audio([Strike(time: 0.6, notes: [64], length: 0.6)], seconds: 2)
+        voice(from: 0.3, pitch: 1400, seconds: 1.2, into: &samples)
+        XCTAssertEqual(listen(samples, expected: [64]).map { $0.midi }, [64])
+    }
+
+    func testRingingNoteIsNotHeardAgainWhenSomethingElseMakesANoise() {
+        // E is expected twice running; while the first is still ringing, a voice starts up.
+        var samples = audio([Strike(time: 0.4, notes: [64], length: 2)], seconds: 2.4)
+        voice(from: 1.0, pitch: 500, seconds: 0.6, into: &samples)
+        XCTAssertEqual(listen(samples, expected: [64]).map { $0.midi }, [64])
+    }
+}
+
+final class LenientJudgeTests: XCTestCase {
+    func testDoubtfulNotesAreNotCountedAsMistakes() throws {
+        let score = try Score(right: "C4 D4")
+        let judge = PerformanceJudge(score: score, hands: [.right], secondsPerBeat: 1)
+        XCTAssertEqual(judge.noteOn(77, at: 0.5, countStray: false), .stray)
+        XCTAssertEqual(judge.strays, 0)
+        XCTAssertEqual(judge.noteOn(77, at: 0.5), .stray)
+        XCTAssertEqual(judge.strays, 1)
+        // A doubtful note that does match still counts as played.
+        XCTAssertEqual(judge.noteOn(60, at: 0, countStray: false), .hit(eventID: 0, grade: .perfect, offset: 0))
+    }
+}

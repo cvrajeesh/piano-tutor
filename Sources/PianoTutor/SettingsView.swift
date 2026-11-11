@@ -14,6 +14,7 @@ struct SettingsView: View {
                     .foregroundColor(Theme.textPrimary)
 
                 keyboardSection
+                microphoneSection
                 soundSection
                 timingSection
                 progressSection
@@ -64,6 +65,51 @@ struct SettingsView: View {
         }
     }
 
+    private var microphoneSection: some View {
+        section("Microphone") {
+            Toggle("Listen to my piano when no MIDI keyboard is connected", isOn: $model.useMicrophone)
+                .foregroundColor(Theme.textPrimary)
+            if model.useMicrophone {
+                microphoneStatus
+            }
+            note("For an acoustic piano, or a keyboard without USB. Put the " + Platform.deviceName + " near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact.")
+            if model.useMicrophone {
+                Toggle("Noisy room: only listen for the right notes", isOn: $model.micRightNotesOnly)
+                    .foregroundColor(Theme.textPrimary)
+                note("Talking and other sounds are mostly told apart from the piano, but not always. With this on, nothing the microphone hears is ever marked as a wrong note; the music simply waits for the right one.")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var microphoneStatus: some View {
+        if model.midi.isConnected {
+            Label("Not listening: a MIDI keyboard is connected", systemImage: "pause.circle")
+                .foregroundColor(Theme.textSecondary)
+        } else {
+            switch model.mic.state {
+            case .listening:
+                Label("Listening", systemImage: "mic.fill")
+                    .foregroundColor(Theme.good)
+                note("Play a key to check. Last note heard: " + (model.lastHeardNote ?? "none yet") + ".")
+            case .asking:
+                Label("Waiting for permission to use the microphone", systemImage: "mic")
+                    .foregroundColor(Theme.textPrimary)
+            case .denied:
+                Label("Middle C is not allowed to use the microphone", systemImage: "mic.slash")
+                    .foregroundColor(Theme.textPrimary)
+                note(Platform.hasComputerKeys
+                    ? "Allow it in System Settings → Privacy & Security → Microphone, then switch this off and on again."
+                    : "Allow it in the Settings app → Privacy & Security → Microphone, then switch this off and on again.")
+            case .failed(let reason):
+                Label(reason, systemImage: "exclamationmark.circle")
+                    .foregroundColor(Theme.textPrimary)
+            case .off:
+                EmptyView()
+            }
+        }
+    }
+
     private var soundSection: some View {
         section("Sound") {
             HStack {
@@ -79,7 +125,7 @@ struct SettingsView: View {
             }
             .pickerStyle(.segmented)
             .frame(maxWidth: 460)
-            note("Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen" + (Platform.hasComputerKeys ? " and computer" : "") + " keys. The metronome and accompaniment always come from the " + Platform.deviceName + ".")
+            note("Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen" + (Platform.hasComputerKeys ? " and computer" : "") + " keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the " + Platform.deviceName + ".")
         }
     }
 

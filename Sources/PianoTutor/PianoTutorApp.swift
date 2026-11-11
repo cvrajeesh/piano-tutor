@@ -47,7 +47,7 @@ struct PianoTutorApp: App {
                 .onChange(of: scenePhase) { phase in
                     // iOS stops the audio engine in the background and after a phone call.
                     if phase == .active {
-                        model.audio.resume()
+                        model.resumeAudio()
                     }
                 }
         }
@@ -214,7 +214,7 @@ struct MainView: View {
     }
 }
 
-/// Shows whether a MIDI keyboard is plugged in.
+/// Shows whether a MIDI keyboard is plugged in, or the microphone is listening instead.
 struct ConnectionBadge: View {
     @EnvironmentObject var model: AppModel
     var dotOnly: Bool = false
@@ -222,15 +222,20 @@ struct ConnectionBadge: View {
     var body: some View {
         if dotOnly {
             dot
-                .accessibilityLabel(model.midi.isConnected ? "Keyboard connected" : "No keyboard")
+                .accessibilityLabel(title)
         } else {
             full
         }
     }
 
+    private var title: String {
+        if model.midi.isConnected { return "Keyboard connected" }
+        return model.mic.isListening ? "Microphone listening" : "No keyboard"
+    }
+
     private var dot: some View {
         Circle()
-            .fill(model.midi.isConnected ? Theme.good : Color(white: 0.45))
+            .fill(model.midi.isConnected || model.mic.isListening ? Theme.good : Color(white: 0.45))
             .frame(width: 9, height: 9)
     }
 
@@ -239,10 +244,10 @@ struct ConnectionBadge: View {
             dot
                 .padding(.top, 4)
             VStack(alignment: .leading, spacing: 2) {
-                Text(model.midi.isConnected ? "Keyboard connected" : "No keyboard")
+                Text(title)
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .foregroundColor(Theme.textPrimary)
-                Text(model.midi.sourceNames.first ?? "Using on-screen keys")
+                Text(model.midi.sourceNames.first ?? (model.mic.isListening ? "Play your piano" : "Using on-screen keys"))
                     .font(.system(size: 11, design: .rounded))
                     .foregroundColor(Theme.textSecondary)
                     .lineLimit(2)

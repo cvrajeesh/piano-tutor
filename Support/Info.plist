@@ -26,6 +26,8 @@
     <string>13.0</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.education</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Middle C listens to your piano to tell which notes you play. The sound is analysed on this device and is never recorded or sent anywhere.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSPrincipalClass</key>

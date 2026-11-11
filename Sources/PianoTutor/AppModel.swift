@@ -58,6 +58,7 @@ final class AppModel: ObservableObject {
     @Published var activeSong: Song?
     @Published private(set) var progress: ProgressStore
     @Published private(set) var lastMIDINote: String?
+    @Published private(set) var lastHeardNote: String?
 
     @Published var monitorMode: MonitorMode {
         didSet { defaults.set(monitorMode.rawValue, forKey: Keys.monitorMode) }
@@ -75,8 +76,22 @@ final class AppModel: ObservableObject {
     @Published var unlockAll: Bool {
         didSet { defaults.set(unlockAll, forKey: Keys.unlockAll) }
     }
+    /// Listen for a piano through the microphone whenever no MIDI keyboard is connected.
+    @Published var useMicrophone: Bool {
+        didSet {
+            defaults.set(useMicrophone, forKey: Keys.useMicrophone)
+            updateMicrophone()
+        }
+    }
+
+    /// For noisy rooms: notes heard by the microphone that are not in the music are passed
+    /// over instead of being marked as mistakes.
+    @Published var micRightNotesOnly: Bool {
+        didSet { defaults.set(micRightNotesOnly, forKey: Keys.micRightNotesOnly) }
+    }
 
     let midi = MIDIManager()
+    let mic = MicrophoneInput()
     let audio = AudioEngine()
     let input = InputHub()
     let scheduler = EventScheduler()
@@ -91,6 +106,8 @@ final class AppModel: ObservableObject {
         static let volume = "volume"
         static let timingOffset = "timingOffsetMs"
         static let unlockAll = "unlockAll"
+        static let useMicrophone = "useMicrophone"
+        static let micRightNotesOnly = "micRightNotesOnly"
     }
 
     init() {
@@ -106,6 +123,8 @@ final class AppModel: ObservableObject {
         volume = storedVolume
         timingOffsetMs = store.double(forKey: Keys.timingOffset)
         unlockAll = store.bool(forKey: Keys.unlockAll)
+        useMicrophone = store.bool(forKey: Keys.useMicrophone)
+        micRightNotesOnly = store.bool(forKey: Keys.micRightNotesOnly)
     }
 
     /// Starts audio and MIDI. Safe to call more than once.
@@ -139,9 +158,56 @@ final class AppModel: ObservableObject {
             .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
         midi.start()
+
+        mic.onNote = { [weak self] note in
+            guard let self = self else { return }
+            if note.kind == .on {
+                self.lastHeardNote = Pitch.fromMIDI(note.midi).fullName
+            }
+            self.input.send(note)
+        }
+        mic.sessionHook = { [weak self] recording in
+            self?.audio.setRecording(recording)
+        }
+        input.onExpectedNotes = { [weak self] notes in
+            self?.mic.setExpected(notes)
+        }
+        mic.objectWillChange
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &cancellables)
+        // The microphone is a stand-in: it steps aside as soon as a MIDI keyboard appears.
+        midi.$sourceNames
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.updateMicrophone() }
+            .store(in: &cancellables)
+        updateMicrophone()
+    }
+
+    private func updateMicrophone() {
+        guard started else { return }
+        if useMicrophone && !midi.isConnected {
+            mic.start()
+        } else if mic.state != .off {
+            mic.stop()
+        }
+    }
+
+    /// Restarts audio after the system stopped it (app sent to the background, a phone call).
+    func resumeAudio() {
+        audio.resume()
+        mic.resume()
+    }
+
+    /// How long after a note is played the app may still learn of it. The microphone needs
+    /// a moment to recognise a note; its notes still carry the time they were actually played.
+    var inputLag: TimeInterval {
+        return mic.isListening ? 0.25 : 0
     }
 
     private func playMonitor(_ note: NoteInput) {
+        // A note heard through the microphone is already sounding in the room.
+        if note.source == .microphone { return }
         let audible: Bool
         switch monitorMode {
         case .always: audible = true
@@ -149,9 +215,14 @@ final class AppModel: ObservableObject {
         case .auto: audible = note.source != .midi
         }
         guard audible else { return }
+        // The microphone would hear the app's own piano, so it stops listening meanwhile.
         switch note.kind {
-        case .on: audio.noteOn(note.midi, velocity: note.velocity)
-        case .off: audio.noteOff(note.midi)
+        case .on:
+            mic.appNote(note.midi, on: true)
+            audio.noteOn(note.midi, velocity: note.velocity)
+        case .off:
+            mic.appNote(note.midi, on: false)
+            audio.noteOff(note.midi)
         }
     }
 

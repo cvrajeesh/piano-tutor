@@ -9,6 +9,7 @@ listens to what you play.
 - **In-time mode** – a metronome counts you in, the staff scrolls, and every note is judged as on the beat, early, late or missed.
 - **Song library** – 18 traditional and classical tunes, playable with either hand or both, at 60%, 80% or full speed.
 - **Free play** – see the name and staff position of whatever you play.
+- **Microphone input** – no MIDI? The app can listen to an acoustic piano, or any keyboard, and work out which keys you play.
 - **61-key on-screen keyboard** matching the CT-S300 (C2–C7), with finger numbers and key hints. On iPhone and iPad it is multi-touch, and on small screens it shows the section of the keyboard the music needs.
 
 Written in Swift with SwiftUI, CoreMIDI and AVFoundation. No third-party code;
@@ -118,12 +119,47 @@ Without a keyboard you can click the on-screen keys or use the computer
 keyboard: `A S D F G H J K` are the white keys from Middle C, `W E T Y U` the
 black keys, and `Z` / `X` shift the octave.
 
+## Playing without MIDI: the microphone
+
+If your instrument has no USB port (an acoustic piano, an older keyboard), switch on
+**Settings → Microphone**. The app then listens whenever no MIDI keyboard is connected
+and treats what it hears like key presses. The sound is analysed on the device; nothing
+is recorded.
+
+What to expect:
+
+- **Single notes** are recognised anywhere, including Free Play, across the whole C2–C7 range.
+- **Chords** are recognised in lessons and songs, where the app knows which notes it is
+  waiting for and only has to check that each one is sounding. In Free Play, chords are
+  not shown. A chord that doubles a note an octave up cannot be told from the lower note alone.
+- **Timing** is judged from the moment the key went down, although the note shows up on
+  screen about a tenth of a second later.
+- The microphone also hears the app. Around metronome clicks and accompaniment only the
+  expected notes are believed, so a wrong note there goes unpunished rather than a click
+  being taken for one. Headphones, or a low volume, work best. While you play the
+  on-screen keys the microphone is ignored.
+- **Talking, shouting and other noise** are mostly ignored. A note only counts if it starts
+  with an attack and then holds exactly the pitch of a key, which voices rarely do, and in a
+  lesson or song a "wrong note" far from the keys the piece uses is passed over. Someone
+  singing in tune can still fool it. For a really noisy room there is
+  **Settings → Microphone → Noisy room**: nothing the microphone hears is then marked as a
+  wrong note, and the music simply waits for the right one.
+- A wrong key is shown a little later than a right one (about an eighth of a second),
+  because it takes that long to be sure it was the piano.
+- It is not as quick or exact as MIDI.
+
+The listening is done by `NoteDetector` in `PianoTutorCore`. Expected notes are looked for
+at their own pitches (the strength of the first two partials, and the exact frequency from
+how the phase advances); any other note comes from the period of the sound (the YIN method).
+It was tuned against synthesised and sampled piano sound, with synthesised speech and
+screams mixed in, rather than against recordings of real rooms.
+
 ## Project layout
 
 | Path | Contents |
 | --- | --- |
-| `Sources/PianoTutorCore` | Pure Swift: pitches, the text notation parser, staff layout, scoring, and all lesson and song content |
-| `Sources/PianoTutor` | The app: MIDI input, audio, the scrolling staff, the keyboard and the screens |
+| `Sources/PianoTutorCore` | Pure Swift: pitches, the text notation parser, staff layout, scoring, note detection for the microphone, and all lesson and song content |
+| `Sources/PianoTutor` | The app: MIDI and microphone input, audio, the scrolling staff, the keyboard and the screens |
 | `Tests/PianoTutorCoreTests` | Unit tests for the core |
 | `scripts/build-app.sh` | Builds the macOS `.app` bundle |
 | `project.yml`, `Support/iOS` | XcodeGen definition and resources for the iPhone and iPad app |

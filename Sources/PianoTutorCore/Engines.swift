@@ -167,7 +167,9 @@ public final class PerformanceJudge {
         }
     }
 
-    public func noteOn(_ midi: Int, at time: Double) -> Outcome {
+    /// `countStray` is false for a note that may not be a note at all (a voice picked up by
+    /// the microphone): if it matches nothing it is passed over instead of counted as a mistake.
+    public func noteOn(_ midi: Int, at time: Double, countStray: Bool = true) -> Outcome {
         var best: Int? = nil
         var bestDistance: Double = Double.greatestFiniteMagnitude
         var index: Int = firstPending
@@ -184,7 +186,9 @@ public final class PerformanceJudge {
             index += 1
         }
         guard let match = best else {
-            strays += 1
+            if countStray {
+                strays += 1
+            }
             return .stray
         }
         let offset: Double = time - targets[match].time

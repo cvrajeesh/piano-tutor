@@ -35,6 +35,13 @@ final class AudioEngine {
         try? session.setActive(true)
         #endif
 
+        // The system stops the engine when the audio route changes (headphones, microphone on or off).
+        NotificationCenter.default.addObserver(
+            forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main
+        ) { [weak self] _ in
+            self?.resume()
+        }
+
         do {
             try engine.start()
         } catch {
@@ -85,6 +92,25 @@ final class AudioEngine {
         try? AVAudioSession.sharedInstance().setActive(true)
         #endif
         try? engine.start()
+    }
+
+    /// On iPhone and iPad, lets the microphone be used while the app keeps making sound.
+    /// A Mac needs no such arrangement.
+    func setRecording(_ on: Bool) {
+        #if os(iOS)
+        let session = AVAudioSession.sharedInstance()
+        do {
+            if on {
+                try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetoothA2DP])
+            } else {
+                try session.setCategory(.playback, mode: .default)
+            }
+            try session.setActive(true)
+        } catch {
+            NSLog("Middle C: could not change the audio session (%@)", error.localizedDescription)
+        }
+        resume()
+        #endif
     }
 
     func noteOn(_ midi: Int, velocity: Int = 90) {
