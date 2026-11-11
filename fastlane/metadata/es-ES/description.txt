@@ -1,6 +1,6 @@
 Aprende a tocar el piano empezando por el do central (Middle C).
 
-Conecta tu teclado, sigue lecciones cortas y Middle C oye cada nota que tocas. Te espera mientras buscas las teclas y te marca la entrada cuando estás listo para tocar a tempo.
+Conecta tu teclado, sigue lecciones cortas y Middle C oye cada nota que tocas. Te espera mientras buscas las teclas y te marca la entrada cuando estás listo para tocar al compás.
 
 CUALQUIER TECLADO
 • Teclado USB-MIDI: conecta un teclado digital a tu iPhone, iPad o Mac y enciéndelo. Se reconoce al instante, sin instalar controladores.
@@ -9,7 +9,7 @@ CUALQUIER TECLADO
 
 DOS FORMAS DE PRACTICAR
 • Práctica: la música te espera. La siguiente tecla se ilumina, con el dedo que debes usar, y la música solo avanza cuando pulsas la correcta.
-• A tempo: un compás de clics te marca la entrada, el pentagrama avanza a ritmo constante y cada nota se valora: a tiempo, adelantada, retrasada o fallada.
+• Al compás: un compás de clics te marca la entrada, el pentagrama avanza a ritmo constante y cada nota se valora: a tiempo, adelantada, retrasada o fallada.
 
 UN CURSO PARA PRINCIPIANTES
 8 unidades y 27 lecciones cortas te llevan desde encontrar el do central hasta tocar una melodía con acordes en la mano izquierda. Cada lección dura unos minutos y se apoya en la anterior:
@@ -17,15 +17,15 @@ UN CURSO PARA PRINCIPIANTES
 • Siente el pulso
 • Lee el pentagrama
 • La mano izquierda
-• Las dos manos juntas
+• Manos juntas
 • Notas más rápidas
 • Más allá de cinco notas
 • Acordes
 
 18 CANCIONES A TU RITMO
-Piezas tradicionales y clásicas, desde Hot Cross Buns y el Himno de la alegría hasta Amazing Grace, el Minueto en sol y el comienzo de Para Elisa. Practica con la mano derecha, la izquierda o las dos, al 60 %, al 80 % o a velocidad normal.
+Piezas tradicionales y clásicas, desde Hot Cross Buns y el Himno de la alegría hasta Amazing Grace, el Minueto en Sol y el comienzo de Para Elisa. Practica con la mano derecha, la izquierda o las dos, al 60 %, al 80 % o a velocidad normal.
 
-TOCA LIBREMENTE
+TOCA LIBRE
 Toca lo que quieras y mira cómo cada nota aparece en los pentagramas de clave de sol y de fa, con su nombre. Una forma rápida de aprender dónde va cada nota.
 
 PENSADA PARA CADA DISPOSITIVO

@@ -1,1 +1,1 @@
-Conecta tu teclado y toca. Middle C oye cada nota, te espera mientras buscas las teclas y te marca la entrada cuando estás listo para tocar a tempo.
+Conecta tu teclado y toca. Middle C oye cada nota, te espera mientras buscas las teclas y te marca la entrada cuando estás listo para tocar al compás.

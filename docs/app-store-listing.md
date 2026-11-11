@@ -50,20 +50,26 @@ The listing is in nine languages, one folder each in `fastlane/metadata`:
 | `zh-Hans` | Chinese (Simplified) |
 
 The English text uses the same British English as the app and the website. The
-translations follow the English, with a few choices worth keeping when they change:
+translations use the app's own words, from its `.lproj` folders in
+`Sources/PianoTutor/Resources` (see [Localization](localization.md)), so the store page
+and the app agree. Keep them in step: when a term changes in the app, change it here
+too.
 
+- **The same terms as the app.** The modes, units and song titles are the app's
+  translations: *Entraînement* and *En rythme* in French, *Al compás* in Spanish,
+  *Studio* in Italian, リズム in Japanese, 跟拍 in Chinese; *Den Rhythmus spüren*,
+  はじめての鍵盤 and 오선 읽기 for units; よろこびの歌, 热十字面包 and 핫 크로스 번 for songs.
+- **The same tone as the app:** *tu* in French, Italian and Spanish, *du* in German,
+  *você* in Portuguese, です・ます in Japanese, 해요체 in Korean, 你 in Chinese.
 - **The name stays "Middle C"** in every language, as a brand. The text explains it
-  the first time with the local name for the note: *do central* (French, Spanish),
+  the first time with the app's name for the note: *do central* (French, Spanish),
   *do centrale* (Italian), *dó central* (Portuguese), *mittleres C* (German),
   真ん中のド (Japanese), 가운데 도 (Korean), 中央C (Chinese).
-- **German speaks to the reader as *du***, which is usual for apps. French, Italian,
-  Spanish and Portuguese use the form usual in those stores (*vous*, *tu*, *tú*,
-  *você*).
-- **Song titles** are given their usual local names where they have one (*Hymne à la
-  joie*, エリーゼのために, 欢乐颂). Traditional English tunes keep their English names.
 - **Keywords** are chosen per language, not translated word for word, and leave out
   words already in the subtitle. Keywords are limited to 100 **bytes**, and Chinese,
   Japanese and Korean characters take 3 bytes each, so those lists are short.
+- **URLs** go to the website in the same language: `/fr/support.html`,
+  `/pt-br/privacy.html` and so on. English stays at the root.
 
 **What's New** comes from the English changelog for every language (see
 [What's New](#whats-new)); App Store Connect needs it in each language the version
@@ -81,9 +87,10 @@ If the app record's primary language isn't English (U.S.), rename `en-US` (and i
 key in `screenshot_captions.json`) to match it; otherwise deliver adds the English
 text as one more language and the primary one stays empty.
 
-This is the store listing only. The app itself is localised separately, in its
-String Catalog; until it is, the screenshots show the English app with translated
-captions (see [Screenshots](#screenshots)).
+This is the store listing only; the app and the website are translated in their own
+files (see [Localization](localization.md)). Until there are captures of the
+translated app, the screenshots show the English app with translated captions (see
+[Screenshots](#screenshots)).
 
 ## The text
 

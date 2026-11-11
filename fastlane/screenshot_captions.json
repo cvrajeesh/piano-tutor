@@ -10,12 +10,12 @@
       "free-play": ["See what you play", "Every note appears on the staff, with its name."]
     },
     "fr-FR": {
-      "lesson-practice": ["Des cours de piano qui écoutent", "Branchez votre clavier. Middle C entend chaque note."],
-      "song": ["La musique vous attend", "La touche suivante s'allume, avec le doigt à utiliser."],
-      "lesson-in-time": ["Puis jouez en mesure", "Un décompte, une portée qui défile, chaque note jugée."],
+      "lesson-practice": ["Des cours de piano qui écoutent", "Branche ton clavier. Middle C entend chaque note."],
+      "song": ["La musique t'attend", "La touche suivante s'allume, avec le doigt à utiliser."],
+      "lesson-in-time": ["Puis joue en rythme", "Un décompte, une portée qui défile, chaque note jugée."],
       "learn": ["27 courtes leçons", "Du do central aux accords à la main gauche."],
       "songs": ["18 morceaux à apprendre", "Une main ou les deux, à 60 %, 80 % ou pleine vitesse."],
-      "free-play": ["Voyez ce que vous jouez", "Chaque note s'affiche sur la portée, avec son nom."]
+      "free-play": ["Vois ce que tu joues", "Chaque note s'affiche sur la portée, avec son nom."]
     },
     "de-DE": {
       "lesson-practice": ["Klavierunterricht, der zuhört", "Keyboard anschließen. Middle C hört jede Note."],
@@ -28,7 +28,7 @@
     "es-ES": {
       "lesson-practice": ["Clases de piano que escuchan", "Conecta tu teclado. Middle C oye cada nota."],
       "song": ["La música te espera", "La siguiente tecla se ilumina, con el dedo que debes usar."],
-      "lesson-in-time": ["Después, toca a tempo", "Cuenta de entrada, pentagrama en movimiento y cada nota valorada."],
+      "lesson-in-time": ["Después, toca al compás", "Cuenta de entrada, pentagrama en movimiento y cada nota valorada."],
       "learn": ["27 lecciones cortas", "Del do central a los acordes con la mano izquierda."],
       "songs": ["18 canciones para aprender", "Con una mano o con las dos, al 60 %, 80 % o a velocidad normal."],
       "free-play": ["Mira lo que tocas", "Cada nota aparece en el pentagrama, con su nombre."]
@@ -61,7 +61,7 @@
       "lesson-practice": ["내 연주를 들어 주는 피아노 레슨", "키보드를 연결하면 모든 음을 들어요."],
       "song": ["음악이 기다려 줘요", "다음 건반이 사용할 손가락과 함께 켜져요."],
       "lesson-in-time": ["이제 박자에 맞춰", "카운트, 흘러가는 악보, 한 음 한 음 판정."],
-      "learn": ["27개의 짧은 레슨", "가운데 도부터 왼손 코드까지."],
+      "learn": ["27개의 짧은 레슨", "가운데 도부터 왼손 화음까지."],
       "songs": ["내 속도로 18곡", "한 손 또는 양손, 60%, 80%, 원래 속도로."],
       "free-play": ["연주한 음을 눈으로", "모든 음이 이름과 함께 악보에 나타나요."]
     },
