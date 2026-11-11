@@ -1,6 +1,7 @@
 #!/bin/bash
 # Renders the app icons from the SVG masters in Support/Icon:
-#   Support/AppIcon.icns                                  macOS app bundle
+#   Support/AppIcon.icns                                  macOS app bundle (SwiftPM build)
+#   Support/macOS/Assets.xcassets/AppIcon.appiconset/*    Mac App Store build
 #   Support/iOS/Assets.xcassets/AppIcon.appiconset/*.png  iPhone and iPad
 # Needs librsvg and ImageMagick (brew install librsvg imagemagick) and, for the
 # .icns, macOS's iconutil. The results are checked in; rerun after editing an SVG.
@@ -32,6 +33,7 @@ mac 128 128x128;   mac 256 128x128@2x
 mac 256 256x256;   mac 512 256x256@2x
 mac 512 512x512;   mac 1024 512x512@2x
 iconutil -c icns "$SET" -o Support/AppIcon.icns
+cp "$SET"/*.png Support/macOS/Assets.xcassets/AppIcon.appiconset/
 rm -rf "$(dirname "$SET")"
 
-echo "Wrote Support/AppIcon.icns and $IOS"
+echo "Wrote Support/AppIcon.icns, Support/macOS/Assets.xcassets and $IOS"

@@ -1,0 +1,164 @@
+# Builds, signs and uploads Middle C to App Store Connect, for iOS and the Mac App Store.
+#
+#   bundle exec fastlane ios beta        # iPhone/iPad build to TestFlight
+#   bundle exec fastlane mac beta        # Mac build to TestFlight
+#   bundle exec fastlane ios release     # upload to the App Store (add submit:true to send for review)
+#   bundle exec fastlane mac release
+#   bundle exec fastlane ios certificates / mac certificates   # create or fetch signing files only
+#
+# Signing uses match: certificates and profiles live encrypted in a private git repo
+# (MATCH_GIT_URL). See "Publishing to the App Store" in README.md for the setup.
+
+default_platform(:ios)
+
+ROOT = File.expand_path("..", __dir__)
+PROJECT = File.join(ROOT, "PianoTutor.xcodeproj")
+OUTPUT_DIR = File.join(ROOT, "build", "fastlane")
+
+PLATFORMS = {
+  ios: { scheme: "PianoTutor-iOS", match: "ios", asc: "ios" },
+  mac: { scheme: "PianoTutor-macOS", match: "macos", asc: "osx" }
+}.freeze
+
+# A setting from Support/iOS/Local.xcconfig, the same file Xcode uses for local builds.
+def local_setting(key)
+  path = File.join(ROOT, "Support", "iOS", "Local.xcconfig")
+  return nil unless File.exist?(path)
+
+  File.foreach(path) do |line|
+    return Regexp.last_match(1) if line =~ /^\s*#{key}\s*=\s*(\S+)/
+  end
+  nil
+end
+
+def required_env(name)
+  value = ENV[name].to_s.strip
+  UI.user_error!("#{name} is not set. See fastlane/.env.example.") if value.empty?
+  value
+end
+
+def bundle_id
+  ENV["APP_BUNDLE_ID"] || local_setting("APP_BUNDLE_ID") || "middlec.liskovlabs.com"
+end
+
+def team
+  ENV["TEAM_ID"] || local_setting("DEVELOPMENT_TEAM") ||
+    UI.user_error!("Set TEAM_ID, or DEVELOPMENT_TEAM in Support/iOS/Local.xcconfig.")
+end
+
+def asc_key
+  @asc_key ||= begin
+    key_id = required_env("ASC_KEY_ID")
+    app_store_connect_api_key(
+      key_id: key_id,
+      issuer_id: required_env("ASC_ISSUER_ID"),
+      key_filepath: ENV["ASC_KEY_PATH"] || File.expand_path("~/.appstoreconnect/private_keys/AuthKey_#{key_id}.p8")
+    )
+  end
+end
+
+def certificates(platform)
+  setup_ci if is_ci # a temporary keychain, so match can install certificates on the runner
+
+  match(
+    type: "appstore",
+    platform: PLATFORMS[platform][:match],
+    app_identifier: bundle_id,
+    team_id: team,
+    api_key: asc_key,
+    git_url: required_env("MATCH_GIT_URL"),
+    # The Mac App Store takes a signed installer package, which needs its own certificate.
+    additional_cert_types: platform == :mac ? ["mac_installer_distribution"] : [],
+    # CI only reads the signing repo; run the certificates lane on a Mac to create or renew.
+    readonly: is_ci
+  )
+end
+
+# Generates the Xcode project, signs it with the match profile and archives it.
+# Returns the path of the .ipa (iOS) or .pkg (Mac).
+def build(platform)
+  config = PLATFORMS.fetch(platform)
+  Dir.chdir(ROOT) { sh("xcodegen", "generate") }
+
+  certificates(platform)
+  profile = lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING].fetch(bundle_id)
+
+  # The generated project uses automatic signing for local development; switch the
+  # app target (not the Swift package) to the distribution certificate and profile.
+  update_code_signing_settings(
+    path: PROJECT,
+    targets: [config[:scheme]],
+    use_automatic_signing: false,
+    team_id: team,
+    code_sign_identity: "Apple Distribution",
+    profile_name: profile,
+    bundle_identifier: bundle_id
+  )
+
+  build_number = latest_testflight_build_number(
+    api_key: asc_key,
+    app_identifier: bundle_id,
+    platform: config[:asc],
+    initial_build_number: 0
+  ) + 1
+  UI.message("Build number #{build_number}")
+
+  build_app(
+    project: PROJECT,
+    scheme: config[:scheme],
+    configuration: "Release",
+    export_method: "app-store",
+    export_team_id: team,
+    output_directory: OUTPUT_DIR,
+    clean: true,
+    xcargs: "CURRENT_PROJECT_VERSION=#{build_number}",
+    export_options: { provisioningProfiles: { bundle_id => profile } }
+  )
+end
+
+def upload_beta(platform, file)
+  upload_to_testflight(
+    api_key: asc_key,
+    app_identifier: bundle_id,
+    app_platform: PLATFORMS[platform][:asc],
+    ipa: platform == :ios ? file : nil,
+    pkg: platform == :mac ? file : nil,
+    skip_waiting_for_build_processing: true
+  )
+end
+
+def upload_release(platform, file, submit)
+  upload_to_app_store(
+    api_key: asc_key,
+    app_identifier: bundle_id,
+    platform: PLATFORMS[platform][:asc],
+    ipa: platform == :ios ? file : nil,
+    pkg: platform == :mac ? file : nil,
+    # Store text and screenshots are edited in App Store Connect for now.
+    skip_metadata: true,
+    skip_screenshots: true,
+    force: true, # no HTML preview to confirm
+    run_precheck_before_submit: false,
+    submit_for_review: submit,
+    automatic_release: false,
+    submission_information: { add_id_info_uses_idfa: false }
+  )
+end
+
+%i[ios mac].each do |os|
+  platform os do
+    desc "Create or fetch the App Store signing certificate and profile"
+    lane(:certificates) { certificates(os) }
+
+    desc "Build and sign an App Store build into build/fastlane"
+    lane(:build) { build(os) }
+
+    desc "Build and upload to TestFlight"
+    lane(:beta) { upload_beta(os, build(os)) }
+
+    desc "Build and upload to the App Store. Pass submit:true to submit for review"
+    lane(:release) do |options|
+      upload_release(os, build(os), options[:submit].to_s == "true")
+    end
+  end
+end

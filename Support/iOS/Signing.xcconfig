@@ -1,4 +1,4 @@
-// Signing for the iOS app. Put your own team in Local.xcconfig next to this file
+// Signing for the iOS and Mac App Store apps. Put your own team in Local.xcconfig next to this file
 // (it is ignored by git), for example:
 //
 //   DEVELOPMENT_TEAM = ABCDE12345

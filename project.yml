@@ -4,12 +4,16 @@
 #   xcodegen generate
 #   open PianoTutor.xcodeproj
 #
-# The macOS app does not need this; it is built by SwiftPM (see scripts/build-app.sh).
+# PianoTutor-macOS is the sandboxed Mac App Store build. For a quick local Mac build
+# you don't need this; SwiftPM builds it (see scripts/build-app.sh).
+#
+# Releases are built, signed and uploaded by fastlane (see fastlane/Fastfile).
 name: PianoTutor
 options:
   bundleIdPrefix: com.pianotutor
   deploymentTarget:
     iOS: "16.0"
+    macOS: "13.0"
   createIntermediateGroups: true
 packages:
   PianoTutor:
@@ -33,9 +37,11 @@ targets:
     settings:
       base:
         PRODUCT_NAME: PianoTutor
-        MARKETING_VERSION: 0.1.0
+        MARKETING_VERSION: &marketingVersion 0.1.0
+        # fastlane overrides this with the next free build number when it uploads.
         CURRENT_PROJECT_VERSION: 1
         SWIFT_VERSION: "5.0"
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
         TARGETED_DEVICE_FAMILY: "1,2"
         GENERATE_INFOPLIST_FILE: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -48,10 +54,49 @@ targets:
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+  PianoTutor-macOS:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/PianoTutor
+      - path: Support/macOS
+        excludes:
+          - "*.entitlements"
+      - path: Support/iOS/PrivacyInfo.xcprivacy
+    dependencies:
+      - package: PianoTutor
+        product: PianoTutorCore
+    # Same bundle identifier as the iOS app, so one App Store record covers both
+    # (universal purchase).
+    configFiles:
+      Debug: Support/iOS/Signing.xcconfig
+      Release: Support/iOS/Signing.xcconfig
+    settings:
+      base:
+        PRODUCT_NAME: Middle C
+        PRODUCT_MODULE_NAME: PianoTutor
+        MARKETING_VERSION: *marketingVersion
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: "5.0"
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_ENTITLEMENTS: Support/macOS/MiddleC.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        COMBINE_HIDPI_IMAGES: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Middle C
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.education
+        INFOPLIST_KEY_NSPrincipalClass: NSApplication
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
 schemes:
   PianoTutor-iOS:
     build:
       targets:
         PianoTutor-iOS: all
+    run:
+      config: Debug
+  PianoTutor-macOS:
+    build:
+      targets:
+        PianoTutor-macOS: all
     run:
       config: Debug
