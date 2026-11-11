@@ -1,0 +1,38 @@
+name: PR title
+
+# Checks that the PR title is a Conventional Commit, such as "feat: Show the next
+# note" or "fix(midi): Reconnect after sleep". PRs are squash-merged with the PR title
+# as the commit message, so this title is what Release Please reads to choose the next
+# version and to sort the changelog into Features and Bug Fixes.
+#
+# pull_request_target runs this check with the base branch's workflow and never checks
+# out the PR's code, so it also works for PRs from forks.
+
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  conventional-title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # feat and fix appear in the changelog (as do perf and revert); the rest don't.
+          types: |
+            feat
+            fix
+            perf
+            revert
+            refactor
+            docs
+            test
+            build
+            ci
+            chore
+          requireScope: false
