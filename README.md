@@ -86,11 +86,11 @@ Apple developer team, then generate the project again:
 
 ```
 DEVELOPMENT_TEAM = ABCDE12345
-APP_BUNDLE_ID = com.example.pianotutor
 ```
 
-`APP_BUNDLE_ID` is optional; set it if `com.liskovlabs.middlec` is not available to
-your team.
+The bundle identifier is `com.liskovlabs.middlec`. If that is not available to your
+team, add `APP_BUNDLE_ID` to the same file with your own, in reverse-DNS form
+(your domain backwards, then the app name).
 
 - **iPad** shows the same layout as the Mac. All 61 keys are shown when they fit.
 - **iPhone** works upright or on its side. The on-screen keyboard shows as many
@@ -163,6 +163,10 @@ the App Store instead, or submit for review. Add these repository secrets:
 | `MATCH_PASSWORD` | The match passphrase |
 | `MATCH_GIT_BASIC_AUTHORIZATION` | `echo -n "github-user:token" \| base64`, with a token that can read the signing repository |
 | `TEAM_ID` | Your Apple developer team ID |
+
+The bundle identifier defaults to `com.liskovlabs.middlec`. To release under a
+different one, add a repository **variable** (not a secret, so it stays readable in
+the logs) named `APP_BUNDLE_ID`.
 
 On CI, match only reads the signing repository. Create or renew certificates on
 your Mac with the `certificates` lanes.
