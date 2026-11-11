@@ -123,6 +123,9 @@ Store text and screenshots are edited in App Store Connect.
 
 ### One-time setup
 
+A step-by-step walkthrough of this setup is in
+[`docs/app-store-setup.md`](docs/app-store-setup.md).
+
 1. **App Store Connect.** Create the app record with the bundle identifier
    (`middlec.liskovlabs.com`) and add both the iOS and macOS platforms.
 2. **API key.** Under Users and Access → Integrations → App Store Connect API,
