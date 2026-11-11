@@ -163,9 +163,20 @@ struct SettingsView: View {
         section("Support Middle C") {
             note("Middle C has no ads and no tracking. If you enjoy learning with it, a coffee helps fund its development.")
             Link(destination: Links.buyMeACoffee) {
-                Label("Buy me a coffee", systemImage: "cup.and.saucer.fill")
+                HStack(spacing: 8) {
+                    BuyMeACoffeeLogo()
+                        .frame(height: 22)
+                    Text("Buy me a coffee")
+                }
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                .foregroundColor(BuyMeACoffeeLogo.ink)
+                .padding(.leading, 14)
+                .padding(.trailing, 18)
+                .padding(.vertical, 8)
+                .background(BuyMeACoffeeLogo.yellow)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
             }
-            .buttonStyle(PrimaryButtonStyle())
+            .buttonStyle(.plain)
         }
     }
 }
