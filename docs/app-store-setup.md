@@ -156,10 +156,14 @@ gh secret set TEAM_ID --body "<DEVELOPMENT_TEAM from Local.xcconfig>"
 
 On CI, `MATCH_GIT_URL` must be the **HTTPS** URL, not the SSH one from your `.env`.
 
-Pushing a tag that matches `MARKETING_VERSION` in `project.yml` then sends both
-apps to TestFlight:
+Let Release Please open its release PR (Settings → Actions → General → **Allow
+GitHub Actions to create and approve pull requests**), or from the terminal:
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+gh api -X PUT repos/<github-user>/piano-tutor/actions/permissions/workflow \
+  -f default_workflow_permissions=read -F can_approve_pull_request_reviews=true
 ```
+
+From then on, every push to `main` that changes the app sends both apps to
+TestFlight, and merging the Release Please PR uploads the new version to the App
+Store. See [Releases](../README.md#releases) in the README.

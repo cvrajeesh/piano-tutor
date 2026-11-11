@@ -2,10 +2,10 @@ name: Release
 
 # Builds, signs and uploads the iOS and Mac App Store apps with fastlane.
 #
-# - Pushing a tag such as v0.2.0 sends both apps to TestFlight. The tag must match
-#   MARKETING_VERSION in project.yml.
+# - release-please.yml calls this after every push to main: a TestFlight build, or,
+#   when the push merged a Release Please PR, an App Store upload of the new version.
 # - Run it by hand (Actions → Release → Run workflow) to choose the platform, upload
-#   to the App Store instead, and optionally submit for review.
+#   to the App Store, and optionally submit for review.
 #
 # Repository secrets it needs (see "Publishing to the App Store" in README.md):
 #   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8    App Store Connect API key
@@ -17,8 +17,24 @@ name: Release
 #   APP_BUNDLE_ID                            overrides the bundle ID in the Fastfile
 
 on:
-  push:
-    tags: ["v*"]
+  workflow_call:
+    inputs:
+      platform:
+        description: "both, ios or mac"
+        type: string
+        default: both
+      lane:
+        description: "beta: TestFlight, release: App Store"
+        type: string
+        default: beta
+      submit:
+        description: Submit for review (release only)
+        type: boolean
+        default: false
+      tag:
+        description: Release tag to build, such as v0.2.0. It must match MARKETING_VERSION.
+        type: string
+        default: ""
   workflow_dispatch:
     inputs:
       platform:
@@ -36,11 +52,6 @@ on:
         type: boolean
         default: false
 
-# One upload per platform at a time, so two runs never pick the same build number.
-concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
   release:
     name: ${{ matrix.platform }} ${{ inputs.lane || 'beta' }}
@@ -49,7 +60,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.platform != 'both') && format('["{0}"]', inputs.platform) || '["ios","mac"]') }}
+        platform: ${{ fromJSON((inputs.platform && inputs.platform != 'both') && format('["{0}"]', inputs.platform) || '["ios","mac"]') }}
+    # One upload per platform at a time, so two runs never pick the same build number.
+    # Betas and releases queue separately, so a newer beta never displaces a waiting release.
+    concurrency:
+      group: upload-${{ matrix.platform }}-${{ inputs.lane || 'beta' }}
+      cancel-in-progress: false
     env:
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
@@ -63,13 +79,17 @@ jobs:
       FASTLANE_HIDE_CHANGELOG: "1"
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
 
       - name: Check the tag matches the app version
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: inputs.tag || startsWith(github.ref, 'refs/tags/v')
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          version=$(sed -n 's/.*MARKETING_VERSION: &marketingVersion //p' project.yml)
-          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match MARKETING_VERSION $version in project.yml"
+          version=$(sed -n 's/.*MARKETING_VERSION: &marketingVersion \([0-9][0-9.]*\).*/\1/p' project.yml)
+          if [ "v$version" != "$TAG" ]; then
+            echo "::error::Tag $TAG does not match MARKETING_VERSION $version in project.yml"
             exit 1
           fi
 

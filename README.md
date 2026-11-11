@@ -117,9 +117,41 @@ record covers both (universal purchase). The Mac App Store build is the sandboxe
 | `bundle exec fastlane ios build` / `mac build` | Signed `.ipa` / `.pkg` in `build/fastlane`, no upload |
 | `bundle exec fastlane ios certificates` / `mac certificates` | Create or fetch the signing certificate and profile |
 
-The version shown in the store is `MARKETING_VERSION` in `project.yml`. The build
-number is set automatically to one more than the latest build on TestFlight.
-Store text and screenshots are edited in App Store Connect.
+The version shown in the store is `MARKETING_VERSION` in `project.yml`, which
+[Release Please](#releases) sets. The build number is set automatically to one
+more than the latest build on TestFlight. Store text and screenshots are edited in
+App Store Connect.
+
+### Releases
+
+Versions and the changelog come from
+[Release Please](https://github.com/googleapis/release-please), which reads
+[Conventional Commit](https://www.conventionalcommits.org) messages on `main`:
+
+| Commit or PR title | Effect on the next version (while below 1.0) |
+| --- | --- |
+| `fix: …` | patch: 0.1.0 → 0.1.1 |
+| `feat: …` | minor: 0.1.0 → 0.2.0 |
+| `feat!: …` or a `BREAKING CHANGE:` footer | minor while below 1.0, major after |
+| `docs:`, `chore:`, `ci:`, `refactor:`, `test:` … | none, and left out of the changelog |
+
+Pull requests are squash-merged, and the PR title becomes the commit message on
+`main`, so **the PR title is what counts**. The PR title check
+(`.github/workflows/pr-title.yml`) fails until the title has one of these
+prefixes: `feat`, `fix`, `perf`, `revert`, `refactor`, `docs`, `test`, `build`,
+`ci`, `chore`. A scope is optional: `fix(midi): Reconnect after sleep`. Commits on
+the branch itself can be worded any way you like.
+
+1. **Every push to `main`** that changes the app sends a build to TestFlight, with
+   the current version and a new build number.
+2. **Release Please keeps a release PR open** ("chore(main): release 0.2.0") with
+   the next version and the `CHANGELOG.md` entries. It updates as more commits land.
+3. **Merging the release PR** bumps `MARKETING_VERSION` in `project.yml`, tags
+   `v0.2.0`, creates a GitHub Release and uploads both apps to the App Store. Submit
+   the version for review in App Store Connect, or run the Release workflow by hand
+   with `release` and `submit`.
+
+To set the next version yourself, add `Release-As: 1.0.0` to the body of a commit.
 
 ### One-time setup
 
@@ -150,10 +182,17 @@ A step-by-step walkthrough of this setup is in
 
 ### GitHub Actions
 
-`.github/workflows/release.yml` runs the same lanes on GitHub. Pushing a tag
-that matches the version (for example `v0.1.0`) sends both apps to TestFlight.
-Run the workflow by hand from the Actions tab to choose a platform, upload to
-the App Store instead, or submit for review. Add these repository secrets:
+`.github/workflows/release.yml` runs the same lanes on GitHub.
+`.github/workflows/release-please.yml` calls it on every push to `main`, as
+described in [Releases](#releases). Run the Release workflow by hand from the
+Actions tab to choose a platform, upload to the App Store, or submit for review.
+
+Release Please opens its PR with the workflow's `GITHUB_TOKEN`, so under Settings →
+Actions → General, tick **Allow GitHub Actions to create and approve pull
+requests**. Pull requests opened that way don't start the Build workflow; that's
+fine for the release PR, which only changes the version and changelog.
+
+Add these repository secrets:
 
 | Secret | Value |
 | --- | --- |
