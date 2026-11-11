@@ -14,9 +14,9 @@ listens to what you play.
 Written in Swift with SwiftUI, CoreMIDI and AVFoundation. No third-party code;
 the piano sound comes from the General MIDI bank built into macOS.
 
-> **Status:** this first version was written without access to a Mac, so it has
-> not been compiled or run yet. The lesson and song data have been checked by
-> script. Expect to fix a few compiler errors on the first build.
+> **Status:** the app builds and its unit tests pass on macOS (see the Build
+> workflow), but it was written without access to a Mac and has not been run by
+> hand yet. Expect rough edges in the notation drawing and layout.
 
 ## Requirements
 
@@ -32,6 +32,12 @@ open "build/Piano Tutor.app"
 
 The script builds a release binary and wraps it in an app bundle. You can move
 `Piano Tutor.app` to your Applications folder.
+
+Every push also builds the app on GitHub Actions; the result is attached to the
+workflow run as the `PianoTutor-app` artifact. A downloaded copy is not
+notarised, so macOS blocks it on first launch: right-click the app and choose
+**Open**, or allow it under System Settings → Privacy & Security. An app you
+build yourself with the script above opens normally.
 
 For development, either run it straight from the package:
 
