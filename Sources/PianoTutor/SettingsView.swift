@@ -161,7 +161,7 @@ struct SettingsView: View {
 
     private var supportSection: some View {
         section("Support Middle C") {
-            note("Middle C has no ads and no tracking. If it helps you learn, you can say thanks with a coffee. It goes towards new lessons and songs.")
+            note("Middle C has no ads and no tracking. If it helps you learn, you can say thanks with a coffee. It supports the development effort.")
             Link(destination: Links.buyMeACoffee) {
                 Label("Buy me a coffee", systemImage: "cup.and.saucer.fill")
             }
