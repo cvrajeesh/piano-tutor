@@ -13,6 +13,7 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
 cp "$BIN_DIR/PianoTutor" "$APP/Contents/MacOS/PianoTutor"
 cp Support/Info.plist "$APP/Contents/Info.plist"
+cp Support/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 cp Sources/PianoTutor/Resources/Bravura.otf "$APP/Contents/Resources/Bravura.otf"
 cp Sources/PianoTutor/Resources/Bravura-LICENSE.txt "$APP/Contents/Resources/Bravura-LICENSE.txt"
 

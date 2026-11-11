@@ -1,0 +1,11 @@
+<!-- Middle C app icon: full-bleed square for iPhone and iPad (the system rounds the corners). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A3350"/><stop offset="1" stop-color="#121724"/></linearGradient><linearGradient id="am" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFCB63"/><stop offset="1" stop-color="#F5A623"/></linearGradient><linearGradient id="pp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFDF6"/><stop offset="1" stop-color="#F3EBD6"/></linearGradient></defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect x="196" y="200" width="200" height="624" rx="34" fill="url(#am)"/>
+  <rect x="412" y="200" width="200" height="624" rx="34" fill="url(#pp)"/>
+  <rect x="628" y="200" width="200" height="624" rx="34" fill="url(#pp)"/>
+  <rect x="340" y="184" width="128" height="390" rx="26" fill="#161B29"/>
+  <rect x="556" y="184" width="128" height="390" rx="26" fill="#161B29"/>
+  <ellipse cx="296" cy="716" rx="58" ry="42" transform="rotate(-22 296 716)" fill="#1C2130"/>
+</svg>

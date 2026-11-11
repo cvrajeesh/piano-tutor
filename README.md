@@ -88,7 +88,7 @@ DEVELOPMENT_TEAM = ABCDE12345
 APP_BUNDLE_ID = com.example.pianotutor
 ```
 
-`APP_BUNDLE_ID` is optional; set it if `com.pianotutor.app` is not available to
+`APP_BUNDLE_ID` is optional; set it if `middlec.liskovlabs.com` is not available to
 your team.
 
 - **iPad** shows the same layout as the Mac. All 61 keys are shown when they fit.

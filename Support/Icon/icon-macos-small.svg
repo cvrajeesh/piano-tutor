@@ -1,0 +1,16 @@
+<!-- Middle C app icon for macOS: simplified for 16 and 32 px. An 824 pt rounded tile with a shadow, centred on a 1024 pt canvas. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A3350"/><stop offset="1" stop-color="#121724"/></linearGradient><linearGradient id="am" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFCB63"/><stop offset="1" stop-color="#F5A623"/></linearGradient><linearGradient id="pp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFDF6"/><stop offset="1" stop-color="#F3EBD6"/></linearGradient>
+    <clipPath id="tile"><rect x="100" y="100" width="824" height="824" rx="185"/></clipPath>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="125%"><feGaussianBlur in="SourceAlpha" stdDeviation="10"/><feOffset dy="10"/><feComponentTransfer><feFuncA type="linear" slope="0.3"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="#121724" filter="url(#shadow)"/>
+  <g clip-path="url(#tile)"><svg x="100" y="100" width="824" height="824" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect x="136" y="150" width="236" height="724" rx="40" fill="url(#am)"/>
+  <rect x="394" y="150" width="236" height="724" rx="40" fill="url(#pp)"/>
+  <rect x="652" y="150" width="236" height="724" rx="40" fill="url(#pp)"/>
+  <rect x="306" y="130" width="154" height="450" rx="30" fill="#161B29"/>
+  <rect x="564" y="130" width="154" height="450" rx="30" fill="#161B29"/>
+  </svg></g>
+</svg>
