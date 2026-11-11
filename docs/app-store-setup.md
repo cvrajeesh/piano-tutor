@@ -163,5 +163,43 @@ gh api -X PUT repos/<github-user>/piano-tutor/actions/permissions/workflow \
   -f default_workflow_permissions=read -F can_approve_pull_request_reviews=true
 ```
 
+Optionally, add the App Review contact, so it doesn't have to be typed into App Store
+Connect:
+
+```bash
+gh secret set REVIEW_FIRST_NAME --body "<first name>"
+gh secret set REVIEW_LAST_NAME --body "<last name>"
+gh secret set REVIEW_EMAIL --body "<email>"
+gh secret set REVIEW_PHONE --body "<phone, with country code>"
+```
+
 From then on, merging the Release Please PR sends the new version of both apps to
 TestFlight. Other pushes to `main` don't upload anything. See the [release process](release-process.md).
+
+## Step 6: The store listing
+
+The App Store text, screenshots, age rating and review notes are in the repository
+and uploaded by fastlane (see [App Store listing](app-store-listing.md)). A few
+things can't be, and are done once:
+
+1. **uv**, which makes the screenshots: `brew install uv`. CI installs it itself.
+2. **App Privacy.** Apple's API keys can't edit it, so log in with your Apple ID:
+
+   ```bash
+   FASTLANE_USER=you@example.com bundle exec fastlane privacy
+   ```
+
+   It uploads `fastlane/app_privacy_details.json` ("Data Not Collected") and
+   publishes it.
+3. **Pricing and Availability.** In App Store Connect, set the price (Free, or a
+   price) and the countries.
+4. **App Review contact.** Either the `REVIEW_*` values in `fastlane/.env` and the
+   secrets above, or App Store Connect → the version → **App Review Information**.
+5. **Check the listing** without sending a build:
+
+   ```bash
+   bundle exec fastlane ios metadata
+   bundle exec fastlane mac metadata
+   ```
+
+   Then open the version in App Store Connect and look at the text and screenshots.

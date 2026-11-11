@@ -1,0 +1,1 @@
+Plug in your keyboard and play. Middle C hears every note, waits while you find the keys, then counts you in when you're ready to play in time.

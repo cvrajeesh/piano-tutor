@@ -5,7 +5,9 @@ and the App Store: how versions are chosen, what runs on GitHub Actions, what yo
 by hand, and how to release from your own Mac.
 
 Before the first release, do the [one-time setup](app-store-setup.md): the App Store
-Connect record, the API key, the signing repository and the GitHub secrets.
+Connect record, the API key, the signing repository and the GitHub secrets. The store
+page itself (text, screenshots, age rating, review notes) is described in
+[App Store listing](app-store-listing.md).
 
 ## At a glance
 
@@ -33,10 +35,12 @@ flowchart LR
 | `.github/workflows/release-please.yml` | Runs on every push to `main`: updates the release PR, and calls the Release workflow when the release PR is merged |
 | `.github/workflows/release.yml` | Builds, signs and uploads with fastlane, once per platform. Can also be run by hand |
 | `.github/workflows/ci.yml` | The Build workflow: builds and tests every push and PR. It does not publish anything |
+| `.github/workflows/store-listing.yml` | Checks the store text and makes the store screenshots on PRs that change them |
+| `fastlane/metadata`, `scripts/store-assets.py` | The App Store text and the screenshots (see [App Store listing](app-store-listing.md)) |
 | `release-please-config.json`, `.release-please-manifest.json` | Release Please settings and the last released version |
-| `fastlane/Fastfile` | The `certificates`, `build`, `beta` and `release` lanes for `ios` and `mac` |
+| `fastlane/Fastfile` | The `certificates`, `build`, `beta`, `release` and `metadata` lanes for `ios` and `mac`, and `privacy` |
 | `project.yml` | `MARKETING_VERSION`, the version shown in the store |
-| `CHANGELOG.md`, `version.txt` | Written by Release Please |
+| `CHANGELOG.md`, `version.txt` | Written by Release Please. The version's changelog section becomes What's New in the store |
 
 The iPhone/iPad app and the Mac app share one bundle identifier
 (`com.liskovlabs.middlec`), so one App Store record covers both (universal
@@ -81,8 +85,9 @@ A scope is optional: `fix(midi): Reconnect after sleep`. The PR title check
 `revert`, `refactor`, `docs`, `test`, `build`, `ci` or `chore`. If you edit the
 title, the check runs again.
 
-The title is also the changelog line, so write it for someone reading the release
-notes: `feat: Play songs at 60% speed`, not `feat: add speed param`.
+The title is also the changelog line, and the changelog becomes **What's New** on the
+App Store page, so write it for someone reading the release notes:
+`feat: Play songs at 60% speed`, not `feat: add speed param`.
 
 ## Every push to `main`
 
@@ -110,7 +115,10 @@ The Release workflow, for iOS and Mac in parallel:
    4. asks App Store Connect for the latest TestFlight build number and adds one;
    5. archives and exports a signed `.ipa` or `.pkg` into `build/fastlane`;
    6. uploads it: `beta` to TestFlight without waiting for Apple to process it,
-      `release` with `deliver` (see [Running the Release workflow by hand](#running-the-release-workflow-by-hand)).
+      `release` with `deliver`, together with the store listing (see
+      [Running the Release workflow by hand](#running-the-release-workflow-by-hand)).
+
+   The `metadata` lane skips steps 1–5 and uploads only the store listing.
 4. Keeps the `.ipa`/`.pkg` and the dSYMs as a workflow artifact
    (`MiddleC-ios-<run>` or `MiddleC-mac-<run>`) for 30 days.
 5. Deletes the key file.
@@ -161,16 +169,18 @@ changes the version and the changelog.
    processed it, a few minutes later. Try it on a device and on a Mac. If something
    is wrong, merge a `fix:` PR and release again; the broken version is never
    submitted.
-6. **Submit for review.** In App Store Connect, add the new version for iOS and for
-   macOS (**+** next to the platform) if it isn't there yet. For each one: select
-   the TestFlight build, fill in **What's New in This Version** (the GitHub Release
-   notes are a good start), check the screenshots, and click **Add for Review**,
-   then **Submit for Review**.
+6. **Submit for review.** Run the Release workflow by hand from the tag
+   (**Use workflow from** → `vX.Y.Z`) with lane `release` and **Submit for review**
+   ticked (see below). For each platform it builds and uploads again with a new build
+   number, creates the version in App Store Connect, uploads the store listing and
+   screenshots, fills in What's New from the changelog, checks the text with
+   precheck, and submits it. See [App Store listing](app-store-listing.md) for what
+   it uploads.
 
-   Or run the Release workflow by hand from the tag with lane `release` and
-   **Submit for review** ticked (see below). That builds and uploads again with a
-   new build number, creates the version and submits it, but still won't fill in
-   What's New for you.
+   To submit by hand instead: in App Store Connect, add the new version for iOS and
+   for macOS (**+** next to the platform), select the TestFlight build, and click
+   **Add for Review**, then **Submit for Review**. Run the `metadata` lane first so
+   the listing and screenshots are up to date.
 7. **Release it.** When Apple approves a version it waits as **Pending Developer
    Release**. Click **Release This Version** in App Store Connect.
 
@@ -202,7 +212,7 @@ Actions → **Release** → **Run workflow**, then choose:
 | --- | --- | --- |
 | Use workflow from | a branch such as `main`, or a tag such as `v0.2.0` | The code that is built |
 | Which app | `both`, `ios`, `mac` | One platform or both |
-| `lane` | `beta`, `release` | TestFlight, or the App Store |
+| `lane` | `beta`, `release`, `metadata` | TestFlight; the App Store with the store listing; or only the store listing, without a build |
 | Submit for review | on / off | Only for `release`: submit the uploaded build for review |
 
 A manual run builds the branch or tag you choose, with its `MARKETING_VERSION`.
@@ -211,7 +221,8 @@ From a tag, it first checks that the tag matches that version. Use it to:
 - send a TestFlight build of `main` (or a branch) between releases;
 - retry an upload that failed;
 - build one platform only;
-- submit a release from its tag in one step (lane `release`, **Submit for review** on).
+- submit a release from its tag in one step (lane `release`, **Submit for review** on);
+- update the store text or screenshots for the version being prepared (lane `metadata`).
 
 ## Releasing from your Mac
 
@@ -221,7 +232,9 @@ The same lanes work locally once `fastlane/.env` is filled in (see the
 | Command | What it does |
 | --- | --- |
 | `bundle exec fastlane ios beta` / `mac beta` | Build, sign and upload to TestFlight |
-| `bundle exec fastlane ios release` / `mac release` | Upload to the App Store; add `submit:true` to submit for review |
+| `bundle exec fastlane ios release` / `mac release` | Upload a build and the store listing to the App Store; add `submit:true` to submit for review |
+| `bundle exec fastlane ios metadata` / `mac metadata` | Upload only the store listing and screenshots |
+| `bundle exec fastlane privacy` | Upload the App Privacy answers (Apple ID login) |
 | `bundle exec fastlane ios build` / `mac build` | Signed `.ipa` / `.pkg` in `build/fastlane`, no upload |
 | `bundle exec fastlane ios certificates` / `mac certificates` | Create or fetch the signing certificate and profile |
 
@@ -244,6 +257,7 @@ has the commands to set them.
 | `MATCH_PASSWORD` | The match passphrase |
 | `MATCH_GIT_BASIC_AUTHORIZATION` | `echo -n "github-user:token" \| base64`, with a token that can read the signing repository |
 | `TEAM_ID` | Your Apple developer team ID |
+| `REVIEW_FIRST_NAME`, `REVIEW_LAST_NAME`, `REVIEW_EMAIL`, `REVIEW_PHONE` | Optional: the App Review contact. When unset, the values in App Store Connect are kept |
 
 The bundle identifier defaults to `com.liskovlabs.middlec`. To release under a
 different one, add a repository **variable** (not a secret, so it stays readable in
@@ -287,6 +301,15 @@ a new version.
 **A certificate or profile has expired.** Run `bundle exec fastlane ios certificates`
 and `mac certificates` on your Mac with an Admin API key. CI picks up the new files
 from the signing repository on its next run.
+
+**precheck stops the submission.** The `release` lane checks the store text before
+it submits, and stops on anything App Review is likely to reject: a broken URL (is
+the website up?), other platforms' names, placeholder text. Fix the file in
+`fastlane/metadata` named in the log, merge it, and run the lane again.
+
+**deliver can't change the description, keywords or screenshots.** The version is already waiting for review
+or live, and App Store Connect only takes the description, keywords and screenshots
+for a version that is still being prepared. Change them with the next version.
 
 **An upload fails half way.** Each platform runs as its own job, so the other one
 may have succeeded. Re-run the failed job, or run the Release workflow by hand for

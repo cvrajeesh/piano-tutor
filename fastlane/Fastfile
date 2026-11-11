@@ -2,22 +2,36 @@
 #
 #   bundle exec fastlane ios beta        # iPhone/iPad build to TestFlight
 #   bundle exec fastlane mac beta        # Mac build to TestFlight
-#   bundle exec fastlane ios release     # upload to the App Store (add submit:true to send for review)
+#   bundle exec fastlane ios release     # build, upload with the store listing (add submit:true to send for review)
 #   bundle exec fastlane mac release
+#   bundle exec fastlane ios metadata    # upload only the store listing and screenshots, no build
+#   bundle exec fastlane mac metadata
+#   bundle exec fastlane privacy         # App Privacy answers (needs an Apple ID login, not the API key)
 #   bundle exec fastlane ios certificates / mac certificates   # create or fetch signing files only
 #
 # Signing uses match: certificates and profiles live encrypted in a private git repo
-# (MATCH_GIT_URL). See docs/app-store-setup.md for the setup.
+# (MATCH_GIT_URL). See docs/app-store-setup.md for the setup, and
+# docs/app-store-listing.md for the store text and screenshots.
 
 default_platform(:ios)
 
 ROOT = File.expand_path("..", __dir__)
 PROJECT = File.join(ROOT, "PianoTutor.xcodeproj")
 OUTPUT_DIR = File.join(ROOT, "build", "fastlane")
+METADATA_DIR = File.join(__dir__, "metadata")
+SCREENSHOTS_DIR = File.join(__dir__, "screenshots")
+LOCALE = "en-US"
 
 PLATFORMS = {
-  ios: { scheme: "PianoTutor-iOS", match: "ios", asc: "ios" },
-  mac: { scheme: "PianoTutor-macOS", match: "macos", asc: "osx" }
+  ios: { scheme: "PianoTutor-iOS", match: "ios", asc: "ios", screenshots: "ios" },
+  mac: { scheme: "PianoTutor-macOS", match: "macos", asc: "osx", screenshots: "mac" }
+}.freeze
+
+# Release Please's changelog headings, as they read in What's New.
+CHANGELOG_HEADINGS = {
+  "Features" => "New",
+  "Bug Fixes" => "Fixes",
+  "Performance Improvements" => "Faster"
 }.freeze
 
 # A setting from Support/iOS/Local.xcconfig, the same file Xcode uses for local builds.
@@ -128,21 +142,103 @@ def upload_beta(platform, file)
   )
 end
 
-def upload_release(platform, file, submit)
+# MARKETING_VERSION from project.yml, the version Release Please last set.
+def marketing_version
+  File.read(File.join(ROOT, "project.yml"))[/MARKETING_VERSION: &marketingVersion ([0-9.]+)/, 1] ||
+    UI.user_error!("Could not find MARKETING_VERSION in project.yml")
+end
+
+# What's New for this version: its section of CHANGELOG.md, without the links and
+# commit hashes. nil when there is none. App Store Connect has no What's New for an
+# app's first version, and deliver leaves it out then.
+def release_notes
+  path = File.join(ROOT, "CHANGELOG.md")
+  return nil unless File.exist?(path)
+
+  section = File.read(path)
+                .split(/^## /)
+                .find { |part| part.start_with?("[#{marketing_version}]", "#{marketing_version} ") }
+  return nil unless section
+
+  lines = section.lines.drop(1).filter_map do |line|
+    if (heading = line[/^### (.+)/, 1])
+      "\n#{CHANGELOG_HEADINGS.fetch(heading.strip, heading.strip)}"
+    elsif (item = line[/^\* (.+)/, 1])
+      item = item.gsub(/\s*\(\[[^\]]*\]\([^)]*\)\)/, "") # ([#17](…)) and ([b73b5ab](…))
+                 .gsub(/\*\*([^*]+):\*\* /, "")          # **scope:**
+                 .gsub(/\[([^\]]+)\]\([^)]*\)/, '\1')     # any other links
+      "• #{item.strip}"
+    end
+  end
+  notes = lines.join("\n").strip
+  notes.empty? ? nil : notes[0, 4000]
+end
+
+# Contact details for App Review. They stay out of the repository; anything unset
+# keeps the value already in App Store Connect. The notes come from
+# fastlane/metadata/review_information/notes.txt.
+def review_contact
+  {
+    first_name: ENV["REVIEW_FIRST_NAME"],
+    last_name: ENV["REVIEW_LAST_NAME"],
+    email_address: ENV["REVIEW_EMAIL"],
+    phone_number: ENV["REVIEW_PHONE"]
+  }.reject { |_, value| value.to_s.strip.empty? }
+end
+
+# Checks the store text and makes the screenshots in fastlane/screenshots
+# (scripts/store-assets.py, which needs uv).
+def store_assets
+  Dir.chdir(ROOT) { sh("uv", "run", "--quiet", "scripts/store-assets.py") }
+end
+
+# Uploads the store listing (text, screenshots, age rating, review notes) and, when
+# file is given, the build. Without a build, the version is the one in project.yml.
+def upload_store(platform, file: nil, submit: false)
+  store_assets
+  notes = release_notes
+  UI.message(notes ? "What's New:\n#{notes}" : "No CHANGELOG.md section for #{marketing_version}; What's New is left as it is")
+
   upload_to_app_store(
     api_key: asc_key,
     app_identifier: bundle_id,
     platform: PLATFORMS[platform][:asc],
     ipa: platform == :ios ? file : nil,
     pkg: platform == :mac ? file : nil,
-    # Store text and screenshots are edited in App Store Connect for now.
-    skip_metadata: true,
-    skip_screenshots: true,
+    skip_binary_upload: file.nil?,
+    app_version: file.nil? ? marketing_version : nil,
+    metadata_path: METADATA_DIR,
+    screenshots_path: File.join(SCREENSHOTS_DIR, PLATFORMS[platform][:screenshots]),
+    overwrite_screenshots: true,
+    app_rating_config_path: File.join(__dir__, "age_rating.json"),
+    app_review_information: review_contact,
+    release_notes: notes ? { LOCALE => notes } : nil,
     force: true, # no HTML preview to confirm
-    run_precheck_before_submit: false,
+    # Checks the text for things App Review rejects. In-app purchases can't be
+    # checked with an API key, and the app has none.
+    run_precheck_before_submit: submit,
+    precheck_default_rule_level: :error,
+    precheck_include_in_app_purchases: false,
     submit_for_review: submit,
     automatic_release: false,
-    submission_information: { add_id_info_uses_idfa: false }
+    submission_information: {
+      add_id_info_uses_idfa: false,
+      # The app bundles the Bravura music font (SIL Open Font License); the tunes are
+      # in the public domain.
+      content_rights_contains_third_party_content: true,
+      content_rights_has_rights: true
+    }
+  )
+end
+
+desc "Upload the App Privacy answers in fastlane/app_privacy_details.json (Apple ID login; not on CI)"
+lane :privacy do
+  # Apple's API keys can't edit App Privacy, so this logs in as FASTLANE_USER.
+  upload_app_privacy_details_to_app_store(
+    username: required_env("FASTLANE_USER"),
+    team_id: ENV["FASTLANE_ITC_TEAM_ID"],
+    app_identifier: bundle_id,
+    json_path: File.join(__dir__, "app_privacy_details.json")
   )
 end
 
@@ -157,9 +253,12 @@ end
     desc "Build and upload to TestFlight"
     lane(:beta) { upload_beta(os, build(os)) }
 
-    desc "Build and upload to the App Store. Pass submit:true to submit for review"
+    desc "Build and upload to the App Store with the store listing. Pass submit:true to submit for review"
     lane(:release) do |options|
-      upload_release(os, build(os), options[:submit].to_s == "true")
+      upload_store(os, file: build(os), submit: options[:submit].to_s == "true")
     end
+
+    desc "Upload the store listing and screenshots to the version in project.yml, without a build"
+    lane(:metadata) { upload_store(os) }
   end
 end
