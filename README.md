@@ -18,6 +18,24 @@ on a Mac the piano sound comes from the General MIDI bank built into macOS.
 > workflow), but it was written without access to a Mac and has not been run by
 > hand yet. Expect rough edges in the notation drawing and layout.
 
+## Screenshots
+
+**Mac**
+
+<img src="docs/screenshots/macos/learn.png" width="49%" alt="The course map on a Mac"> <img src="docs/screenshots/macos/lesson-practice.png" width="49%" alt="A practice exercise on a Mac">
+
+**iPad**
+
+<img src="docs/screenshots/ipad/song-landscape.png" width="59%" alt="Playing a song on an iPad held sideways"> <img src="docs/screenshots/ipad/learn-portrait.png" width="39%" alt="The course map on an upright iPad">
+
+**iPhone**
+
+<img src="docs/screenshots/iphone/lesson-practice-landscape.png" width="80%" alt="A practice exercise on an iPhone held sideways">
+
+<img src="docs/screenshots/iphone/learn-portrait.png" width="24%" alt="The course map on an iPhone"> <img src="docs/screenshots/iphone/lesson-practice-portrait.png" width="24%" alt="A practice exercise on an iPhone"> <img src="docs/screenshots/iphone/song-portrait.png" width="24%" alt="Playing a song on an iPhone"> <img src="docs/screenshots/iphone/free-play-portrait.png" width="24%" alt="Free play on an iPhone">
+
+More screens, in both orientations, are in [`docs/screenshots`](docs/screenshots).
+
 ## Requirements
 
 - Mac: macOS 13 (Ventura) or later
