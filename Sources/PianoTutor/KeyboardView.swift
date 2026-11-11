@@ -373,7 +373,7 @@ struct KeyboardPanel: View {
         Button(action: action) {
             Image(systemName: symbol)
                 .font(.system(size: 13, weight: .bold))
-                .foregroundColor(Theme.textPrimary)
+                .foregroundStyle(Theme.textPrimary)
                 .frame(width: KeyboardPanel.arrowWidth)
                 .frame(maxHeight: .infinity)
                 .background(Theme.panelRaised)

@@ -63,6 +63,8 @@ struct ExercisePlayer: View {
         onToggleSlow: @escaping () -> Void,
         onContinue: @escaping (PerformanceSummary) -> Void
     ) {
+        // Created once per view identity: later changes to `config` are ignored here.
+        // `ExerciseView` and `SongSessionView` change this view's `.id` to start a new session instead.
         _session = StateObject(wrappedValue: PlaySession(config: config, model: model))
         self.title = title
         self.instruction = instruction
@@ -130,12 +132,12 @@ struct ExercisePlayer: View {
         HStack(spacing: 8) {
             Text(title)
                 .font(.system(size: screen.compact ? 17 : 20, weight: .bold, design: .rounded))
-                .foregroundColor(Theme.textPrimary)
+                .foregroundStyle(Theme.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             Text(isTempo ? "IN TIME" : "PRACTICE")
                 .font(.system(size: 10, weight: .bold, design: .rounded))
-                .foregroundColor(Theme.ink)
+                .foregroundStyle(Theme.ink)
                 .padding(.horizontal, 7)
                 .padding(.vertical, 3)
                 .background(isTempo ? Theme.accent : Theme.textSecondary)
@@ -144,7 +146,7 @@ struct ExercisePlayer: View {
             if isSlow {
                 Text("SLOW")
                     .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
+                    .foregroundStyle(Theme.textPrimary)
                     .padding(.horizontal, 7)
                     .padding(.vertical, 3)
                     .background(Theme.panelRaised)
@@ -157,7 +159,7 @@ struct ExercisePlayer: View {
     private var instructionText: some View {
         Text(instruction)
             .font(.system(size: 13, design: .rounded))
-            .foregroundColor(Theme.textSecondary)
+            .foregroundStyle(Theme.textSecondary)
     }
 
     @ViewBuilder
@@ -165,7 +167,7 @@ struct ExercisePlayer: View {
         if session.streak >= 3 {
             Label(String(session.streak) + " in a row", systemImage: "flame.fill")
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundColor(Theme.accent)
+                .foregroundStyle(Theme.accent)
                 .fixedSize()
         }
     }
@@ -240,10 +242,10 @@ struct ExercisePlayer: View {
         VStack(spacing: screen.short ? 8 : 12) {
             Text("Ready?")
                 .font(.system(size: screen.short ? 18 : 22, weight: .bold, design: .rounded))
-                .foregroundColor(Theme.textPrimary)
+                .foregroundStyle(Theme.textPrimary)
             Text("You will hear one measure of clicks before the first note.")
                 .font(.system(size: 13, design: .rounded))
-                .foregroundColor(Theme.textSecondary)
+                .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
             Button("Start") {
                 session.start()
@@ -296,15 +298,15 @@ struct ResultCard: View {
             StarsView(stars: summary.stars, size: screen.short ? 20 : 30)
             Text(headline)
                 .font(.system(size: screen.short ? 18 : 24, weight: .bold, design: .rounded))
-                .foregroundColor(Theme.textPrimary)
+                .foregroundStyle(Theme.textPrimary)
             Text(detail)
                 .font(.system(size: 13, design: .rounded))
-                .foregroundColor(Theme.textSecondary)
+                .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
             if !summary.passed && !screen.short {
                 Text("Try it again, or slow the tempo down first.")
                     .font(.system(size: 13, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
+                    .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.center)
             }
             HStack(spacing: screen.compact ? 8 : 10) {
@@ -348,7 +350,7 @@ struct SessionTopBar<Accessory: View>: View {
             Button(action: onClose) {
                 Image(systemName: "xmark")
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(Theme.textPrimary)
+                    .foregroundStyle(Theme.textPrimary)
                     .frame(width: 30, height: 30)
                     .background(Theme.panelRaised)
                     .clipShape(Circle())
@@ -360,7 +362,7 @@ struct SessionTopBar<Accessory: View>: View {
 
             Text(title)
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundColor(Theme.textSecondary)
+                .foregroundStyle(Theme.textSecondary)
                 .lineLimit(1)
 
             if stepCount > 1 {

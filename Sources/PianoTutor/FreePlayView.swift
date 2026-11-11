@@ -40,10 +40,10 @@ struct FreePlayView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Free Play")
                         .font(.system(size: 30, weight: .bold, design: .rounded))
-                        .foregroundColor(Theme.textPrimary)
+                        .foregroundStyle(Theme.textPrimary)
                     Text("Play anything. The notes you hold appear on the staff with their names.")
                         .font(.system(size: 14, design: .rounded))
-                        .foregroundColor(Theme.textSecondary)
+                        .foregroundStyle(Theme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -92,18 +92,18 @@ struct FreePlayView: View {
         VStack(spacing: screen.compact ? 6 : 10) {
             Text(heldPitches.isEmpty ? "–" : heldPitches.map { $0.name }.joined(separator: "  "))
                 .font(.system(size: screen.compact ? 32 : 40, weight: .bold, design: .rounded))
-                .foregroundColor(Theme.textPrimary)
+                .foregroundStyle(Theme.textPrimary)
                 .minimumScaleFactor(0.4)
                 .lineLimit(1)
             Text(heldPitches.isEmpty ? "Press a key" : heldPitches.map { $0.fullName }.joined(separator: " "))
                 .font(.system(size: 13, design: .rounded))
-                .foregroundColor(Theme.textSecondary)
+                .foregroundStyle(Theme.textSecondary)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
             if Platform.hasComputerKeys && !model.midi.isConnected {
                 Text("Computer keys: A S D F G H J K play the white keys from Middle C, W E T Y U the black keys. Z and X shift the octave" + octaveNote + ".")
                     .font(.system(size: 12, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
+                    .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.top, 10)
             }

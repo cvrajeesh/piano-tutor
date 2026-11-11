@@ -12,10 +12,10 @@ struct SongsView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Songs")
                         .font(.system(size: 30, weight: .bold, design: .rounded))
-                        .foregroundColor(Theme.textPrimary)
+                        .foregroundStyle(Theme.textPrimary)
                     Text("Practise any tune at your own speed, one hand at a time or both together.")
                         .font(.system(size: 14, design: .rounded))
-                        .foregroundColor(Theme.textSecondary)
+                        .foregroundStyle(Theme.textSecondary)
                 }
                 ForEach(1...3, id: \.self) { level in
                     levelSection(level)
@@ -32,7 +32,7 @@ struct SongsView: View {
         return VStack(alignment: .leading, spacing: 10) {
             Text(SongLibrary.levelName(level).uppercased())
                 .font(.system(size: 11, weight: .bold, design: .rounded))
-                .foregroundColor(Theme.accent)
+                .foregroundStyle(Theme.accent)
             ForEach(songs) { song in
                 SongRow(song: song)
             }
@@ -51,24 +51,24 @@ struct SongRow: View {
             HStack(spacing: 14) {
                 Image(systemName: "music.note")
                     .font(.system(size: 16))
-                    .foregroundColor(Theme.accent)
+                    .foregroundStyle(Theme.accent)
                     .frame(width: 34, height: 34)
                     .background(Theme.panelRaised)
                     .clipShape(Circle())
                 VStack(alignment: .leading, spacing: 2) {
                     Text(song.title)
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
-                        .foregroundColor(Theme.textPrimary)
+                        .foregroundStyle(Theme.textPrimary)
                         .multilineTextAlignment(.leading)
                     Text(song.credit)
                         .font(.system(size: 12, design: .rounded))
-                        .foregroundColor(Theme.textSecondary)
+                        .foregroundStyle(Theme.textSecondary)
                         .lineLimit(1)
                 }
                 Spacer(minLength: 0)
                 Text(song.score.hands.count > 1 ? "Both hands" : "Right hand")
                     .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
+                    .foregroundStyle(Theme.textSecondary)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(Theme.panelRaised)
@@ -192,7 +192,7 @@ struct SongSessionView: View {
     /// The row of options. It scrolls sideways when the screen is too narrow to show them all.
     private var options: some View {
         let pickerWidth: CGFloat = screen.compact ? 160 : 190
-        return ScrollView(.horizontal, showsIndicators: false) {
+        return ScrollView(.horizontal) {
             HStack(spacing: screen.compact ? 10 : 18) {
                 Picker("Mode", selection: $perform) {
                     Text("Practice").tag(false)
@@ -232,5 +232,6 @@ struct SongSessionView: View {
             .font(.system(size: 12, design: .rounded))
             .padding(.horizontal, screen.short ? 0 : (screen.narrow ? 12 : 20))
         }
+        .scrollIndicators(.hidden)
     }
 }

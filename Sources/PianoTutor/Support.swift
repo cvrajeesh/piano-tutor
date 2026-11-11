@@ -54,15 +54,8 @@ struct ScreenLayout: Equatable {
     var compact: Bool { return narrow || short }
 }
 
-private struct ScreenLayoutKey: EnvironmentKey {
-    static let defaultValue = ScreenLayout()
-}
-
 extension EnvironmentValues {
-    var screenLayout: ScreenLayout {
-        get { return self[ScreenLayoutKey.self] }
-        set { self[ScreenLayoutKey.self] = newValue }
-    }
+    @Entry var screenLayout = ScreenLayout()
 }
 
 extension Score {
@@ -110,7 +103,7 @@ struct StarsView: View {
             ForEach(0..<3, id: \.self) { index in
                 Image(systemName: index < stars ? "star.fill" : "star")
                     .font(.system(size: size))
-                    .foregroundColor(index < stars ? Theme.accent : Color(white: 0.4))
+                    .foregroundStyle(index < stars ? Theme.accent : Color(white: 0.4))
             }
         }
         .accessibilityElement(children: .ignore)
@@ -125,7 +118,7 @@ struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: small ? 14 : 15, weight: .semibold, design: .rounded))
-            .foregroundColor(Theme.ink)
+            .foregroundStyle(Theme.ink)
             .padding(.horizontal, small ? 14 : 22)
             .padding(.vertical, small ? 7 : 10)
             .background(Theme.accent.opacity(configuration.isPressed ? 0.7 : 1.0))
@@ -139,7 +132,7 @@ struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: small ? 14 : 15, weight: .medium, design: .rounded))
-            .foregroundColor(Theme.textPrimary)
+            .foregroundStyle(Theme.textPrimary)
             .padding(.horizontal, small ? 12 : 18)
             .padding(.vertical, small ? 7 : 10)
             .background(Theme.panelRaised.opacity(configuration.isPressed ? 0.6 : 1.0))

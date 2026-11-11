@@ -125,10 +125,10 @@ struct MainView: View {
             HStack(spacing: 10) {
                 Image(systemName: "pianokeys.inverse")
                     .font(.system(size: 22))
-                    .foregroundColor(Theme.accent)
+                    .foregroundStyle(Theme.accent)
                 Text("Middle C")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
+                    .foregroundStyle(Theme.textPrimary)
             }
             .padding(.bottom, 22)
 
@@ -143,7 +143,7 @@ struct MainView: View {
                         Spacer()
                     }
                     .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundColor(model.section == section ? Theme.ink : Theme.textPrimary)
+                    .foregroundStyle(model.section == section ? Theme.ink : Theme.textPrimary)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 9)
                     .background(model.section == section ? Theme.accent : Color.clear)
@@ -171,7 +171,7 @@ struct MainView: View {
                 } label: {
                     Image(systemName: section.symbol)
                         .font(.system(size: 17, weight: .medium))
-                        .foregroundColor(model.section == section ? Theme.ink : Theme.textPrimary)
+                        .foregroundStyle(model.section == section ? Theme.ink : Theme.textPrimary)
                         .frame(width: 44, height: 40)
                         .background(model.section == section ? Theme.accent : Color.clear)
                         .clipShape(RoundedRectangle(cornerRadius: 9))
@@ -203,7 +203,7 @@ struct MainView: View {
                         Text(section.title)
                             .font(.system(size: 10, weight: .medium, design: .rounded))
                     }
-                    .foregroundColor(model.section == section ? Theme.accent : Theme.textSecondary)
+                    .foregroundStyle(model.section == section ? Theme.accent : Theme.textSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.top, 8)
                     .padding(.bottom, 4)
@@ -249,10 +249,10 @@ struct ConnectionBadge: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
+                    .foregroundStyle(Theme.textPrimary)
                 Text(model.midi.sourceNames.first ?? (model.mic.isListening ? "Play your piano" : "Using on-screen keys"))
                     .font(.system(size: 11, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
+                    .foregroundStyle(Theme.textSecondary)
                     .lineLimit(2)
             }
         }

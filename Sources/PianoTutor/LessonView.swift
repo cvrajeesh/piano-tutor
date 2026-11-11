@@ -109,11 +109,11 @@ struct InfoStepView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text(card.title)
                         .font(.system(size: screen.compact ? 22 : 26, weight: .bold, design: .rounded))
-                        .foregroundColor(Theme.textPrimary)
+                        .foregroundStyle(Theme.textPrimary)
                     ForEach(Array(card.paragraphs.enumerated()), id: \.offset) { _, paragraph in
                         Text(paragraph)
                             .font(.system(size: 16, design: .rounded))
-                            .foregroundColor(Theme.textSecondary)
+                            .foregroundStyle(Theme.textSecondary)
                             .lineSpacing(4)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -186,11 +186,11 @@ struct FindStepView: View {
                 Spacer(minLength: 0)
                 Text(task.title)
                     .font(.system(size: screen.short ? 20 : (screen.narrow ? 24 : 28), weight: .bold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
+                    .foregroundStyle(Theme.textPrimary)
                     .multilineTextAlignment(.center)
                 Text(task.detail)
                     .font(.system(size: screen.short ? 14 : 16, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
+                    .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
 
@@ -198,7 +198,7 @@ struct FindStepView: View {
                     ForEach(Array(task.targets.enumerated()), id: \.offset) { position, target in
                         Text(target.name)
                             .font(.system(size: screen.compact ? 15 : 20, weight: .bold, design: .rounded))
-                            .foregroundColor(position < index ? Theme.ink : Theme.textPrimary)
+                            .foregroundStyle(position < index ? Theme.ink : Theme.textPrimary)
                             .frame(width: boxSize, height: boxSize)
                             .background(position < index ? Theme.good : (position == index ? Theme.panelRaised : Theme.panel))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -212,7 +212,7 @@ struct FindStepView: View {
 
                 Text(message)
                     .font(.system(size: 14, weight: .medium, design: .rounded))
-                    .foregroundColor(done ? Theme.good : Theme.accent)
+                    .foregroundStyle(done ? Theme.good : Theme.accent)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                     .frame(height: 20)
@@ -291,10 +291,10 @@ struct LessonCompleteView: View {
             StarsView(stars: stars, size: screen.short ? 32 : 44)
             Text("Lesson complete")
                 .font(.system(size: screen.short ? 24 : 30, weight: .bold, design: .rounded))
-                .foregroundColor(Theme.textPrimary)
+                .foregroundStyle(Theme.textPrimary)
             Text(lesson.title)
                 .font(.system(size: 16, design: .rounded))
-                .foregroundColor(Theme.textSecondary)
+                .foregroundStyle(Theme.textSecondary)
             // Side by side where there is room, stacked on an upright iPhone.
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 12) {
