@@ -163,6 +163,5 @@ gh api -X PUT repos/<github-user>/piano-tutor/actions/permissions/workflow \
   -f default_workflow_permissions=read -F can_approve_pull_request_reviews=true
 ```
 
-From then on, every push to `main` that changes the app sends both apps to
-TestFlight, and merging the Release Please PR uploads the new version to the App
-Store. See the [release process](release-process.md).
+From then on, merging the Release Please PR sends the new version of both apps to
+TestFlight. Other pushes to `main` don't upload anything. See the [release process](release-process.md).

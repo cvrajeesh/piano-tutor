@@ -2,8 +2,8 @@ name: Release
 
 # Builds, signs and uploads the iOS and Mac App Store apps with fastlane.
 #
-# - release-please.yml calls this after every push to main: a TestFlight build, or,
-#   when the push merged a Release Please PR, an App Store upload of the new version.
+# - release-please.yml calls this when a Release Please PR is merged, to send the
+#   new version, built from its tag, to TestFlight.
 # - Run it by hand (Actions → Release → Run workflow) to choose the platform, upload
 #   to the App Store, and optionally submit for review.
 #
