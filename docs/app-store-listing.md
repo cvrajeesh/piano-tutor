@@ -156,7 +156,7 @@ No demo account is needed; the app has no sign-in.
 
 `fastlane/age_rating.json` answers Apple's age rating questionnaire: no violence,
 no mature themes, no gambling or contests, no user-generated content, no chat, no
-advertising, no unrestricted web access (the links in Settings open the browser). The
+advertising, no unrestricted web access (the feedback link in Settings opens the browser). The
 app comes out at **4+**. If the app ever adds something on that list, change the
 answer here; it's uploaded with every `release` and `metadata` run.
 
@@ -220,10 +220,11 @@ prepared. The promotional text and the URLs can change at any time.
 
 ## Things App Review may ask about
 
-- **The tip link.** Settings links to Buy Me a Coffee. Apple's guideline 3.1.1 asks
-  for tips to go through In-App Purchase on iOS, and App Review may reject a build
-  with an outside tip link. If it does, remove the link from the iOS app (keep it on
-  the website) or replace it with an in-app tip.
+- **Tips.** The app has no tip or donation link: Apple's guideline 3.1.1 asks for
+  tips to go through In-App Purchase, and App Review rejects apps that link to an
+  outside tip page. Buy Me a Coffee is only on the website. Don't add it back to the
+  app, or mention it in the store text; an in-app tip would have to be an In-App
+  Purchase.
 - **The microphone.** The review notes and the permission prompt both explain that
   audio is analysed on the device and never recorded.
 - **USB-MIDI keyboards.** The reviewer won't have one. The notes explain the

@@ -10,4 +10,4 @@ Optional hardware and permissions:
 - USB-MIDI keyboards (for example a Casio CT-S300) are detected automatically through CoreMIDI when plugged in. No driver or setup is needed.
 - The microphone is used only if the user turns on Settings > Microphone > "Listen to my piano when no MIDI keyboard is connected", to recognise notes played on an acoustic piano. The audio is analysed on the device in real time and is never recorded, stored or sent anywhere. The app asks for microphone access only when that setting is turned on.
 
-The app collects no data, has no analytics or ads, and works offline. The links to the website, feedback board and tip page open in the browser.
+The app collects no data, has no analytics or ads, and works offline. The link to the feedback board opens in the browser.
