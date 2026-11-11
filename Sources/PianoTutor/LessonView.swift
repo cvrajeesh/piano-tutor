@@ -97,6 +97,7 @@ struct LessonView: View {
 
 /// A page of explanation with an optional notation example.
 struct InfoStepView: View {
+    @Environment(\.screenLayout) private var screen
     let card: InfoCard
     let onContinue: () -> Void
 
@@ -107,7 +108,7 @@ struct InfoStepView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     Text(card.title)
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .font(.system(size: screen.compact ? 22 : 26, weight: .bold, design: .rounded))
                         .foregroundColor(Theme.textPrimary)
                     ForEach(Array(card.paragraphs.enumerated()), id: \.offset) { _, paragraph in
                         Text(paragraph)
@@ -125,7 +126,7 @@ struct InfoStepView: View {
                             showPlayhead: false,
                             animated: false
                         )
-                        .frame(height: layout.clefs.count > 1 ? 300 : 190)
+                        .frame(height: (layout.clefs.count > 1 ? 300 : 190) * (screen.compact ? 0.8 : 1))
                         .background(Theme.paper)
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                     }
@@ -134,7 +135,7 @@ struct InfoStepView: View {
                         .keyboardShortcut(.defaultAction)
                         .padding(.top, 6)
                 }
-                .padding(36)
+                .padding(screen.compact ? 18 : 36)
                 .frame(maxWidth: 760, alignment: .leading)
                 .frame(maxWidth: .infinity)
             }
@@ -146,6 +147,7 @@ struct InfoStepView: View {
 /// "Find this key" drill.
 struct FindStepView: View {
     @EnvironmentObject var input: InputHub
+    @Environment(\.screenLayout) private var screen
     let task: FindTask
     let onDone: () -> Void
 
@@ -165,24 +167,38 @@ struct FindStepView: View {
         return [target.midi: KeyTarget(hand: task.hand, finger: nil)]
     }
 
+    /// The whole drill's range, so that a cut-down keyboard does not jump about (or give the answer away).
+    private var focus: ClosedRange<Int>? {
+        let keys: [Int] = task.targets.map { $0.midi }
+        guard let low = keys.min(), let high = keys.max() else { return nil }
+        return low...high
+    }
+
+    /// The side of one target box; they shrink to fit a narrow screen.
+    private var boxSize: CGFloat {
+        return screen.compact ? 38 : 54
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            VStack(spacing: 18) {
-                Spacer()
+            VStack(spacing: screen.short ? 6 : 18) {
+                Spacer(minLength: 0)
                 Text(task.title)
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: screen.short ? 20 : (screen.narrow ? 24 : 28), weight: .bold, design: .rounded))
                     .foregroundColor(Theme.textPrimary)
+                    .multilineTextAlignment(.center)
                 Text(task.detail)
-                    .font(.system(size: 16, design: .rounded))
+                    .font(.system(size: screen.short ? 14 : 16, design: .rounded))
                     .foregroundColor(Theme.textSecondary)
                     .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
 
-                HStack(spacing: 10) {
+                HStack(spacing: screen.compact ? 6 : 10) {
                     ForEach(Array(task.targets.enumerated()), id: \.offset) { position, target in
                         Text(target.name)
-                            .font(.system(size: 20, weight: .bold, design: .rounded))
+                            .font(.system(size: screen.compact ? 15 : 20, weight: .bold, design: .rounded))
                             .foregroundColor(position < index ? Theme.ink : Theme.textPrimary)
-                            .frame(width: 54, height: 54)
+                            .frame(width: boxSize, height: boxSize)
                             .background(position < index ? Theme.good : (position == index ? Theme.panelRaised : Theme.panel))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                             .overlay(
@@ -191,18 +207,20 @@ struct FindStepView: View {
                             )
                     }
                 }
-                .padding(.top, 8)
+                .padding(.top, screen.short ? 2 : 8)
 
                 Text(message)
                     .font(.system(size: 14, weight: .medium, design: .rounded))
                     .foregroundColor(done ? Theme.good : Theme.accent)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                     .frame(height: 20)
-                Spacer()
+                Spacer(minLength: 0)
             }
-            .padding(30)
+            .padding(screen.short ? 8 : (screen.narrow ? 16 : 30))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            KeyboardPanel(targets: hintTargets, good: good, wrong: wrong)
+            KeyboardPanel(targets: hintTargets, good: good, wrong: wrong, focus: focus)
         }
         .onReceive(input.events) { note in
             handle(note)
@@ -250,6 +268,7 @@ struct FindStepView: View {
 }
 
 struct LessonCompleteView: View {
+    @Environment(\.screenLayout) private var screen
     let lesson: Lesson
     let stars: Int
     let next: Lesson?
@@ -257,29 +276,43 @@ struct LessonCompleteView: View {
     let onNext: (Lesson) -> Void
 
     var body: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: screen.short ? 10 : 18) {
             Spacer()
-            StarsView(stars: stars, size: 44)
+            StarsView(stars: stars, size: screen.short ? 32 : 44)
             Text("Lesson complete")
-                .font(.system(size: 30, weight: .bold, design: .rounded))
+                .font(.system(size: screen.short ? 24 : 30, weight: .bold, design: .rounded))
                 .foregroundColor(Theme.textPrimary)
             Text(lesson.title)
                 .font(.system(size: 16, design: .rounded))
                 .foregroundColor(Theme.textSecondary)
-            HStack(spacing: 12) {
-                Button("Back to lessons", action: onDone)
-                    .buttonStyle(SecondaryButtonStyle())
-                if let next = next {
-                    Button("Next: " + next.title) {
-                        onNext(next)
-                    }
-                    .buttonStyle(PrimaryButtonStyle())
-                    .keyboardShortcut(.defaultAction)
+            // Side by side where there is room, stacked on an upright iPhone.
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) {
+                    buttons
+                }
+                VStack(spacing: 10) {
+                    buttons
                 }
             }
-            .padding(.top, 10)
+            .padding(.top, screen.short ? 2 : 10)
             Spacer()
         }
+        .padding(.horizontal, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    @ViewBuilder
+    private var buttons: some View {
+        Button("Back to lessons", action: onDone)
+            .buttonStyle(SecondaryButtonStyle())
+            .fixedSize()
+        if let next = next {
+            Button("Next: " + next.title) {
+                onNext(next)
+            }
+            .buttonStyle(PrimaryButtonStyle())
+            .keyboardShortcut(.defaultAction)
+            .lineLimit(1)
+        }
     }
 }

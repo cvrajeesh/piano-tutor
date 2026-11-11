@@ -2,7 +2,8 @@
 import PackageDescription
 
 // PianoTutorCore is pure Swift (notation, scoring, lesson content) and builds anywhere.
-// The app itself needs SwiftUI, CoreMIDI and AVFoundation, so it is macOS-only.
+// The app itself needs SwiftUI, CoreMIDI and AVFoundation. SwiftPM builds it for macOS;
+// the iPhone and iPad app is built from the same sources by the Xcode project (see project.yml).
 var products: [Product] = [
     .library(name: "PianoTutorCore", targets: ["PianoTutorCore"])
 ]
@@ -24,7 +25,7 @@ targets.append(
 
 let package = Package(
     name: "PianoTutor",
-    platforms: [.macOS(.v13)],
+    platforms: [.macOS(.v13), .iOS(.v16)],
     products: products,
     targets: targets
 )

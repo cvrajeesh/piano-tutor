@@ -1,5 +1,7 @@
 import Foundation
+#if os(macOS)
 import AppKit
+#endif
 import Combine
 
 struct NoteInput {
@@ -11,6 +13,7 @@ struct NoteInput {
     enum Source {
         case midi
         case computerKeys
+        /// A click or a touch on the on-screen keys.
         case mouse
     }
 
@@ -31,6 +34,7 @@ final class InputHub: ObservableObject {
     /// Called for every note before listeners, used to play the sound.
     var monitor: ((NoteInput) -> Void)?
 
+    #if os(macOS)
     private var keyMonitor: Any?
     private var activeKeys: [UInt16: Int] = [:]
 
@@ -40,6 +44,7 @@ final class InputHub: ObservableObject {
         "g": 67, "y": 68, "h": 69, "u": 70, "j": 71, "k": 72, "o": 73,
         "l": 74, "p": 75, ";": 76,
     ]
+    #endif
 
     /// Must be called on the main thread.
     func send(_ input: NoteInput) {
@@ -66,14 +71,18 @@ final class InputHub: ObservableObject {
     }
 
     /// Lets the computer keyboard stand in for a piano when no MIDI keyboard is plugged in.
+    /// On iPhone and iPad the on-screen keys are played by touch instead.
     func installComputerKeyboard() {
+        #if os(macOS)
         guard keyMonitor == nil else { return }
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp]) { [weak self] event in
             guard let self = self else { return event }
             return self.handleKey(event) ? nil : event
         }
+        #endif
     }
 
+    #if os(macOS)
     private func handleKey(_ event: NSEvent) -> Bool {
         let blocked: NSEvent.ModifierFlags = [.command, .control, .option]
         if !event.modifierFlags.intersection(blocked).isEmpty { return false }
@@ -102,4 +111,5 @@ final class InputHub: ObservableObject {
         press(midi, source: .computerKeys)
         return true
     }
+    #endif
 }

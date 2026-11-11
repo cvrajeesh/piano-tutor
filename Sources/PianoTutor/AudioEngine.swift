@@ -2,12 +2,15 @@ import Foundation
 import AVFoundation
 import AudioToolbox
 
-/// Plays piano notes and metronome clicks using the General MIDI sound bank that ships with macOS.
+/// Plays piano notes and metronome clicks. macOS ships a General MIDI sound bank; iOS does not,
+/// so there the app uses a bank bundled as `SoundBank.sf2` or `SoundBank.dls` if one is present
+/// and otherwise the sampler's built-in plain tone.
 final class AudioEngine {
     private let engine = AVAudioEngine()
     private let piano = AVAudioUnitSampler()
     private let percussion = AVAudioUnitSampler()
     private var started: Bool = false
+    private var bankLoaded: Bool = false
 
     var volume: Double = 0.8 {
         didSet {
@@ -25,6 +28,13 @@ final class AudioEngine {
         engine.connect(percussion, to: engine.mainMixerNode, format: nil)
         engine.mainMixerNode.outputVolume = Float(volume)
 
+        #if os(iOS)
+        // Play even when the ring/silent switch is set to silent.
+        let session = AVAudioSession.sharedInstance()
+        try? session.setCategory(.playback, mode: .default)
+        try? session.setActive(true)
+        #endif
+
         do {
             try engine.start()
         } catch {
@@ -32,22 +42,49 @@ final class AudioEngine {
             return
         }
 
-        // If the bank cannot be loaded the samplers fall back to a plain tone, which still works.
-        let bank = URL(fileURLWithPath: "/System/Library/Components/CoreAudio.component/Contents/Resources/gs_instruments.dls")
-        if FileManager.default.fileExists(atPath: bank.path) {
-            try? piano.loadSoundBankInstrument(
+        // If no bank can be loaded the samplers fall back to a plain tone, which still works.
+        guard let bank = AudioEngine.soundBankURL() else { return }
+        do {
+            try piano.loadSoundBankInstrument(
                 at: bank,
                 program: 0,
                 bankMSB: UInt8(kAUSampler_DefaultMelodicBankMSB),
                 bankLSB: UInt8(kAUSampler_DefaultBankLSB)
             )
-            try? percussion.loadSoundBankInstrument(
+            try percussion.loadSoundBankInstrument(
                 at: bank,
                 program: 0,
                 bankMSB: UInt8(kAUSampler_DefaultPercussionBankMSB),
                 bankLSB: UInt8(kAUSampler_DefaultBankLSB)
             )
+            bankLoaded = true
+        } catch {
+            NSLog("Piano Tutor: could not load the sound bank (%@)", error.localizedDescription)
         }
+    }
+
+    private static func soundBankURL() -> URL? {
+        for ext in ["sf2", "dls"] {
+            if let bundled = Bundle.main.url(forResource: "SoundBank", withExtension: ext) {
+                return bundled
+            }
+        }
+        #if os(macOS)
+        let system = URL(fileURLWithPath: "/System/Library/Components/CoreAudio.component/Contents/Resources/gs_instruments.dls")
+        if FileManager.default.fileExists(atPath: system.path) {
+            return system
+        }
+        #endif
+        return nil
+    }
+
+    /// Restarts the engine after the system stopped it (app sent to the background, a phone call).
+    func resume() {
+        guard started, !engine.isRunning else { return }
+        #if os(iOS)
+        try? AVAudioSession.sharedInstance().setActive(true)
+        #endif
+        try? engine.start()
     }
 
     func noteOn(_ midi: Int, velocity: Int = 90) {
@@ -63,7 +100,16 @@ final class AudioEngine {
     /// A wood-block tick; the accented one marks the first beat of a measure.
     func click(accent: Bool) {
         guard started else { return }
-        percussion.startNote(accent ? 76 : 77, withVelocity: accent ? 115 : 85, onChannel: 0)
+        if bankLoaded {
+            percussion.startNote(accent ? 76 : 77, withVelocity: accent ? 115 : 85, onChannel: 0)
+            return
+        }
+        // Without a percussion bank the sampler holds a plain tone, so cut it to a short blip.
+        let note: UInt8 = accent ? 96 : 91
+        percussion.startNote(note, withVelocity: accent ? 115 : 85, onChannel: 0)
+        DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: .now() + 0.04) { [percussion] in
+            percussion.stopNote(note, onChannel: 0)
+        }
     }
 
     func allNotesOff() {

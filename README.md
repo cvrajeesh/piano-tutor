@@ -1,6 +1,6 @@
 # Piano Tutor
 
-A native macOS app for learning to play the keyboard. Plug in a USB-MIDI keyboard
+A native app for Mac, iPad and iPhone for learning to play the keyboard. Plug in a USB-MIDI keyboard
 (it was written with the Casio CT-S300 in mind), follow the lessons, and the app
 listens to what you play.
 
@@ -9,21 +9,40 @@ listens to what you play.
 - **In-time mode** – a metronome counts you in, the staff scrolls, and every note is judged as on the beat, early, late or missed.
 - **Song library** – 18 traditional and classical tunes, playable with either hand or both, at 60%, 80% or full speed.
 - **Free play** – see the name and staff position of whatever you play.
-- **61-key on-screen keyboard** matching the CT-S300 (C2–C7), with finger numbers and key hints.
+- **61-key on-screen keyboard** matching the CT-S300 (C2–C7), with finger numbers and key hints. On iPhone and iPad it is multi-touch, and on small screens it shows the section of the keyboard the music needs.
 
 Written in Swift with SwiftUI, CoreMIDI and AVFoundation. No third-party code;
-the piano sound comes from the General MIDI bank built into macOS.
+on a Mac the piano sound comes from the General MIDI bank built into macOS.
 
 > **Status:** the app builds and its unit tests pass on macOS (see the Build
 > workflow), but it was written without access to a Mac and has not been run by
 > hand yet. Expect rough edges in the notation drawing and layout.
 
+## Screenshots
+
+**Mac**
+
+<img src="docs/screenshots/macos/learn.png" width="49%" alt="The course map on a Mac"> <img src="docs/screenshots/macos/lesson-practice.png" width="49%" alt="A practice exercise on a Mac">
+
+**iPad**
+
+<img src="docs/screenshots/ipad/song-landscape.png" width="59%" alt="Playing a song on an iPad held sideways"> <img src="docs/screenshots/ipad/learn-portrait.png" width="39%" alt="The course map on an upright iPad">
+
+**iPhone**
+
+<img src="docs/screenshots/iphone/lesson-practice-landscape.png" width="80%" alt="A practice exercise on an iPhone held sideways">
+
+<img src="docs/screenshots/iphone/learn-portrait.png" width="24%" alt="The course map on an iPhone"> <img src="docs/screenshots/iphone/lesson-practice-portrait.png" width="24%" alt="A practice exercise on an iPhone"> <img src="docs/screenshots/iphone/song-portrait.png" width="24%" alt="Playing a song on an iPhone"> <img src="docs/screenshots/iphone/free-play-portrait.png" width="24%" alt="Free play on an iPhone">
+
+More screens, in both orientations, are in [`docs/screenshots`](docs/screenshots).
+
 ## Requirements
 
-- macOS 13 (Ventura) or later
-- Xcode 15 or later, or the Xcode Command Line Tools (`xcode-select --install`)
+- Mac: macOS 13 (Ventura) or later
+- iPhone and iPad: iOS / iPadOS 16 or later
+- Xcode 15 or later. The Mac app also builds with just the Xcode Command Line Tools (`xcode-select --install`).
 
-## Build and run
+## Build and run on a Mac
 
 ```bash
 ./scripts/build-app.sh
@@ -49,6 +68,40 @@ or open `Package.swift` in Xcode and press Run.
 
 Run the tests with `swift test`.
 
+## Build and run on iPhone and iPad
+
+The iOS app is built from the same sources by an Xcode project that
+[XcodeGen](https://github.com/yonaskolb/XcodeGen) generates from `project.yml`:
+
+```bash
+brew install xcodegen
+xcodegen generate
+open PianoTutor.xcodeproj
+```
+
+Choose the **PianoTutor-iOS** scheme and a simulator, and press Run. To run on
+your own device, create `Support/iOS/Local.xcconfig` (ignored by git) with your
+Apple developer team, then generate the project again:
+
+```
+DEVELOPMENT_TEAM = ABCDE12345
+APP_BUNDLE_ID = com.example.pianotutor
+```
+
+`APP_BUNDLE_ID` is optional; set it if `com.pianotutor.app` is not available to
+your team.
+
+- **iPad** shows the same layout as the Mac. All 61 keys are shown when they fit.
+- **iPhone** works upright or on its side. The on-screen keyboard shows as many
+  keys as can be played comfortably, placed around the notes of the current
+  exercise; the arrows at its ends move it by an octave.
+- A USB-MIDI keyboard works the same way as on a Mac. Connect it to the USB-C
+  port (or through a Lightning to USB adapter on older devices).
+- iOS has no built-in piano sound bank, so notes play as a plain tone. To get a
+  real piano, add a General MIDI SoundFont named `SoundBank.sf2` to `Support/iOS`
+  and run `xcodegen generate` again.
+- There is no app icon yet.
+
 ## Connecting a Casio CT-S300
 
 1. Connect the keyboard's USB port (micro-USB, on the back) to your Mac. Use a cable that carries data; some cables only charge.
@@ -72,7 +125,8 @@ black keys, and `Z` / `X` shift the octave.
 | `Sources/PianoTutorCore` | Pure Swift: pitches, the text notation parser, staff layout, scoring, and all lesson and song content |
 | `Sources/PianoTutor` | The app: MIDI input, audio, the scrolling staff, the keyboard and the screens |
 | `Tests/PianoTutorCoreTests` | Unit tests for the core |
-| `scripts/build-app.sh` | Builds the `.app` bundle |
+| `scripts/build-app.sh` | Builds the macOS `.app` bundle |
+| `project.yml`, `Support/iOS` | XcodeGen definition and resources for the iPhone and iPad app |
 
 ## Adding your own music
 

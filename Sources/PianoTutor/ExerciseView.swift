@@ -43,6 +43,7 @@ struct ExerciseView: View {
 
 struct ExercisePlayer: View {
     @StateObject private var session: PlaySession
+    @Environment(\.screenLayout) private var screen
     let title: String
     let instruction: String
     let isSlow: Bool
@@ -104,11 +105,16 @@ struct ExercisePlayer: View {
                     )
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 14)
+            .padding(.horizontal, screen.compact ? 10 : 20)
+            .padding(.bottom, screen.compact ? 8 : 14)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            KeyboardPanel(targets: session.targets, good: session.goodKeys, wrong: session.wrongKeys)
+            KeyboardPanel(
+                targets: session.targets,
+                good: session.goodKeys,
+                wrong: session.wrongKeys,
+                focus: session.config.score.keyRange(hands: session.config.hands)
+            )
         }
         .onAppear {
             if !isTempo {
@@ -120,69 +126,132 @@ struct ExercisePlayer: View {
         }
     }
 
-    private var header: some View {
-        HStack(alignment: .center, spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 8) {
-                    Text(title)
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundColor(Theme.textPrimary)
-                    Text(isTempo ? "IN TIME" : "PRACTICE")
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
-                        .foregroundColor(Theme.ink)
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 3)
-                        .background(isTempo ? Theme.accent : Theme.textSecondary)
-                        .clipShape(Capsule())
-                    if isSlow {
-                        Text("SLOW")
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
-                            .foregroundColor(Theme.textPrimary)
-                            .padding(.horizontal, 7)
-                            .padding(.vertical, 3)
-                            .background(Theme.panelRaised)
-                            .clipShape(Capsule())
-                    }
-                }
-                Text(instruction)
-                    .font(.system(size: 13, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            Spacer()
-            if session.streak >= 3 {
-                Label(String(session.streak) + " in a row", systemImage: "flame.fill")
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundColor(Theme.accent)
-            }
-            ProgressView(value: session.progress)
-                .progressViewStyle(.linear)
-                .tint(Theme.accent)
-                .frame(width: 140)
-            if session.phase == .running {
-                Button("Restart", action: onRetry)
-                    .buttonStyle(SecondaryButtonStyle())
+    private var titleRow: some View {
+        HStack(spacing: 8) {
+            Text(title)
+                .font(.system(size: screen.compact ? 17 : 20, weight: .bold, design: .rounded))
+                .foregroundColor(Theme.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Text(isTempo ? "IN TIME" : "PRACTICE")
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .foregroundColor(Theme.ink)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 3)
+                .background(isTempo ? Theme.accent : Theme.textSecondary)
+                .clipShape(Capsule())
+                .fixedSize()
+            if isSlow {
+                Text("SLOW")
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .foregroundColor(Theme.textPrimary)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(Theme.panelRaised)
+                    .clipShape(Capsule())
+                    .fixedSize()
             }
         }
-        .padding(.horizontal, 22)
-        .padding(.vertical, 14)
+    }
+
+    private var instructionText: some View {
+        Text(instruction)
+            .font(.system(size: 13, design: .rounded))
+            .foregroundColor(Theme.textSecondary)
+    }
+
+    @ViewBuilder
+    private var streakLabel: some View {
+        if session.streak >= 3 {
+            Label(String(session.streak) + " in a row", systemImage: "flame.fill")
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundColor(Theme.accent)
+                .fixedSize()
+        }
+    }
+
+    private var progressBar: some View {
+        ProgressView(value: session.progress)
+            .progressViewStyle(.linear)
+            .tint(Theme.accent)
+    }
+
+    @ViewBuilder
+    private var restartButton: some View {
+        if session.phase == .running {
+            Button("Restart", action: onRetry)
+                .buttonStyle(SecondaryButtonStyle(small: screen.compact))
+        }
+    }
+
+    @ViewBuilder
+    private var header: some View {
+        if screen.narrow {
+            // Upright iPhone: stack everything.
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 10) {
+                    titleRow
+                    Spacer(minLength: 0)
+                    streakLabel
+                    restartButton
+                }
+                .frame(minHeight: 32)
+                instructionText
+                    .fixedSize(horizontal: false, vertical: true)
+                progressBar
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+        } else if screen.short {
+            // iPhone on its side: one line, to leave the height to the staff.
+            HStack(alignment: .center, spacing: 12) {
+                titleRow
+                    .layoutPriority(1)
+                instructionText
+                    .lineLimit(1)
+                Spacer(minLength: 0)
+                streakLabel
+                progressBar
+                    .frame(width: 80)
+                restartButton
+            }
+            .frame(minHeight: 32)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 5)
+        } else {
+            HStack(alignment: .center, spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    titleRow
+                    instructionText
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer()
+                streakLabel
+                progressBar
+                    .frame(width: 140)
+                restartButton
+            }
+            .padding(.horizontal, 22)
+            .padding(.vertical, 14)
+        }
     }
 
     private var startCard: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: screen.short ? 8 : 12) {
             Text("Ready?")
-                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .font(.system(size: screen.short ? 18 : 22, weight: .bold, design: .rounded))
                 .foregroundColor(Theme.textPrimary)
             Text("You will hear one measure of clicks before the first note.")
                 .font(.system(size: 13, design: .rounded))
                 .foregroundColor(Theme.textSecondary)
+                .multilineTextAlignment(.center)
             Button("Start") {
                 session.start()
             }
             .buttonStyle(PrimaryButtonStyle())
             .keyboardShortcut(.defaultAction)
         }
-        .padding(26)
+        .padding(screen.short ? 14 : 26)
         .background(Theme.panel.opacity(0.96))
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .shadow(color: Color.black.opacity(0.35), radius: 18, y: 6)
@@ -191,6 +260,7 @@ struct ExercisePlayer: View {
 
 /// Shown when an exercise ends.
 struct ResultCard: View {
+    @Environment(\.screenLayout) private var screen
     let summary: PerformanceSummary
     let isSlow: Bool
     let continueLabel: String
@@ -222,38 +292,41 @@ struct ResultCard: View {
     }
 
     var body: some View {
-        VStack(spacing: 14) {
-            StarsView(stars: summary.stars, size: 30)
+        VStack(spacing: screen.short ? 6 : 14) {
+            StarsView(stars: summary.stars, size: screen.short ? 20 : 30)
             Text(headline)
-                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .font(.system(size: screen.short ? 18 : 24, weight: .bold, design: .rounded))
                 .foregroundColor(Theme.textPrimary)
             Text(detail)
                 .font(.system(size: 13, design: .rounded))
                 .foregroundColor(Theme.textSecondary)
-            if !summary.passed {
+                .multilineTextAlignment(.center)
+            if !summary.passed && !screen.short {
                 Text("Try it again, or slow the tempo down first.")
                     .font(.system(size: 13, design: .rounded))
                     .foregroundColor(Theme.textSecondary)
+                    .multilineTextAlignment(.center)
             }
-            HStack(spacing: 10) {
+            HStack(spacing: screen.compact ? 8 : 10) {
                 Button("Try again", action: onRetry)
-                    .buttonStyle(SecondaryButtonStyle())
+                    .buttonStyle(SecondaryButtonStyle(small: screen.compact))
                 if summary.timed {
                     Button(isSlow ? "Full speed" : "Slower", action: onToggleSlow)
-                        .buttonStyle(SecondaryButtonStyle())
+                        .buttonStyle(SecondaryButtonStyle(small: screen.compact))
                 }
                 if summary.passed {
                     Button(continueLabel, action: onContinue)
-                        .buttonStyle(PrimaryButtonStyle())
+                        .buttonStyle(PrimaryButtonStyle(small: screen.compact))
                         .keyboardShortcut(.defaultAction)
                 } else {
                     Button("Skip", action: onContinue)
-                        .buttonStyle(SecondaryButtonStyle())
+                        .buttonStyle(SecondaryButtonStyle(small: screen.compact))
                 }
             }
+            .fixedSize()
             .padding(.top, 4)
         }
-        .padding(28)
+        .padding(screen.compact ? 16 : 28)
         .background(Theme.panel.opacity(0.97))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color.black.opacity(0.4), radius: 20, y: 8)
@@ -261,14 +334,17 @@ struct ResultCard: View {
 }
 
 /// The bar across the top of a lesson or song, with a close button.
-struct SessionTopBar: View {
+/// `accessory` is extra content placed in the bar (the song options on an iPhone held sideways).
+struct SessionTopBar<Accessory: View>: View {
+    @Environment(\.screenLayout) private var screen
     let title: String
     let stepCount: Int
     let stepIndex: Int
     let onClose: () -> Void
+    @ViewBuilder var accessory: () -> Accessory
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: screen.compact ? 10 : 14) {
             Button(action: onClose) {
                 Image(systemName: "xmark")
                     .font(.system(size: 13, weight: .bold))
@@ -276,29 +352,39 @@ struct SessionTopBar: View {
                     .frame(width: 30, height: 30)
                     .background(Theme.panelRaised)
                     .clipShape(Circle())
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .keyboardShortcut(.cancelAction)
+            .accessibilityLabel("Close")
 
             Text(title)
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                 .foregroundColor(Theme.textSecondary)
+                .lineLimit(1)
 
             if stepCount > 1 {
-                HStack(spacing: 4) {
+                HStack(spacing: screen.narrow ? 2 : 4) {
                     ForEach(0..<stepCount, id: \.self) { index in
                         Capsule()
                             .fill(index < stepIndex ? Theme.accent : (index == stepIndex ? Theme.textPrimary : Color(white: 0.3)))
                             .frame(height: 5)
                     }
                 }
-                .frame(maxWidth: 420)
+                .frame(minWidth: 60, maxWidth: 420)
             }
-            Spacer()
-            ConnectionBadge()
+            accessory()
+            Spacer(minLength: 0)
+            ConnectionBadge(dotOnly: screen.compact)
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 10)
+        .padding(.horizontal, screen.compact ? 12 : 20)
+        .padding(.vertical, screen.short ? 6 : 10)
         .background(Theme.panel)
+    }
+}
+
+extension SessionTopBar where Accessory == EmptyView {
+    init(title: String, stepCount: Int, stepIndex: Int, onClose: @escaping () -> Void) {
+        self.init(title: title, stepCount: stepCount, stepIndex: stepIndex, onClose: onClose, accessory: { EmptyView() })
     }
 }
