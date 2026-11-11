@@ -40,12 +40,4 @@ public enum SongLibrary {
         Song(id: "fur-elise", title: "Für Elise (opening)", credit: "Ludwig van Beethoven", level: 3,
              score: sc(Tunes.furElise, time: .threeFour, tempo: 100, pickup: 1, rp: nil)),
     ]
-
-    public static func levelName(_ level: Int) -> String {
-        switch level {
-        case 1: return "First tunes"
-        case 2: return "Getting going"
-        default: return "A challenge"
-        }
-    }
 }

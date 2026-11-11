@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Middle C: strings whose wording depends on a number. Each language lists the plural
+     forms its grammar needs (CLDR categories: zero, one, two, few, many, other); every
+     language needs "other". These keys take precedence over Localizable.strings. -->
+<plist version="1.0">
+<dict>
+    <!-- Result of a practice exercise: how many wrong keys were pressed. -->
+    <key>%lld wrong keys along the way.</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@keys@</string>
+        <key>keys</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>lld</string>
+            <key>one</key>
+            <string>%lld tecla incorrecta por el camino.</string>
+            <key>many</key>
+            <string>%lld teclas incorrectas por el camino.</string>
+            <key>other</key>
+            <string>%lld teclas incorrectas por el camino.</string>
+        </dict>
+    </dict>
+    <!-- How many notes in a row were right, such as "5 in a row". Shown from 3 upwards. -->
+    <key>%lld in a row</key>
+    <dict>
+        <key>NSStringLocalizedFormatKey</key>
+        <string>%#@notes@</string>
+        <key>notes</key>
+        <dict>
+            <key>NSStringFormatSpecTypeKey</key>
+            <string>NSStringPluralRuleType</string>
+            <key>NSStringFormatValueTypeKey</key>
+            <string>lld</string>
+            <key>one</key>
+            <string>%lld seguida</string>
+            <key>many</key>
+            <string>%lld seguidas</string>
+            <key>other</key>
+            <string>%lld seguidas</string>
+        </dict>
+    </dict>
+</dict>
+</plist>

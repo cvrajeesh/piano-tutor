@@ -70,7 +70,7 @@ final class MIDIManager: ObservableObject {
         if status == noErr, let name = value?.takeRetainedValue() {
             return name as String
         }
-        return "MIDI keyboard"
+        return String(localized: "MIDI keyboard", comment: "Name shown for a connected keyboard that does not report its own name")
     }
 
     private func receive(_ eventList: UnsafePointer<MIDIEventList>) {

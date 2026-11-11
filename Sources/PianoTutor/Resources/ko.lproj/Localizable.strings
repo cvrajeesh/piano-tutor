@@ -1,0 +1,286 @@
+/* Middle C: the app's own text, in English. This is the source for every translation.
+   Keys are the English text as written in the Swift code. See docs/localization.md. */
+
+/* ---- AppModel ---- */
+
+/* Option for hearing your playing through the device */
+"Always" = "항상";
+/* Option for hearing your playing through the device: decide automatically */
+"Automatic" = "자동";
+/* Option for hearing your playing through the device */
+"Never" = "안 함";
+
+/* ---- AppModel, FreePlayView ---- */
+
+/* Section name in the sidebar and tab bar: play anything and see the notes */
+"Free Play" = "자유 연주";
+
+/* ---- AppModel, LearnView ---- */
+
+/* Section name in the sidebar and tab bar: the course */
+"Learn" = "배우기";
+
+/* ---- AppModel, SettingsView ---- */
+
+/* Section name in the sidebar and tab bar */
+"Settings" = "설정";
+
+/* ---- AppModel, SongsView ---- */
+
+/* Section name in the sidebar and tab bar: the song library */
+"Songs" = "노래";
+
+/* ---- ExerciseView ---- */
+
+/* Result of an exercise played in time. The last placeholder is the accuracy as a percentage, such as 85% */
+"%lld of %lld notes, %lld right on the beat (%@)" = "음 %2$lld개 중 %1$lld개, 정박 %3$lld개 (%4$@)";
+/* Result of an exercise played in time. The last placeholder is the accuracy as a percentage, such as 85% */
+"%lld of %lld notes, %lld right on the beat, %lld wrong (%@)" = "음 %2$lld개 중 %1$lld개, 정박 %3$lld개, 틀린 음 %4$lld개 (%5$@)";
+/* Result headline for three stars */
+"Beautifully played" = "아주 멋진 연주예요";
+"Close" = "닫기";
+"Every note right first time." = "모든 음을 한 번에 맞혔어요.";
+/* Button that plays the exercise again at its normal tempo */
+"Full speed" = "원래 속도";
+/* Result headline for an exercise that was not passed */
+"Nearly there" = "거의 다 왔어요";
+"Ready?" = "준비됐나요?";
+"Restart" = "다시 시작";
+/* Button that moves on without passing the exercise */
+"Skip" = "건너뛰기";
+/* Badge on an exercise played at a slower tempo, shown in capitals */
+"Slow" = "느리게";
+/* Button that plays the exercise again at a slower tempo */
+"Slower" = "더 느리게";
+"Try again" = "다시 해 보기";
+"Try it again, or slow the tempo down first." = "다시 해 보거나, 먼저 템포를 늦춰 보세요.";
+/* Result headline for two stars */
+"Well done" = "잘했어요";
+/* Result headline for one star */
+"You got through it" = "끝까지 해냈어요";
+"You will hear one measure of clicks before the first note." = "첫 음 전에 한 마디 동안 메트로놈 소리가 들려요.";
+
+/* ---- ExerciseView, LearnView ---- */
+
+"Start" = "시작";
+
+/* ---- ExerciseView, LearnView, LessonView ---- */
+
+"Continue" = "계속";
+
+/* ---- ExerciseView, SongsView ---- */
+
+/* Badge for the mode where you play along with the metronome, shown in capitals */
+"In time" = "박자 연주";
+/* Badge for the mode where the music waits for you, shown in capitals */
+"Practice" = "연습";
+
+/* ---- FreePlayView ---- */
+
+/* The placeholders are letters on computer keys in the user's keyboard layout, such as A S D F G H J K. The last one is the octave shift, such as +1 or -2 */
+"Computer keys: %@ play the white keys from Middle C, %@ the black keys. %@ and %@ shift the octave (now %@)." = "컴퓨터 키보드: %1$@ 키는 가운데 도부터 흰 건반을, %2$@ 키는 검은 건반을 쳐요. %3$@ 키와 %4$@ 키로 옥타브를 바꿔요(현재 %5$@).";
+/* The placeholders are letters on computer keys in the user's keyboard layout, such as A S D F G H J K */
+"Computer keys: %@ play the white keys from Middle C, %@ the black keys. %@ and %@ shift the octave." = "컴퓨터 키보드: %1$@ 키는 가운데 도부터 흰 건반을, %2$@ 키는 검은 건반을 쳐요. %3$@ 키와 %4$@ 키로 옥타브를 바꿔요.";
+"Play anything. The notes you hold appear on the staff with their names." = "무엇이든 쳐 보세요. 누르고 있는 음이 계이름과 함께 오선에 나타나요.";
+"Press a key" = "건반을 눌러 보세요";
+
+/* ---- KeyboardView ---- */
+
+"Higher keys" = "높은 건반";
+"Lower keys" = "낮은 건반";
+
+/* ---- LearnView ---- */
+
+"Connect the USB port on the back of your keyboard to your iPad (you may need a USB-C or Lightning adapter) and switch the keyboard on. It is recognised automatically. Until then you can play the on-screen keys." = "키보드 뒷면의 USB 포트를 iPad에 연결하고(USB-C 또는 Lightning 어댑터가 필요할 수 있어요) 키보드를 켜세요. 자동으로 인식돼요. 그 전까지는 화면의 건반을 칠 수 있어요.";
+"Connect the USB port on the back of your keyboard to your iPhone (you may need a USB-C or Lightning adapter) and switch the keyboard on. It is recognised automatically. Until then you can play the on-screen keys." = "키보드 뒷면의 USB 포트를 iPhone에 연결하고(USB-C 또는 Lightning 어댑터가 필요할 수 있어요) 키보드를 켜세요. 자동으로 인식돼요. 그 전까지는 화면의 건반을 칠 수 있어요.";
+"Connect your keyboard" = "키보드를 연결하세요";
+"No MIDI? Middle C can listen to a piano or any keyboard through the microphone. Turn it on in Settings." = "MIDI가 없나요? Middle C는 마이크로 피아노나 어떤 키보드 소리든 들을 수 있어요. 설정에서 켜 보세요.";
+/* The placeholder is the letters on the computer keys that play the piano, as printed in the user's keyboard layout, such as "A S D F G H J K" */
+"Plug the USB port on the back of your keyboard into your Mac and switch the keyboard on. It is recognised automatically; no driver is needed. Until then you can click the on-screen keys or use the %@ row of your computer keyboard." = "키보드 뒷면의 USB 포트를 Mac에 연결하고 키보드를 켜세요. 드라이버 없이 자동으로 인식돼요. 그 전까지는 화면의 건반을 클릭하거나 컴퓨터 키보드의 %@ 줄을 사용할 수 있어요.";
+/* Heading above each unit of the course, shown in capitals */
+"Unit %lld" = "%lld단원";
+"Work through the lessons in order. Each one takes a few minutes." = "레슨을 순서대로 해 보세요. 레슨마다 몇 분이면 충분해요.";
+
+/* ---- LessonView ---- */
+
+"Back to lessons" = "레슨 목록으로";
+"Lesson complete" = "레슨 완료";
+/* Button that opens the next lesson; the placeholder is its title */
+"Next: %@" = "다음: %@";
+/* Both placeholders are note names, such as C and D: the key that was played and the one to find */
+"That was %@. Look for %@." = "방금 친 건반은 %1$@ 건반이에요. %2$@ 건반을 찾아보세요.";
+/* Shown when every key in a find-the-key drill has been found */
+"That's it!" = "바로 그거예요!";
+/* The placeholder is a note name, such as C */
+"You already found that one. Try a different %@." = "그 건반은 이미 찾았어요. 다른 %@ 건반을 쳐 보세요.";
+
+/* ---- Localization ---- */
+
+/* Song library heading for the hardest songs */
+"A challenge" = "도전해 보세요";
+/* Song library heading for the easiest songs */
+"First tunes" = "첫 노래";
+/* Song library heading for songs of medium difficulty */
+"Getting going" = "실력 쌓기";
+
+/* ---- MIDIManager ---- */
+
+/* Name shown for a connected keyboard that does not report its own name */
+"MIDI keyboard" = "MIDI 키보드";
+
+/* ---- MicrophoneInput ---- */
+
+"No microphone was found." = "마이크를 찾을 수 없어요.";
+/* The text in brackets is the system's description of the error */
+"The microphone could not be started (%@)." = "마이크를 시작할 수 없어요(%@).";
+
+/* ---- PianoTutorApp ---- */
+
+/* Connection status */
+"Keyboard connected" = "키보드 연결됨";
+/* Connection status */
+"Microphone listening" = "마이크로 듣는 중";
+/* Connection status */
+"No keyboard" = "키보드 없음";
+/* Connection status detail while the microphone is listening */
+"Play your piano" = "피아노를 쳐 보세요";
+/* Connection status detail when nothing is connected */
+"Using on-screen keys" = "화면 건반 사용 중";
+
+/* ---- PlaySession ---- */
+
+/* Feedback on the staff: a note played before the beat */
+"Early" = "빠름";
+/* Feedback on the staff: a note played after the beat */
+"Late" = "늦음";
+/* Feedback on the staff: a note that was not played */
+"Missed" = "놓침";
+/* Feedback on the staff when a wrong key is pressed in practice mode */
+"Not that one" = "그 음이 아니에요";
+/* Feedback on the staff: a note played right on the beat */
+"Perfect" = "완벽";
+/* Feedback on the staff when a key that is not in the music is played in time */
+"Wrong note" = "틀린 음";
+
+/* ---- SettingsView ---- */
+
+/* Use the names of the macOS System Settings panes as they appear in this language */
+"Allow it in System Settings → Privacy & Security → Microphone, then switch this off and on again." = "시스템 설정 → 개인정보 보호 및 보안 → 마이크에서 허용한 다음, 이 설정을 껐다가 다시 켜세요.";
+/* Use the names of the iOS Settings screens as they appear in this language */
+"Allow it in the Settings app → Privacy & Security → Microphone, then switch this off and on again." = "설정 앱 → 개인정보 보호 및 보안 → 마이크에서 허용한 다음, 이 설정을 껐다가 다시 켜세요.";
+/* "Automatic" is the name of the first option above; use the same word */
+"Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen and computer keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the Mac." = "‘자동’은 MIDI 키보드일 때는 키보드에 스피커가 있으므로 소리를 내지 않고, 화면 건반과 컴퓨터 키보드에는 피아노 소리를 내요. 마이크로 들은 음은 다시 재생하지 않아요. 메트로놈과 반주는 항상 Mac에서 나와요.";
+/* "Automatic" is the name of the first option above; use the same word */
+"Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the iPad." = "‘자동’은 MIDI 키보드일 때는 키보드에 스피커가 있으므로 소리를 내지 않고, 화면 건반에는 피아노 소리를 내요. 마이크로 들은 음은 다시 재생하지 않아요. 메트로놈과 반주는 항상 iPad에서 나와요.";
+/* "Automatic" is the name of the first option above; use the same word */
+"Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the iPhone." = "‘자동’은 MIDI 키보드일 때는 키보드에 스피커가 있으므로 소리를 내지 않고, 화면 건반에는 피아노 소리를 내요. 마이크로 들은 음은 다시 재생하지 않아요. 메트로놈과 반주는 항상 iPhone에서 나와요.";
+"Cancel" = "취소";
+"Connect the keyboard's USB port to your iPad with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two." = "데이터 케이블로 키보드의 USB 포트를 iPad에 연결하고(충전만 되는 케이블도 있어요) 키보드를 켜세요. 1~2초 안에 여기에 나타나요.";
+"Connect the keyboard's USB port to your iPhone with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two." = "데이터 케이블로 키보드의 USB 포트를 iPhone에 연결하고(충전만 되는 케이블도 있어요) 키보드를 켜세요. 1~2초 안에 여기에 나타나요.";
+"Connect the keyboard's USB port to your Mac with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two." = "데이터 케이블로 키보드의 USB 포트를 Mac에 연결하고(충전만 되는 케이블도 있어요) 키보드를 켜세요. 1~2초 안에 여기에 나타나요.";
+"For an acoustic piano, or a keyboard without USB. Put the iPad near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact." = "어쿠스틱 피아노나 USB가 없는 키보드용이에요. iPad를 피아노 가까이에 두세요. 한 번에 한 음은 어디서나 인식하고, 화음은 앱이 어떤 음을 들어야 할지 아는 레슨과 노래에서 인식해요. 메트로놈 소리 때문에 헷갈릴 수 있으니 헤드폰을 쓰거나 음량을 낮추세요. 그래도 MIDI 키보드가 더 빠르고 정확해요.";
+"For an acoustic piano, or a keyboard without USB. Put the iPhone near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact." = "어쿠스틱 피아노나 USB가 없는 키보드용이에요. iPhone을 피아노 가까이에 두세요. 한 번에 한 음은 어디서나 인식하고, 화음은 앱이 어떤 음을 들어야 할지 아는 레슨과 노래에서 인식해요. 메트로놈 소리 때문에 헷갈릴 수 있으니 헤드폰을 쓰거나 음량을 낮추세요. 그래도 MIDI 키보드가 더 빠르고 정확해요.";
+"For an acoustic piano, or a keyboard without USB. Put the Mac near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact." = "어쿠스틱 피아노나 USB가 없는 키보드용이에요. Mac을 피아노 가까이에 두세요. 한 번에 한 음은 어디서나 인식하고, 화음은 앱이 어떤 음을 들어야 할지 아는 레슨과 노래에서 인식해요. 메트로놈 소리 때문에 헷갈릴 수 있으니 헤드폰을 쓰거나 음량을 낮추세요. 그래도 MIDI 키보드가 더 빠르고 정확해요.";
+"Hear my playing through the iPad" = "내 연주를 iPad로 듣기";
+"Hear my playing through the iPhone" = "내 연주를 iPhone으로 듣기";
+"Hear my playing through the Mac" = "내 연주를 Mac으로 듣기";
+/* "Late" and "Early" are the feedback words shown on the staff; use the same translations */
+"If notes you play on the beat are often marked Late, raise this. Wireless headphones and speakers usually need 100 ms or more. If they are marked Early, lower it." = "박자에 맞춰 친 음이 자주 ‘늦음’으로 표시되면 이 값을 올리세요. 무선 헤드폰과 스피커는 보통 100ms 이상이 필요해요. ‘빠름’으로 표시되면 값을 낮추세요.";
+"Keyboard" = "키보드";
+"Language" = "언어";
+"Listen to my piano when no MIDI keyboard is connected" = "MIDI 키보드가 없을 때 내 피아노 소리 듣기";
+"Listening" = "듣는 중";
+"Look again" = "다시 찾기";
+"Microphone" = "마이크";
+"Middle C is not allowed to use the microphone" = "Middle C에 마이크 사용 권한이 없어요";
+/* iPhone and iPad only */
+"Middle C uses the language of your device. To use a different language for Middle C only, choose it on the app's page in the Settings app." = "Middle C는 기기의 언어를 사용해요. Middle C에서만 다른 언어를 쓰려면 설정 앱의 Middle C 페이지에서 선택하세요.";
+/* Use the names of the macOS System Settings panes as they appear in this language */
+"Middle C uses the language of your Mac. To use a different language for Middle C only, add it in System Settings → General → Language & Region → Applications." = "Middle C는 Mac의 언어를 사용해요. Middle C에서만 다른 언어를 쓰려면 시스템 설정 → 일반 → 언어 및 지역 → 응용 프로그램에서 추가하세요.";
+"No MIDI keyboard found" = "MIDI 키보드를 찾지 못했어요";
+"Noisy room: only listen for the right notes" = "시끄러운 곳: 맞는 음만 듣기";
+"Not listening: a MIDI keyboard is connected" = "듣지 않음: MIDI 키보드가 연결됨";
+/* Timing setting: how much to shift the judging of notes, in milliseconds */
+"Offset" = "보정";
+/* Button that opens the app's page in the iOS Settings app */
+"Open Settings" = "설정 열기";
+/* The placeholder is a note name with its octave, such as C4 */
+"Play a key to check the connection. Last note received: %@." = "건반을 눌러 연결을 확인하세요. 마지막으로 받은 음: %@.";
+"Play a key to check the connection. No note received yet." = "건반을 눌러 연결을 확인하세요. 아직 받은 음이 없어요.";
+/* The placeholder is a note name with its octave, such as C4 */
+"Play a key to check. Last note heard: %@." = "건반을 눌러 확인하세요. 마지막으로 들은 음: %@.";
+"Play a key to check. No note heard yet." = "건반을 눌러 확인하세요. 아직 들린 음이 없어요.";
+"Progress" = "진행 상황";
+"Reset all stars and completed lessons?" = "모든 별과 완료한 레슨을 초기화할까요?";
+"Reset progress" = "진행 상황 초기화";
+"Reset progress…" = "진행 상황 초기화…";
+"Sound" = "소리";
+"Talking and other sounds are mostly told apart from the piano, but not always. With this on, nothing the microphone hears is ever marked as a wrong note; the music simply waits for the right one." = "말소리나 다른 소리는 대부분 피아노와 구별되지만 항상 그렇지는 않아요. 이 설정을 켜면 마이크로 들은 소리는 절대 ‘틀린 음’으로 표시되지 않고, 맞는 음이 나올 때까지 악보가 기다려요.";
+"Timing" = "타이밍";
+"Unlock all lessons" = "모든 레슨 열기";
+"Volume" = "음량";
+"Waiting for permission to use the microphone" = "마이크 사용 권한을 기다리는 중";
+
+/* ---- SongsView ---- */
+
+/* Song option: play both hands */
+"Both" = "양손";
+/* Badge on a song written for both hands */
+"Both hands" = "양손";
+/* Button that closes a finished song */
+"Done" = "완료";
+"Hands" = "손";
+"Key hints" = "건반 힌트";
+/* Song option: play the left hand only */
+"Left" = "왼손";
+"Metronome" = "메트로놈";
+"Mode" = "모드";
+"Note names" = "계이름";
+"Play in time with the clicks. Your best result is saved." = "메트로놈 소리에 맞춰 연주하세요. 최고 기록이 저장돼요.";
+"Practise any tune at your own speed, one hand at a time or both together." = "어떤 노래든 내 속도에 맞춰, 한 손씩 또는 양손으로 연습하세요.";
+/* Song option: play the right hand only */
+"Right" = "오른손";
+/* Badge on a song written for the right hand only */
+"Right hand" = "오른손";
+"Speed" = "속도";
+/* "In time" is the name of the mode option; use the same words */
+"The music waits for you. Switch to In time when you know the notes." = "악보가 기다려 줘요. 음을 익혔으면 ‘박자 연주’로 바꿔 보세요.";
+
+/* ---- Support ---- */
+
+/* Accessibility label for a lesson or song rating, e.g. "2 of 3 stars" */
+"%lld of 3 stars" = "별 3개 중 %lld개";
+
+/* ---- Feedback and website links (PianoTutorApp, SettingsView) ---- */
+
+/* Help menu item on the Mac that opens the app's website */
+"Middle C Website" = "Middle C 웹사이트";
+/* Help menu item on the Mac that opens the feedback board. Title case, as in Mac menus. */
+"Report a Problem or Suggest an Idea…" = "문제 신고 또는 아이디어 제안…";
+/* Settings section heading, shown in capitals */
+"Feedback" = "피드백";
+"Found a problem, or have an idea for Middle C? Post it on the feedback board, where you can also vote for other people's ideas." = "Middle C에서 문제를 발견했거나 좋은 아이디어가 있나요? 피드백 게시판에 올려 주세요. 다른 사람의 아이디어에 투표할 수도 있어요.";
+/* Button in Settings that opens the feedback board */
+"Report a problem or suggest an idea" = "문제 신고 또는 아이디어 제안";
+/* Settings section heading, shown in capitals */
+"Website" = "웹사이트";
+"Help with keyboards and the microphone, answers to common questions, and the privacy policy are on the Middle C website." = "키보드와 마이크 도움말, 자주 묻는 질문에 대한 답변, 개인정보 처리방침은 Middle C 웹사이트에서 볼 수 있어요.";
+
+/* ---- VoiceOver (KeyboardView, StaffView, LessonView) ---- */
+
+/* VoiceOver name of the on-screen keyboard */
+"Piano keyboard" = "피아노 건반";
+/* VoiceOver: the keys to play next; the placeholder is a list of keys, such as "C4 and E4" */
+"Play %@." = "%@ 치세요.";
+/* VoiceOver: a key to play and the finger to play it with, such as "E4, finger 3" */
+"%@, finger %lld" = "%1$@, %2$lld번 손가락";
+/* VoiceOver: the keys a lesson points out; the placeholder is a list of keys */
+"Marked: %@." = "표시된 건반: %@.";
+/* VoiceOver: the keys held down; the placeholder is a list of keys */
+"Holding %@." = "누르고 있는 건반: %@.";
+/* VoiceOver name of a music staff */
+"Music staff" = "오선";
+/* VoiceOver: an empty staff */
+"No notes" = "음표 없음";
+/* Read out by VoiceOver after a key is found; the placeholder is the next note to find, such as D */
+"Right. Next, %@." = "맞아요. 다음은 %@.";

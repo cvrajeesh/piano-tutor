@@ -219,20 +219,22 @@ struct KeyboardView: View {
         var parts: [String] = []
         if !targets.isEmpty {
             let keys: [String] = targets.keys.sorted().map { midi in
-                var text: String = Announcer.spokenName(ofKey: midi)
+                let name: String = Announcer.spokenName(ofKey: midi)
                 if let finger = targets[midi]?.finger {
-                    text += ", finger " + String(finger)
+                    return String(localized: "\(name), finger \(finger)", comment: "VoiceOver: a key to play and the finger to play it with, such as \"E4, finger 3\"")
                 }
-                return text
+                return name
             }
-            parts.append("Play " + keys.joined(separator: " and "))
+            parts.append(String(localized: "Play \(Announcer.list(keys)).", comment: "VoiceOver: the keys to play next; the placeholder is a list of keys, such as \"C4 and E4\""))
         } else if !marks.isEmpty {
-            parts.append("Marked: " + marks.map { Announcer.spokenName(ofKey: $0.midi) }.joined(separator: ", "))
+            let keys: [String] = marks.map { Announcer.spokenName(ofKey: $0.midi) }
+            parts.append(String(localized: "Marked: \(Announcer.list(keys)).", comment: "VoiceOver: the keys a lesson points out; the placeholder is a list of keys"))
         }
         if !held.isEmpty {
-            parts.append("Holding " + held.sorted().map { Announcer.spokenName(ofKey: $0) }.joined(separator: ", "))
+            let keys: [String] = held.sorted().map { Announcer.spokenName(ofKey: $0) }
+            parts.append(String(localized: "Holding \(Announcer.list(keys)).", comment: "VoiceOver: the keys held down; the placeholder is a list of keys"))
         }
-        return parts.joined(separator: ". ")
+        return parts.joined(separator: " ")
     }
 
     /// Called with the position of every finger (or the mouse) that is down on the keys.
@@ -277,7 +279,7 @@ struct KeyboardView: View {
             if let finger = target.finger { return String(finger) }
             return nil
         }
-        return mark(for: midi)?.label
+        return mark(for: midi)?.label?.text
     }
 
     private func labelColor(for midi: Int) -> Color {
@@ -315,18 +317,21 @@ struct KeyboardView: View {
             let baseY: CGFloat = black ? rect.maxY - fontSize * 0.95 : size.height - fontSize * 1.0
 
             if let text = label(for: midi) {
-                let long: Bool = text.count > 2
-                let drawn = Text(text)
-                    .font(.system(size: long ? fontSize * 0.8 : fontSize, weight: .bold, design: .rounded))
-                    .foregroundColor(labelColor(for: midi))
-                context.draw(drawn, at: CGPoint(x: rect.midX, y: baseY))
+                // Note names and words vary in length between languages (C, Sol, ファ, Do central).
+                let color: Color = labelColor(for: midi)
+                context.drawFitted(at: CGPoint(x: rect.midX, y: baseY), size: fontSize, maxWidth: rect.width - 3) { size in
+                    Text(verbatim: text)
+                        .font(.system(size: size, weight: .bold, design: .rounded))
+                        .foregroundColor(color)
+                }
             } else if !black && midi % 12 == 0 && !isHighlighted(midi) {
                 // Name every C; Middle C gets a dot as a landmark.
-                let octave: Int = midi / 12 - 1
-                let name = Text("C" + String(octave))
-                    .font(.system(size: fontSize * 0.72, weight: .medium, design: .rounded))
-                    .foregroundColor(Color(white: 0.45))
-                context.draw(name, at: CGPoint(x: rect.midX, y: baseY))
+                let name: String = NoteNaming.current.fullName(midi: midi)
+                context.drawFitted(at: CGPoint(x: rect.midX, y: baseY), size: fontSize * 0.72, maxWidth: rect.width - 3) { size in
+                    Text(verbatim: name)
+                        .font(.system(size: size, weight: .medium, design: .rounded))
+                        .foregroundColor(Color(white: 0.45))
+                }
                 if midi == 60 {
                     let dot = CGRect(x: rect.midX - 2.5, y: baseY - fontSize * 1.1, width: 5, height: 5)
                     context.fill(Path(ellipseIn: dot), with: .color(Theme.accent))
@@ -370,11 +375,11 @@ struct KeyboardPanel: View {
                 let auto: Int = start(count: count, shift: 0)
                 let first: Int = start(count: count, shift: shift)
                 HStack(spacing: 4) {
-                    arrow("chevron.left", enabled: first > 0) {
+                    arrow("chevron.left", label: "Lower keys", enabled: first > 0) {
                         shift = max(first - 7, 0) - auto
                     }
                     keys(firstWhite: first, count: count)
-                    arrow("chevron.right", enabled: first < total - count) {
+                    arrow("chevron.right", label: "Higher keys", enabled: first < total - count) {
                         shift = min(first + 7, total - count) - auto
                     }
                 }
@@ -409,7 +414,7 @@ struct KeyboardPanel: View {
         )
     }
 
-    private func arrow(_ symbol: String, enabled: Bool, action: @escaping () -> Void) -> some View {
+    private func arrow(_ symbol: String, label: LocalizedStringKey, enabled: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: symbol)
                 .font(.system(size: 13, weight: .bold))
@@ -423,6 +428,6 @@ struct KeyboardPanel: View {
         .buttonStyle(.plain)
         .opacity(enabled ? 1 : 0.35)
         .disabled(!enabled)
-        .accessibilityLabel(symbol == "chevron.left" ? "Lower keys" : "Higher keys")
+        .accessibilityLabel(label)
     }
 }

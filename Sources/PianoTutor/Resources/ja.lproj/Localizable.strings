@@ -1,0 +1,286 @@
+/* Middle C: the app's own text, in English. This is the source for every translation.
+   Keys are the English text as written in the Swift code. See docs/localization.md. */
+
+/* ---- AppModel ---- */
+
+/* Option for hearing your playing through the device */
+"Always" = "常に";
+/* Option for hearing your playing through the device: decide automatically */
+"Automatic" = "自動";
+/* Option for hearing your playing through the device */
+"Never" = "しない";
+
+/* ---- AppModel, FreePlayView ---- */
+
+/* Section name in the sidebar and tab bar: play anything and see the notes */
+"Free Play" = "自由演奏";
+
+/* ---- AppModel, LearnView ---- */
+
+/* Section name in the sidebar and tab bar: the course */
+"Learn" = "レッスン";
+
+/* ---- AppModel, SettingsView ---- */
+
+/* Section name in the sidebar and tab bar */
+"Settings" = "設定";
+
+/* ---- AppModel, SongsView ---- */
+
+/* Section name in the sidebar and tab bar: the song library */
+"Songs" = "曲";
+
+/* ---- ExerciseView ---- */
+
+/* Result of an exercise played in time. The last placeholder is the accuracy as a percentage, such as 85% */
+"%lld of %lld notes, %lld right on the beat (%@)" = "%2$lld音中%1$lld音、拍ぴったり%3$lld音（%4$@）";
+/* Result of an exercise played in time. The last placeholder is the accuracy as a percentage, such as 85% */
+"%lld of %lld notes, %lld right on the beat, %lld wrong (%@)" = "%2$lld音中%1$lld音、拍ぴったり%3$lld音、違う音%4$lld音（%5$@）";
+/* Result headline for three stars */
+"Beautifully played" = "すばらしい演奏です";
+"Close" = "閉じる";
+"Every note right first time." = "すべての音を一度で弾けました。";
+/* Button that plays the exercise again at its normal tempo */
+"Full speed" = "元の速さ";
+/* Result headline for an exercise that was not passed */
+"Nearly there" = "あと少し";
+"Ready?" = "準備はいいですか？";
+"Restart" = "やり直す";
+/* Button that moves on without passing the exercise */
+"Skip" = "スキップ";
+/* Badge on an exercise played at a slower tempo, shown in capitals */
+"Slow" = "ゆっくり";
+/* Button that plays the exercise again at a slower tempo */
+"Slower" = "ゆっくり弾く";
+"Try again" = "もう一度";
+"Try it again, or slow the tempo down first." = "もう一度弾いてみましょう。先にテンポを落としてもかまいません。";
+/* Result headline for two stars */
+"Well done" = "よくできました";
+/* Result headline for one star */
+"You got through it" = "最後まで弾けました";
+"You will hear one measure of clicks before the first note." = "最初の音の前に、1小節分のクリック音が鳴ります。";
+
+/* ---- ExerciseView, LearnView ---- */
+
+"Start" = "スタート";
+
+/* ---- ExerciseView, LearnView, LessonView ---- */
+
+"Continue" = "続ける";
+
+/* ---- ExerciseView, SongsView ---- */
+
+/* Badge for the mode where you play along with the metronome, shown in capitals */
+"In time" = "リズム";
+/* Badge for the mode where the music waits for you, shown in capitals */
+"Practice" = "練習";
+
+/* ---- FreePlayView ---- */
+
+/* The placeholders are letters on computer keys in the user's keyboard layout, such as A S D F G H J K. The last one is the octave shift, such as +1 or -2 */
+"Computer keys: %@ play the white keys from Middle C, %@ the black keys. %@ and %@ shift the octave (now %@)." = "コンピュータのキー：%1$@で真ん中のドからの白鍵、%2$@で黒鍵を弾けます。%3$@と%4$@でオクターブを切り替えます（現在：%5$@）。";
+/* The placeholders are letters on computer keys in the user's keyboard layout, such as A S D F G H J K */
+"Computer keys: %@ play the white keys from Middle C, %@ the black keys. %@ and %@ shift the octave." = "コンピュータのキー：%1$@で真ん中のドからの白鍵、%2$@で黒鍵を弾けます。%3$@と%4$@でオクターブを切り替えます。";
+"Play anything. The notes you hold appear on the staff with their names." = "自由に弾いてみましょう。押さえている音が、音名といっしょに五線に表示されます。";
+"Press a key" = "鍵盤を押してください";
+
+/* ---- KeyboardView ---- */
+
+"Higher keys" = "高い音の鍵盤";
+"Lower keys" = "低い音の鍵盤";
+
+/* ---- LearnView ---- */
+
+"Connect the USB port on the back of your keyboard to your iPad (you may need a USB-C or Lightning adapter) and switch the keyboard on. It is recognised automatically. Until then you can play the on-screen keys." = "キーボードの背面にあるUSBポートをiPadにつないで（USB-CまたはLightningのアダプタが必要な場合があります）、キーボードの電源を入れてください。自動的に認識されます。それまでは画面上の鍵盤で弾けます。";
+"Connect the USB port on the back of your keyboard to your iPhone (you may need a USB-C or Lightning adapter) and switch the keyboard on. It is recognised automatically. Until then you can play the on-screen keys." = "キーボードの背面にあるUSBポートをiPhoneにつないで（USB-CまたはLightningのアダプタが必要な場合があります）、キーボードの電源を入れてください。自動的に認識されます。それまでは画面上の鍵盤で弾けます。";
+"Connect your keyboard" = "キーボードをつなぎましょう";
+"No MIDI? Middle C can listen to a piano or any keyboard through the microphone. Turn it on in Settings." = "MIDIがなくても大丈夫。Middle Cはマイクでピアノやキーボードの音を聴き取れます。「設定」でオンにしてください。";
+/* The placeholder is the letters on the computer keys that play the piano, as printed in the user's keyboard layout, such as "A S D F G H J K" */
+"Plug the USB port on the back of your keyboard into your Mac and switch the keyboard on. It is recognised automatically; no driver is needed. Until then you can click the on-screen keys or use the %@ row of your computer keyboard." = "キーボードの背面にあるUSBポートをMacにつないで、キーボードの電源を入れてください。自動的に認識され、ドライバは必要ありません。それまでは画面上の鍵盤をクリックするか、コンピュータのキーボードの「%@」の列で弾けます。";
+/* Heading above each unit of the course, shown in capitals */
+"Unit %lld" = "ユニット%lld";
+"Work through the lessons in order. Each one takes a few minutes." = "レッスンは順番に進めましょう。どれも数分で終わります。";
+
+/* ---- LessonView ---- */
+
+"Back to lessons" = "レッスン一覧へ";
+"Lesson complete" = "レッスン完了";
+/* Button that opens the next lesson; the placeholder is its title */
+"Next: %@" = "次へ：%@";
+/* Both placeholders are note names, such as C and D: the key that was played and the one to find */
+"That was %@. Look for %@." = "今のは%1$@です。%2$@を探しましょう。";
+/* Shown when every key in a find-the-key drill has been found */
+"That's it!" = "できました！";
+/* The placeholder is a note name, such as C */
+"You already found that one. Try a different %@." = "そこはもう見つけました。別の%@を探しましょう。";
+
+/* ---- Localization ---- */
+
+/* Song library heading for the hardest songs */
+"A challenge" = "チャレンジ";
+/* Song library heading for the easiest songs */
+"First tunes" = "はじめての曲";
+/* Song library heading for songs of medium difficulty */
+"Getting going" = "ステップアップ";
+
+/* ---- MIDIManager ---- */
+
+/* Name shown for a connected keyboard that does not report its own name */
+"MIDI keyboard" = "MIDIキーボード";
+
+/* ---- MicrophoneInput ---- */
+
+"No microphone was found." = "マイクが見つかりません。";
+/* The text in brackets is the system's description of the error */
+"The microphone could not be started (%@)." = "マイクを開始できませんでした（%@）。";
+
+/* ---- PianoTutorApp ---- */
+
+/* Connection status */
+"Keyboard connected" = "キーボード接続中";
+/* Connection status */
+"Microphone listening" = "マイクで聴き取り中";
+/* Connection status */
+"No keyboard" = "キーボードなし";
+/* Connection status detail while the microphone is listening */
+"Play your piano" = "ピアノを弾いてください";
+/* Connection status detail when nothing is connected */
+"Using on-screen keys" = "画面の鍵盤を使用中";
+
+/* ---- PlaySession ---- */
+
+/* Feedback on the staff: a note played before the beat */
+"Early" = "早い";
+/* Feedback on the staff: a note played after the beat */
+"Late" = "遅い";
+/* Feedback on the staff: a note that was not played */
+"Missed" = "ミス";
+/* Feedback on the staff when a wrong key is pressed in practice mode */
+"Not that one" = "ちがいます";
+/* Feedback on the staff: a note played right on the beat */
+"Perfect" = "ぴったり";
+/* Feedback on the staff when a key that is not in the music is played in time */
+"Wrong note" = "違う音";
+
+/* ---- SettingsView ---- */
+
+/* Use the names of the macOS System Settings panes as they appear in this language */
+"Allow it in System Settings → Privacy & Security → Microphone, then switch this off and on again." = "「システム設定」→「プライバシーとセキュリティ」→「マイク」で許可してから、この設定をいったんオフにして、もう一度オンにしてください。";
+/* Use the names of the iOS Settings screens as they appear in this language */
+"Allow it in the Settings app → Privacy & Security → Microphone, then switch this off and on again." = "「設定」アプリ→「プライバシーとセキュリティ」→「マイク」で許可してから、この設定をいったんオフにして、もう一度オンにしてください。";
+/* "Automatic" is the name of the first option above; use the same word */
+"Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen and computer keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the Mac." = "「自動」では、MIDIキーボードは本体にスピーカーがあるので音を鳴らさず、画面上の鍵盤とコンピュータのキーではピアノの音を鳴らします。マイクで聴き取った音が再生されることはありません。メトロノームと伴奏は常にMacから鳴ります。";
+/* "Automatic" is the name of the first option above; use the same word */
+"Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the iPad." = "「自動」では、MIDIキーボードは本体にスピーカーがあるので音を鳴らさず、画面上の鍵盤ではピアノの音を鳴らします。マイクで聴き取った音が再生されることはありません。メトロノームと伴奏は常にiPadから鳴ります。";
+/* "Automatic" is the name of the first option above; use the same word */
+"Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the iPhone." = "「自動」では、MIDIキーボードは本体にスピーカーがあるので音を鳴らさず、画面上の鍵盤ではピアノの音を鳴らします。マイクで聴き取った音が再生されることはありません。メトロノームと伴奏は常にiPhoneから鳴ります。";
+"Cancel" = "キャンセル";
+"Connect the keyboard's USB port to your iPad with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two." = "キーボードのUSBポートとiPadをデータ通信に対応したケーブルでつなぎ（充電専用のケーブルもあります）、キーボードの電源を入れてください。1〜2秒でここに表示されます。";
+"Connect the keyboard's USB port to your iPhone with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two." = "キーボードのUSBポートとiPhoneをデータ通信に対応したケーブルでつなぎ（充電専用のケーブルもあります）、キーボードの電源を入れてください。1〜2秒でここに表示されます。";
+"Connect the keyboard's USB port to your Mac with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two." = "キーボードのUSBポートとMacをデータ通信に対応したケーブルでつなぎ（充電専用のケーブルもあります）、キーボードの電源を入れてください。1〜2秒でここに表示されます。";
+"For an acoustic piano, or a keyboard without USB. Put the iPad near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact." = "アコースティックピアノや、USBのないキーボード向けです。iPadをピアノの近くに置いてください。単音はどこでも認識されます。和音は、聴き取るべき音をアプリが知っているレッスンと曲の中で認識されます。メトロノームの音で誤認識することがあるので、ヘッドフォンを使うか音量を小さくしてください。MIDIキーボードのほうが反応が速く、より正確です。";
+"For an acoustic piano, or a keyboard without USB. Put the iPhone near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact." = "アコースティックピアノや、USBのないキーボード向けです。iPhoneをピアノの近くに置いてください。単音はどこでも認識されます。和音は、聴き取るべき音をアプリが知っているレッスンと曲の中で認識されます。メトロノームの音で誤認識することがあるので、ヘッドフォンを使うか音量を小さくしてください。MIDIキーボードのほうが反応が速く、より正確です。";
+"For an acoustic piano, or a keyboard without USB. Put the Mac near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact." = "アコースティックピアノや、USBのないキーボード向けです。Macをピアノの近くに置いてください。単音はどこでも認識されます。和音は、聴き取るべき音をアプリが知っているレッスンと曲の中で認識されます。メトロノームの音で誤認識することがあるので、ヘッドフォンを使うか音量を小さくしてください。MIDIキーボードのほうが反応が速く、より正確です。";
+"Hear my playing through the iPad" = "演奏の音をiPadで鳴らす";
+"Hear my playing through the iPhone" = "演奏の音をiPhoneで鳴らす";
+"Hear my playing through the Mac" = "演奏の音をMacで鳴らす";
+/* "Late" and "Early" are the feedback words shown on the staff; use the same translations */
+"If notes you play on the beat are often marked Late, raise this. Wireless headphones and speakers usually need 100 ms or more. If they are marked Early, lower it." = "拍どおりに弾いた音がよく「遅い」と判定される場合は、この値を上げてください。ワイヤレスのヘッドフォンやスピーカーでは、ふつう100ミリ秒以上が必要です。「早い」と判定される場合は下げてください。";
+"Keyboard" = "キーボード";
+"Language" = "言語";
+"Listen to my piano when no MIDI keyboard is connected" = "MIDIキーボードがないときはピアノの音をマイクで聴く";
+"Listening" = "聴き取り中";
+"Look again" = "再検索";
+"Microphone" = "マイク";
+"Middle C is not allowed to use the microphone" = "Middle Cにマイクの使用が許可されていません";
+/* iPhone and iPad only */
+"Middle C uses the language of your device. To use a different language for Middle C only, choose it on the app's page in the Settings app." = "Middle Cはデバイスの言語で表示されます。Middle Cだけ別の言語にするには、「設定」アプリのMiddle Cのページで選んでください。";
+/* Use the names of the macOS System Settings panes as they appear in this language */
+"Middle C uses the language of your Mac. To use a different language for Middle C only, add it in System Settings → General → Language & Region → Applications." = "Middle CはMacの言語で表示されます。Middle Cだけ別の言語にするには、「システム設定」→「一般」→「言語と地域」→「アプリケーション」で追加してください。";
+"No MIDI keyboard found" = "MIDIキーボードが見つかりません";
+"Noisy room: only listen for the right notes" = "騒がしい部屋：正しい音だけを聴き取る";
+"Not listening: a MIDI keyboard is connected" = "聴き取り停止中：MIDIキーボードが接続されています";
+/* Timing setting: how much to shift the judging of notes, in milliseconds */
+"Offset" = "補正";
+/* Button that opens the app's page in the iOS Settings app */
+"Open Settings" = "設定を開く";
+/* The placeholder is a note name with its octave, such as C4 */
+"Play a key to check the connection. Last note received: %@." = "鍵盤を弾いて接続を確認してください。最後に受信した音：%@";
+"Play a key to check the connection. No note received yet." = "鍵盤を弾いて接続を確認してください。まだ音を受信していません。";
+/* The placeholder is a note name with its octave, such as C4 */
+"Play a key to check. Last note heard: %@." = "鍵盤を弾いて確認してください。最後に聴き取った音：%@";
+"Play a key to check. No note heard yet." = "鍵盤を弾いて確認してください。まだ音を聴き取っていません。";
+"Progress" = "進み具合";
+"Reset all stars and completed lessons?" = "すべての星と完了したレッスンをリセットしますか？";
+"Reset progress" = "進み具合をリセット";
+"Reset progress…" = "進み具合をリセット…";
+"Sound" = "サウンド";
+"Talking and other sounds are mostly told apart from the piano, but not always. With this on, nothing the microphone hears is ever marked as a wrong note; the music simply waits for the right one." = "話し声などの音は、たいていピアノの音と区別できますが、いつもとは限りません。これをオンにすると、マイクが聴き取った音が「違う音」と判定されることはなく、正しい音が鳴るまで楽譜が待ちます。";
+"Timing" = "タイミング";
+"Unlock all lessons" = "すべてのレッスンを解放";
+"Volume" = "音量";
+"Waiting for permission to use the microphone" = "マイクの使用許可を待っています";
+
+/* ---- SongsView ---- */
+
+/* Song option: play both hands */
+"Both" = "両手";
+/* Badge on a song written for both hands */
+"Both hands" = "両手";
+/* Button that closes a finished song */
+"Done" = "完了";
+"Hands" = "手";
+"Key hints" = "鍵盤ヒント";
+/* Song option: play the left hand only */
+"Left" = "左手";
+"Metronome" = "メトロノーム";
+"Mode" = "モード";
+"Note names" = "音名";
+"Play in time with the clicks. Your best result is saved." = "クリックに合わせて弾きましょう。いちばん良い結果が保存されます。";
+"Practise any tune at your own speed, one hand at a time or both together." = "好きな曲を自分のペースで練習しましょう。片手ずつでも、両手いっしょでもかまいません。";
+/* Song option: play the right hand only */
+"Right" = "右手";
+/* Badge on a song written for the right hand only */
+"Right hand" = "右手";
+"Speed" = "速さ";
+/* "In time" is the name of the mode option; use the same words */
+"The music waits for you. Switch to In time when you know the notes." = "正しい音を弾くまで楽譜が待ってくれます。音を覚えたら「リズム」に切り替えましょう。";
+
+/* ---- Support ---- */
+
+/* Accessibility label for a lesson or song rating, e.g. "2 of 3 stars" */
+"%lld of 3 stars" = "星3つ中%lld個";
+
+/* ---- Feedback and website links (PianoTutorApp, SettingsView) ---- */
+
+/* Help menu item on the Mac that opens the app's website */
+"Middle C Website" = "Middle C Webサイト";
+/* Help menu item on the Mac that opens the feedback board. Title case, as in Mac menus. */
+"Report a Problem or Suggest an Idea…" = "問題を報告／アイデアを提案…";
+/* Settings section heading, shown in capitals */
+"Feedback" = "フィードバック";
+"Found a problem, or have an idea for Middle C? Post it on the feedback board, where you can also vote for other people's ideas." = "問題を見つけたり、Middle Cについてのアイデアがあったりしたら、フィードバックボードに投稿してください。ほかの人のアイデアに投票することもできます。";
+/* Button in Settings that opens the feedback board */
+"Report a problem or suggest an idea" = "問題を報告／アイデアを提案";
+/* Settings section heading, shown in capitals */
+"Website" = "Webサイト";
+"Help with keyboards and the microphone, answers to common questions, and the privacy policy are on the Middle C website." = "キーボードとマイクについてのヘルプ、よくある質問への回答、プライバシーポリシーは、Middle CのWebサイトにあります。";
+
+/* ---- VoiceOver (KeyboardView, StaffView, LessonView) ---- */
+
+/* VoiceOver name of the on-screen keyboard */
+"Piano keyboard" = "ピアノの鍵盤";
+/* VoiceOver: the keys to play next; the placeholder is a list of keys, such as "C4 and E4" */
+"Play %@." = "%@を弾いてください。";
+/* VoiceOver: a key to play and the finger to play it with, such as "E4, finger 3" */
+"%@, finger %lld" = "%1$@、%2$lldの指";
+/* VoiceOver: the keys a lesson points out; the placeholder is a list of keys */
+"Marked: %@." = "印のついた鍵盤：%@。";
+/* VoiceOver: the keys held down; the placeholder is a list of keys */
+"Holding %@." = "%@を押さえています。";
+/* VoiceOver name of a music staff */
+"Music staff" = "五線譜";
+/* VoiceOver: an empty staff */
+"No notes" = "音符なし";
+/* Read out by VoiceOver after a key is found; the placeholder is the next note to find, such as D */
+"Right. Next, %@." = "正解です。次は%@です。";

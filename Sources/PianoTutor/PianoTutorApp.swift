@@ -31,7 +31,7 @@ struct PianoTutorApp: App {
             .commands {
                 CommandGroup(replacing: .newItem) {}
                 CommandGroup(after: .help) {
-                    Button("Middle C Website") {
+                    Button(String(localized: "Middle C Website", comment: "Help menu item that opens the app's website")) {
                         NSWorkspace.shared.open(Links.website)
                     }
                     Button("Report a Problem or Suggest an Idea…") {
@@ -45,7 +45,8 @@ struct PianoTutorApp: App {
     }
 
     private var window: some Scene {
-        WindowGroup("Middle C") {
+        // The app's name is a brand and stays the same in every language.
+        WindowGroup(Text(verbatim: "Middle C")) {
             RootView()
                 .environmentObject(model)
                 .environmentObject(model.input)
@@ -134,7 +135,7 @@ struct MainView: View {
                 Image(systemName: "pianokeys.inverse")
                     .font(.system(size: 22))
                     .foregroundStyle(Theme.accent)
-                Text("Middle C")
+                Text(verbatim: "Middle C")
                     .scaledFont(20, weight: .bold)
                     .foregroundStyle(Theme.textPrimary)
                     .lineLimit(1)
@@ -246,8 +247,18 @@ struct ConnectionBadge: View {
     }
 
     private var title: String {
-        if model.midi.isConnected { return "Keyboard connected" }
-        return model.mic.isListening ? "Microphone listening" : "No keyboard"
+        if model.midi.isConnected { return String(localized: "Keyboard connected", comment: "Connection status") }
+        return model.mic.isListening
+            ? String(localized: "Microphone listening", comment: "Connection status")
+            : String(localized: "No keyboard", comment: "Connection status")
+    }
+
+    /// The keyboard's name, or what to do without one.
+    private var detail: String {
+        if let name = model.midi.sourceNames.first { return name }
+        return model.mic.isListening
+            ? String(localized: "Play your piano", comment: "Connection status detail while the microphone is listening")
+            : String(localized: "Using on-screen keys", comment: "Connection status detail when nothing is connected")
     }
 
     private var dot: some View {
@@ -264,7 +275,7 @@ struct ConnectionBadge: View {
                 Text(title)
                     .scaledFont(12, weight: .semibold)
                     .foregroundStyle(Theme.textPrimary)
-                Text(model.midi.sourceNames.first ?? (model.mic.isListening ? "Play your piano" : "Using on-screen keys"))
+                Text(detail)
                     .scaledFont(11)
                     .foregroundStyle(Theme.textSecondary)
                     .lineLimit(2)

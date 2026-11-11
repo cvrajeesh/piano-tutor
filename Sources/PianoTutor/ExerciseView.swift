@@ -8,7 +8,7 @@ struct ExerciseView: View {
     let title: String
     let instruction: String
     let baseConfig: SessionConfig
-    var continueLabel: String = "Continue"
+    var continueLabel: String = String(localized: "Continue")
     let onContinue: (PerformanceSummary) -> Void
 
     @State private var attempt: Int = 0
@@ -136,7 +136,8 @@ struct ExercisePlayer: View {
                 .foregroundStyle(Theme.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-            Text(isTempo ? "IN TIME" : "PRACTICE")
+            modeBadge
+                .textCase(.uppercase)
                 .scaledFont(10, weight: .bold)
                 .foregroundStyle(Theme.ink)
                 .padding(.horizontal, 7)
@@ -145,7 +146,8 @@ struct ExercisePlayer: View {
                 .clipShape(Capsule())
                 .fixedSize()
             if isSlow {
-                Text("SLOW")
+                Text("Slow", comment: "Badge on an exercise played at a slower tempo, shown in capitals")
+                    .textCase(.uppercase)
                     .scaledFont(10, weight: .bold)
                     .foregroundStyle(Theme.textPrimary)
                     .padding(.horizontal, 7)
@@ -157,6 +159,13 @@ struct ExercisePlayer: View {
         }
     }
 
+    private var modeBadge: Text {
+        if isTempo {
+            return Text("In time", comment: "Badge for the mode where you play along with the metronome, shown in capitals")
+        }
+        return Text("Practice", comment: "Badge for the mode where the music waits for you, shown in capitals")
+    }
+
     private var instructionText: some View {
         Text(instruction)
             .scaledFont(13)
@@ -166,7 +175,11 @@ struct ExercisePlayer: View {
     @ViewBuilder
     private var streakLabel: some View {
         if session.streak >= 3 {
-            Label(String(session.streak) + " in a row", systemImage: "flame.fill")
+            Label {
+                Text("\(session.streak) in a row", comment: "How many notes in a row were right, such as 5 in a row")
+            } icon: {
+                Image(systemName: "flame.fill")
+            }
                 .scaledFont(13, weight: .semibold)
                 .foregroundStyle(Theme.accent)
                 .fixedSize()
@@ -272,26 +285,24 @@ struct ResultCard: View {
     let onContinue: () -> Void
 
     private var headline: String {
-        if !summary.passed { return "Nearly there" }
+        if !summary.passed { return String(localized: "Nearly there", comment: "Result headline for an exercise that was not passed") }
         switch summary.stars {
-        case 3: return "Beautifully played"
-        case 2: return "Well done"
-        default: return "You got through it"
+        case 3: return String(localized: "Beautifully played", comment: "Result headline for three stars")
+        case 2: return String(localized: "Well done", comment: "Result headline for two stars")
+        default: return String(localized: "You got through it", comment: "Result headline for one star")
         }
     }
 
     private var detail: String {
-        let percent: Int = Int((summary.accuracy * 100).rounded())
         if summary.timed {
-            var text: String = String(summary.hits) + " of " + String(summary.total) + " notes, "
-                + String(summary.perfect) + " right on the beat"
+            let percent: String = summary.accuracy.formatted(.percent.precision(.fractionLength(0)))
             if summary.strays > 0 {
-                text += ", " + String(summary.strays) + " wrong"
+                return String(localized: "\(summary.hits) of \(summary.total) notes, \(summary.perfect) right on the beat, \(summary.strays) wrong (\(percent))", comment: "Result of an exercise played in time. The last placeholder is the accuracy as a percentage, such as 85%")
             }
-            return text + " (" + String(percent) + "%)"
+            return String(localized: "\(summary.hits) of \(summary.total) notes, \(summary.perfect) right on the beat (\(percent))", comment: "Result of an exercise played in time. The last placeholder is the accuracy as a percentage, such as 85%")
         }
-        if summary.strays == 0 { return "Every note right first time." }
-        return String(summary.strays) + (summary.strays == 1 ? " wrong key" : " wrong keys") + " along the way."
+        if summary.strays == 0 { return String(localized: "Every note right first time.") }
+        return String(localized: "\(summary.strays) wrong keys along the way.", comment: "Result of a practice exercise: how many wrong keys were pressed")
     }
 
     var body: some View {
@@ -314,16 +325,24 @@ struct ResultCard: View {
                 Button("Try again", action: onRetry)
                     .buttonStyle(SecondaryButtonStyle(small: screen.compact))
                 if summary.timed {
-                    Button(isSlow ? "Full speed" : "Slower", action: onToggleSlow)
-                        .buttonStyle(SecondaryButtonStyle(small: screen.compact))
+                    Button(action: onToggleSlow) {
+                        if isSlow {
+                            Text("Full speed", comment: "Button that plays the exercise again at its normal tempo")
+                        } else {
+                            Text("Slower", comment: "Button that plays the exercise again at a slower tempo")
+                        }
+                    }
+                    .buttonStyle(SecondaryButtonStyle(small: screen.compact))
                 }
                 if summary.passed {
                     Button(continueLabel, action: onContinue)
                         .buttonStyle(PrimaryButtonStyle(small: screen.compact))
                         .keyboardShortcut(.defaultAction)
                 } else {
-                    Button("Skip", action: onContinue)
-                        .buttonStyle(SecondaryButtonStyle(small: screen.compact))
+                    Button(action: onContinue) {
+                        Text("Skip", comment: "Button that moves on without passing the exercise")
+                    }
+                    .buttonStyle(SecondaryButtonStyle(small: screen.compact))
                 }
             }
             .fixedSize()

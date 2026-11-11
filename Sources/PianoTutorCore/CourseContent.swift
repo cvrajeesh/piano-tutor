@@ -33,12 +33,12 @@ public enum Curriculum {
                 info("C lives to the left of the two black keys", [
                     "Find any group of two black keys. The white key just to the left of the group is always C.",
                     "Your keyboard has six of them. Each one starts a new set of the same seven note names: C, D, E, F, G, A, B.",
-                ], marks: [mark("C2", "C"), mark("C3", "C"), mark("C4", "C"), mark("C5", "C"), mark("C6", "C"), mark("C7", "C")]),
+                ], marks: [named("C2"), named("C3"), named("C4"), named("C5"), named("C6"), named("C7")]),
                 find("Find three different Cs", "Play any C on your keyboard, then two more in other places.", ["C4", "C4", "C4"], anyOctave: true, hint: false),
                 info("Middle C", [
                     "Middle C is the C closest to the centre of the keyboard. On a 61-key keyboard such as the Casio CT-S300, it is the third C from the left.",
                     "Almost everything you play at first starts here, so it is worth knowing where it is without looking for long.",
-                ], marks: [mark("C4", "Middle C")]),
+                ], marks: [mark("C4", .text("Middle C"))]),
                 find("Play Middle C", "It is lit up on the keyboard below.", ["C4"]),
                 find("Now from memory", "Middle C, the C below it, the C above it, then Middle C again.", ["C4", "C3", "C5", "C4"], hint: false),
             ]),
@@ -46,7 +46,7 @@ public enum Curriculum {
                 info("Fingers have numbers", [
                     "Pianists number their fingers from 1 to 5. In both hands the thumb is 1 and the little finger is 5.",
                     "Rest your right thumb on Middle C and let fingers 2 and 3 sit on the next two white keys, D and E. Keep your fingers gently curved, as if you were holding a small ball.",
-                ], marks: [mark("C4", "1", hand: .right), mark("D4", "2", hand: .right), mark("E4", "3", hand: .right)]),
+                ], marks: [mark("C4", .finger(1), hand: .right), mark("D4", .finger(2), hand: .right), mark("E4", .finger(3), hand: .right)]),
                 find("Play C, D, E", "One finger per key: 1, 2, 3.", ["C4", "D4", "E4"]),
                 practice("Stepping up and down", waits, sc("C4 D4 E4 D4 | C4 D4 E4/h | E4 D4 C4 D4 | E4 D4 C4/h")),
                 practice("Mix them up", "Watch the note heads move up and down, and follow them with your fingers.", sc("C4 E4 D4 C4 | E4 C4 D4/h | E4 E4 D4 D4 | C4/w")),
@@ -56,7 +56,7 @@ public enum Curriculum {
                 info("One finger for each key", [
                     "Add F and G. Now every finger has a key of its own: 1 on C, 2 on D, 3 on E, 4 on F and 5 on G.",
                     "This is called the C position. Your hand stays in one place and only your fingers move, so you never need to look down to find the next note.",
-                ], marks: [mark("C4", "1", hand: .right), mark("D4", "2", hand: .right), mark("E4", "3", hand: .right), mark("F4", "4", hand: .right), mark("G4", "5", hand: .right)]),
+                ], marks: [mark("C4", .finger(1), hand: .right), mark("D4", .finger(2), hand: .right), mark("E4", .finger(3), hand: .right), mark("F4", .finger(4), hand: .right), mark("G4", .finger(5), hand: .right)]),
                 find("Find F and G", "Follow the lit keys.", ["F4", "G4", "C4", "G4", "E4"]),
                 practice("Climb and come back", waits, sc("C4 D4 E4 F4 | G4/h G4/h | G4 F4 E4 D4 | C4/w")),
                 practice("Skipping keys", "Sometimes the tune jumps over a key. The finger numbers show you which finger to use.", sc("C4 E4 D4 F4 | E4 G4 F4 D4 | C4 E4 G4 E4 | C4/w")),
@@ -125,7 +125,7 @@ public enum Curriculum {
                 info("Your five notes", [
                     "Middle C hangs below the staff on a short line of its own. D sits just under the bottom line. E is on the bottom line, F is in the first space and G is on the second line.",
                     "So far the letter names have been printed inside the notes. In this lesson they are gradually taken away.",
-                ], marks: [mark("C4", "C", hand: .right), mark("D4", "D", hand: .right), mark("E4", "E", hand: .right), mark("F4", "F", hand: .right), mark("G4", "G", hand: .right)], figure: sc("C4 D4 E4 F4 | G4/w")),
+                ], marks: [named("C4", hand: .right), named("D4", hand: .right), named("E4", hand: .right), named("F4", hand: .right), named("G4", hand: .right)], figure: sc("C4 D4 E4 F4 | G4/w")),
                 practice("Names and key hints", "Notice where each note sits on the staff as you play it.", sc("C4 D4 E4 F4 | G4 F4 E4 D4 | C4 E4 G4 E4 | C4/w")),
                 practice("Names only", "The keyboard no longer lights up. Use the letters.", sc("E4 E4 G4 G4 | F4 F4 D4/h | C4 D4 E4 F4 | G4/h C4/h"), hints: false),
                 practice("Key hints only", "The letters are gone. Check the keyboard only if you get stuck.", sc("C4 C4 E4 E4 | G4 G4 E4/h | F4 F4 D4 D4 | C4/w"), names: false),
@@ -169,7 +169,7 @@ public enum Curriculum {
                 info("Meet your left hand", [
                     "Fingers are numbered the same way in the left hand, with the thumb as 1. Because the left hand mirrors the right, your little finger now plays the lowest note.",
                     "Find the C below Middle C. Put finger 5 on it and let the other fingers rest on D, E, F and G. Your left thumb ends up on G.",
-                ], marks: [mark("C3", "5", hand: .left), mark("D3", "4", hand: .left), mark("E3", "3", hand: .left), mark("F3", "2", hand: .left), mark("G3", "1", hand: .left)]),
+                ], marks: [mark("C3", .finger(5), hand: .left), mark("D3", .finger(4), hand: .left), mark("E3", .finger(3), hand: .left), mark("F3", .finger(2), hand: .left), mark("G3", .finger(1), hand: .left)]),
                 find("Find your left-hand notes", "Follow the lit keys with your left hand.", ["C3", "G3", "E3", "D3", "F3"], hand: .left),
                 practice("Left hand climbs", waits, sc(left: "C3 D3 E3 F3 | G3/h G3/h | G3 F3 E3 D3 | C3/w")),
                 practice("Left hand skips", "Fingers 5, 3 and 1 play C, E and G.", sc(left: "C3 E3 G3 E3 | C3 E3 G3/h | G3 E3 F3 D3 | C3/w")),
@@ -178,7 +178,7 @@ public enum Curriculum {
                 info("A staff for low notes", [
                     "Left-hand music is written in the bass clef. Its two dots sit either side of the line for F, which is why it is also called the F clef.",
                     "In the bass clef your five notes are: C in the second space, D on the middle line, E in the third space, F on the fourth line and G in the top space.",
-                ], marks: [mark("C3", "C", hand: .left), mark("D3", "D", hand: .left), mark("E3", "E", hand: .left), mark("F3", "F", hand: .left), mark("G3", "G", hand: .left)], figure: sc(left: "C3 D3 E3 F3 | G3/w")),
+                ], marks: [named("C3", hand: .left), named("D3", hand: .left), named("E3", hand: .left), named("F3", hand: .left), named("G3", hand: .left)], figure: sc(left: "C3 D3 E3 F3 | G3/w")),
                 practice("Names, no key hints", "Read the letters and notice where each note sits.", sc(left: "C3 D3 E3 D3 | C3 E3 G3/h | F3 E3 D3 E3 | C3/w"), hints: false),
                 practice("Key hints, no names", "Now read the positions.", sc(left: "G3 F3 E3 D3 | C3/h G3/h | E3 E3 F3 F3 | G3/w"), names: false),
                 play("Low and steady", inTime, sc(left: "C3/h G3/h | E3/h G3/h | C3 E3 G3 E3 | C3/w", tempo: 66), names: false),
@@ -298,7 +298,7 @@ public enum Curriculum {
                 info("Six notes, five fingers", [
                     "Many tunes need one more note than your hand covers. A is the white key just above G.",
                     "To reach it, let your hand open a little so that finger 5 can stretch up to A while finger 4 takes G. Then let the hand close back into the C position.",
-                ], marks: [mark("C4", "C", hand: .right), mark("G4", "G", hand: .right), mark("A4", "A", hand: .right)]),
+                ], marks: [named("C4", hand: .right), named("G4", hand: .right), named("A4", hand: .right)]),
                 find("Find A", "G, up to A, and back.", ["G4", "A4", "G4"]),
                 practice("Twinkle, Twinkle, Little Star", "Follow the finger numbers in the first two measures.", sc(Tunes.twinkle)),
                 play("Twinkle, Twinkle, Little Star", inTime, sc(Tunes.twinkle, tempo: 84)),
@@ -309,13 +309,13 @@ public enum Curriculum {
                 info("Black keys are named after their neighbours", [
                     "A sharp (♯) means the very next key to the right. A flat (♭) means the very next key to the left. So the black key just above F is F sharp, and the black key just below B is B flat.",
                     "Every black key therefore has two names: F sharp is also G flat. On the staff the sign is written just before the note, and it stays in force until the end of the measure.",
-                ], marks: [mark("F#4", "F♯"), mark("Bb4", "B♭")]),
+                ], marks: [named("F#4"), named("Bb4")]),
                 find("Find the black keys", "Each one is named from the white key beside it.", ["F#4", "Bb4", "C#4", "Eb4"]),
                 practice("D position", "Move your thumb to D. Finger 3 now plays F sharp.", sc("D4 E4 F#4 G4 | A4/h F#4/h | G4 F#4 E4 D4 | D4/w", rp: "D4")),
                 practice("F position", "Thumb on F. Finger 4 plays B flat.", sc("F4 G4 A4 Bb4 | C5/h A4/h | Bb4 A4 G4 F4 | F4/w", rp: "F4")),
                 info("Key signatures", [
                     "When a piece uses the same sharps or flats all the way through, they are written once at the start of every staff instead of in front of each note. This is called a key signature.",
-                    "Two sharps, on the lines for F and C, mean that every F and every C in the piece is played sharp.",
+                    "Two sharps, written where F and C sit on the staff, mean that every F and every C in the piece is played sharp.",
                 ], figure: sc("D4 E4 F#4 G4 | A4/w", key: 2, rp: "D4")),
                 practice("Remember the key signature", "There are no sharp signs in front of the notes now, but every F is still F sharp.", sc("D4 E4 F#4 G4 | A4 G4 F#4 E4 | D4 F#4 A4 F#4 | D4/w", key: 2, rp: "D4")),
             ]),
@@ -323,7 +323,7 @@ public enum Curriculum {
                 info("Positions can move", [
                     "Put your right thumb on the G above Middle C. Your five fingers now cover G, A, B, C and D.",
                     "The finger pattern is exactly the same as before. Only the notes are new.",
-                ], marks: [mark("G4", "1", hand: .right), mark("A4", "2", hand: .right), mark("B4", "3", hand: .right), mark("C5", "4", hand: .right), mark("D5", "5", hand: .right)]),
+                ], marks: [mark("G4", .finger(1), hand: .right), mark("A4", .finger(2), hand: .right), mark("B4", .finger(3), hand: .right), mark("C5", .finger(4), hand: .right), mark("D5", .finger(5), hand: .right)]),
                 find("Find the G position", "Follow the lit keys.", ["G4", "B4", "D5", "C5", "A4"]),
                 practice("Five new notes", waits, sc("G4 A4 B4 C5 | D5/h D5/h | D5 C5 B4 A4 | G4/w", rp: "G4")),
                 practice("Ode to Joy in G", "The same tune you know, five notes higher.", sc(Tunes.odeInG, key: 1, rp: "G4"), names: false),
@@ -351,7 +351,7 @@ public enum Curriculum {
                 info("Three notes at once", [
                     "A chord is several notes played together. The C major chord uses every other key of your five-finger position: C, E and G, played with fingers 1, 3 and 5.",
                     "Press all three keys at exactly the same moment, with a relaxed wrist. On the staff the notes of a chord are stacked on top of each other.",
-                ], marks: [mark("C4", "1", hand: .right), mark("E4", "3", hand: .right), mark("G4", "5", hand: .right)], figure: sc("C4 E4 G4/h | C4+E4+G4/w")),
+                ], marks: [mark("C4", .finger(1), hand: .right), mark("E4", .finger(3), hand: .right), mark("G4", .finger(5), hand: .right)], figure: sc("C4 E4 G4/h | C4+E4+G4/w")),
                 practice("Build the chord", "First one note at a time, then all three together.", sc("C4 E4 G4/h | C4+E4+G4/w | C4 E4 G4/h | C4+E4+G4/w")),
                 practice("Left-hand chord", "The same three notes with fingers 5, 3 and 1.", sc(left: "C3 E3 G3/h | C3+E3+G3/w | C3 E3 G3/h | C3+E3+G3/w")),
                 play("Chords in time", "Lift and replay the chord cleanly on each beat.", sc(left: "C3+E3+G3/w | C3+E3+G3/h C3+E3+G3/h | C3+E3+G3 C3+E3+G3 C3+E3+G3 C3+E3+G3 | C3+E3+G3/w", tempo: 66)),

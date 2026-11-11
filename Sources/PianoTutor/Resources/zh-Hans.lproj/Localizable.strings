@@ -1,0 +1,286 @@
+/* Middle C: the app's own text, in English. This is the source for every translation.
+   Keys are the English text as written in the Swift code. See docs/localization.md. */
+
+/* ---- AppModel ---- */
+
+/* Option for hearing your playing through the device */
+"Always" = "始终";
+/* Option for hearing your playing through the device: decide automatically */
+"Automatic" = "自动";
+/* Option for hearing your playing through the device */
+"Never" = "从不";
+
+/* ---- AppModel, FreePlayView ---- */
+
+/* Section name in the sidebar and tab bar: play anything and see the notes */
+"Free Play" = "自由弹奏";
+
+/* ---- AppModel, LearnView ---- */
+
+/* Section name in the sidebar and tab bar: the course */
+"Learn" = "学习";
+
+/* ---- AppModel, SettingsView ---- */
+
+/* Section name in the sidebar and tab bar */
+"Settings" = "设置";
+
+/* ---- AppModel, SongsView ---- */
+
+/* Section name in the sidebar and tab bar: the song library */
+"Songs" = "歌曲";
+
+/* ---- ExerciseView ---- */
+
+/* Result of an exercise played in time. The last placeholder is the accuracy as a percentage, such as 85% */
+"%lld of %lld notes, %lld right on the beat (%@)" = "%2$lld个音弹对%1$lld个，其中%3$lld个正好在拍上（%4$@）";
+/* Result of an exercise played in time. The last placeholder is the accuracy as a percentage, such as 85% */
+"%lld of %lld notes, %lld right on the beat, %lld wrong (%@)" = "%2$lld个音弹对%1$lld个，其中%3$lld个正好在拍上，弹错%4$lld个（%5$@）";
+/* Result headline for three stars */
+"Beautifully played" = "弹得真棒";
+"Close" = "关闭";
+"Every note right first time." = "每个音都一次弹对。";
+/* Button that plays the exercise again at its normal tempo */
+"Full speed" = "原速";
+/* Result headline for an exercise that was not passed */
+"Nearly there" = "就差一点";
+"Ready?" = "准备好了吗？";
+"Restart" = "重来";
+/* Button that moves on without passing the exercise */
+"Skip" = "跳过";
+/* Badge on an exercise played at a slower tempo, shown in capitals */
+"Slow" = "慢速";
+/* Button that plays the exercise again at a slower tempo */
+"Slower" = "放慢";
+"Try again" = "再试一次";
+"Try it again, or slow the tempo down first." = "再试一次，或者先把速度放慢。";
+/* Result headline for two stars */
+"Well done" = "弹得好";
+/* Result headline for one star */
+"You got through it" = "你弹完了";
+"You will hear one measure of clicks before the first note." = "第一个音之前，你会先听到一小节的节拍声。";
+
+/* ---- ExerciseView, LearnView ---- */
+
+"Start" = "开始";
+
+/* ---- ExerciseView, LearnView, LessonView ---- */
+
+"Continue" = "继续";
+
+/* ---- ExerciseView, SongsView ---- */
+
+/* Badge for the mode where you play along with the metronome, shown in capitals */
+"In time" = "跟拍";
+/* Badge for the mode where the music waits for you, shown in capitals */
+"Practice" = "练习";
+
+/* ---- FreePlayView ---- */
+
+/* The placeholders are letters on computer keys in the user's keyboard layout, such as A S D F G H J K. The last one is the octave shift, such as +1 or -2 */
+"Computer keys: %@ play the white keys from Middle C, %@ the black keys. %@ and %@ shift the octave (now %@)." = "电脑键盘：%1$@从中央C起弹白键，%2$@弹黑键。%3$@和%4$@切换八度（当前为%5$@）。";
+/* The placeholders are letters on computer keys in the user's keyboard layout, such as A S D F G H J K */
+"Computer keys: %@ play the white keys from Middle C, %@ the black keys. %@ and %@ shift the octave." = "电脑键盘：%1$@从中央C起弹白键，%2$@弹黑键。%3$@和%4$@切换八度。";
+"Play anything. The notes you hold appear on the staff with their names." = "随便弹吧。你按住的音会连同音名一起显示在五线谱上。";
+"Press a key" = "按一个键";
+
+/* ---- KeyboardView ---- */
+
+"Higher keys" = "更高的键";
+"Lower keys" = "更低的键";
+
+/* ---- LearnView ---- */
+
+"Connect the USB port on the back of your keyboard to your iPad (you may need a USB-C or Lightning adapter) and switch the keyboard on. It is recognised automatically. Until then you can play the on-screen keys." = "把键盘背面的USB接口连接到iPad（可能需要USB-C或Lightning转换器），然后打开键盘电源，它会被自动识别。在此之前，你可以先弹屏幕上的琴键。";
+"Connect the USB port on the back of your keyboard to your iPhone (you may need a USB-C or Lightning adapter) and switch the keyboard on. It is recognised automatically. Until then you can play the on-screen keys." = "把键盘背面的USB接口连接到iPhone（可能需要USB-C或Lightning转换器），然后打开键盘电源，它会被自动识别。在此之前，你可以先弹屏幕上的琴键。";
+"Connect your keyboard" = "连接你的键盘";
+"No MIDI? Middle C can listen to a piano or any keyboard through the microphone. Turn it on in Settings." = "没有MIDI？Middle C可以通过麦克风听钢琴或任何键盘的声音。请在“设置”中打开。";
+/* The placeholder is the letters on the computer keys that play the piano, as printed in the user's keyboard layout, such as "A S D F G H J K" */
+"Plug the USB port on the back of your keyboard into your Mac and switch the keyboard on. It is recognised automatically; no driver is needed. Until then you can click the on-screen keys or use the %@ row of your computer keyboard." = "把键盘背面的USB接口连接到Mac，然后打开键盘电源。它会被自动识别，无需安装驱动程序。在此之前，你可以点按屏幕上的琴键，或使用电脑键盘上%@这一排键。";
+/* Heading above each unit of the course, shown in capitals */
+"Unit %lld" = "第%lld单元";
+"Work through the lessons in order. Each one takes a few minutes." = "按顺序一课一课学，每课只需几分钟。";
+
+/* ---- LessonView ---- */
+
+"Back to lessons" = "返回课程";
+"Lesson complete" = "本课完成";
+/* Button that opens the next lesson; the placeholder is its title */
+"Next: %@" = "下一课：%@";
+/* Both placeholders are note names, such as C and D: the key that was played and the one to find */
+"That was %@. Look for %@." = "这是%1$@。请找%2$@。";
+/* Shown when every key in a find-the-key drill has been found */
+"That's it!" = "全找到了！";
+/* The placeholder is a note name, such as C */
+"You already found that one. Try a different %@." = "这个已经找过了。换一个%@试试。";
+
+/* ---- Localization ---- */
+
+/* Song library heading for the hardest songs */
+"A challenge" = "挑战一下";
+/* Song library heading for the easiest songs */
+"First tunes" = "入门曲目";
+/* Song library heading for songs of medium difficulty */
+"Getting going" = "渐入佳境";
+
+/* ---- MIDIManager ---- */
+
+/* Name shown for a connected keyboard that does not report its own name */
+"MIDI keyboard" = "MIDI键盘";
+
+/* ---- MicrophoneInput ---- */
+
+"No microphone was found." = "未找到麦克风。";
+/* The text in brackets is the system's description of the error */
+"The microphone could not be started (%@)." = "无法启动麦克风（%@）。";
+
+/* ---- PianoTutorApp ---- */
+
+/* Connection status */
+"Keyboard connected" = "键盘已连接";
+/* Connection status */
+"Microphone listening" = "麦克风正在听";
+/* Connection status */
+"No keyboard" = "未连接键盘";
+/* Connection status detail while the microphone is listening */
+"Play your piano" = "弹你的钢琴吧";
+/* Connection status detail when nothing is connected */
+"Using on-screen keys" = "正在使用屏幕琴键";
+
+/* ---- PlaySession ---- */
+
+/* Feedback on the staff: a note played before the beat */
+"Early" = "偏早";
+/* Feedback on the staff: a note played after the beat */
+"Late" = "偏晚";
+/* Feedback on the staff: a note that was not played */
+"Missed" = "漏弹";
+/* Feedback on the staff when a wrong key is pressed in practice mode */
+"Not that one" = "不是这个";
+/* Feedback on the staff: a note played right on the beat */
+"Perfect" = "完美";
+/* Feedback on the staff when a key that is not in the music is played in time */
+"Wrong note" = "错音";
+
+/* ---- SettingsView ---- */
+
+/* Use the names of the macOS System Settings panes as they appear in this language */
+"Allow it in System Settings → Privacy & Security → Microphone, then switch this off and on again." = "请在“系统设置”→“隐私与安全性”→“麦克风”中允许访问，然后把这个开关关闭再重新打开。";
+/* Use the names of the iOS Settings screens as they appear in this language */
+"Allow it in the Settings app → Privacy & Security → Microphone, then switch this off and on again." = "请在“设置”App→“隐私与安全性”→“麦克风”中允许访问，然后把这个开关关闭再重新打开。";
+/* "Automatic" is the name of the first option above; use the same word */
+"Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen and computer keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the Mac." = "选择“自动”时，MIDI键盘不会发声（它本身就有扬声器），屏幕琴键和电脑键盘则会发出钢琴声。通过麦克风听到的音不会被回放。节拍器和伴奏始终从Mac播放。";
+/* "Automatic" is the name of the first option above; use the same word */
+"Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the iPad." = "选择“自动”时，MIDI键盘不会发声（它本身就有扬声器），屏幕琴键则会发出钢琴声。通过麦克风听到的音不会被回放。节拍器和伴奏始终从iPad播放。";
+/* "Automatic" is the name of the first option above; use the same word */
+"Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the iPhone." = "选择“自动”时，MIDI键盘不会发声（它本身就有扬声器），屏幕琴键则会发出钢琴声。通过麦克风听到的音不会被回放。节拍器和伴奏始终从iPhone播放。";
+"Cancel" = "取消";
+"Connect the keyboard's USB port to your iPad with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two." = "用数据线把键盘的USB接口连接到iPad（有些线只能充电），然后打开键盘电源。一两秒内它就会出现在这里。";
+"Connect the keyboard's USB port to your iPhone with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two." = "用数据线把键盘的USB接口连接到iPhone（有些线只能充电），然后打开键盘电源。一两秒内它就会出现在这里。";
+"Connect the keyboard's USB port to your Mac with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two." = "用数据线把键盘的USB接口连接到Mac（有些线只能充电），然后打开键盘电源。一两秒内它就会出现在这里。";
+"For an acoustic piano, or a keyboard without USB. Put the iPad near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact." = "适用于原声钢琴或没有USB接口的键盘。把iPad放在钢琴旁边。单个音在任何地方都能识别；和弦只在课程和歌曲中识别，因为那里App知道该听哪些音。节拍器声可能会干扰识别，请戴耳机或调低音量。MIDI键盘仍然更快、更准确。";
+"For an acoustic piano, or a keyboard without USB. Put the iPhone near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact." = "适用于原声钢琴或没有USB接口的键盘。把iPhone放在钢琴旁边。单个音在任何地方都能识别；和弦只在课程和歌曲中识别，因为那里App知道该听哪些音。节拍器声可能会干扰识别，请戴耳机或调低音量。MIDI键盘仍然更快、更准确。";
+"For an acoustic piano, or a keyboard without USB. Put the Mac near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact." = "适用于原声钢琴或没有USB接口的键盘。把Mac放在钢琴旁边。单个音在任何地方都能识别；和弦只在课程和歌曲中识别，因为那里App知道该听哪些音。节拍器声可能会干扰识别，请戴耳机或调低音量。MIDI键盘仍然更快、更准确。";
+"Hear my playing through the iPad" = "用iPad播放我弹的声音";
+"Hear my playing through the iPhone" = "用iPhone播放我弹的声音";
+"Hear my playing through the Mac" = "用Mac播放我弹的声音";
+/* "Late" and "Early" are the feedback words shown on the staff; use the same translations */
+"If notes you play on the beat are often marked Late, raise this. Wireless headphones and speakers usually need 100 ms or more. If they are marked Early, lower it." = "如果你踩着拍子弹的音经常被标为“偏晚”，就调高这个值。无线耳机和音箱通常需要100毫秒或更多。如果被标为“偏早”，就调低它。";
+"Keyboard" = "键盘";
+"Language" = "语言";
+"Listen to my piano when no MIDI keyboard is connected" = "未连接MIDI键盘时，用麦克风听我的钢琴";
+"Listening" = "正在听";
+"Look again" = "重新查找";
+"Microphone" = "麦克风";
+"Middle C is not allowed to use the microphone" = "Middle C没有使用麦克风的权限";
+/* iPhone and iPad only */
+"Middle C uses the language of your device. To use a different language for Middle C only, choose it on the app's page in the Settings app." = "Middle C使用设备的语言。如果只想让Middle C使用其他语言，请在“设置”App中此App的页面里选择。";
+/* Use the names of the macOS System Settings panes as they appear in this language */
+"Middle C uses the language of your Mac. To use a different language for Middle C only, add it in System Settings → General → Language & Region → Applications." = "Middle C使用Mac的语言。如果只想让Middle C使用其他语言，请在“系统设置”→“通用”→“语言与地区”→“应用程序”中添加。";
+"No MIDI keyboard found" = "未找到MIDI键盘";
+"Noisy room: only listen for the right notes" = "环境嘈杂：只听正确的音";
+"Not listening: a MIDI keyboard is connected" = "未在听：已连接MIDI键盘";
+/* Timing setting: how much to shift the judging of notes, in milliseconds */
+"Offset" = "偏移";
+/* Button that opens the app's page in the iOS Settings app */
+"Open Settings" = "打开设置";
+/* The placeholder is a note name with its octave, such as C4 */
+"Play a key to check the connection. Last note received: %@." = "弹一个键来检查连接。最近收到的音：%@。";
+"Play a key to check the connection. No note received yet." = "弹一个键来检查连接。还没有收到任何音。";
+/* The placeholder is a note name with its octave, such as C4 */
+"Play a key to check. Last note heard: %@." = "弹一个键来检查。最近听到的音：%@。";
+"Play a key to check. No note heard yet." = "弹一个键来检查。还没有听到任何音。";
+"Progress" = "进度";
+"Reset all stars and completed lessons?" = "要重置所有星星和已完成的课程吗？";
+"Reset progress" = "重置进度";
+"Reset progress…" = "重置进度…";
+"Sound" = "声音";
+"Talking and other sounds are mostly told apart from the piano, but not always. With this on, nothing the microphone hears is ever marked as a wrong note; the music simply waits for the right one." = "说话声和其他声音大多能和琴声区分开，但并不总是如此。打开后，麦克风听到的任何声音都不会被标为错音，乐谱只会等你弹出正确的音。";
+"Timing" = "节奏判定";
+"Unlock all lessons" = "解锁所有课程";
+"Volume" = "音量";
+"Waiting for permission to use the microphone" = "正在等待麦克风使用权限";
+
+/* ---- SongsView ---- */
+
+/* Song option: play both hands */
+"Both" = "双手";
+/* Badge on a song written for both hands */
+"Both hands" = "双手";
+/* Button that closes a finished song */
+"Done" = "完成";
+"Hands" = "手";
+"Key hints" = "按键提示";
+/* Song option: play the left hand only */
+"Left" = "左手";
+"Metronome" = "节拍器";
+"Mode" = "模式";
+"Note names" = "音名";
+"Play in time with the clicks. Your best result is saved." = "跟着节拍声弹。你的最好成绩会被保存。";
+"Practise any tune at your own speed, one hand at a time or both together." = "按自己的速度练习任何曲子，可以单手分开练，也可以双手一起练。";
+/* Song option: play the right hand only */
+"Right" = "右手";
+/* Badge on a song written for the right hand only */
+"Right hand" = "右手";
+"Speed" = "速度";
+/* "In time" is the name of the mode option; use the same words */
+"The music waits for you. Switch to In time when you know the notes." = "乐谱会等你。熟悉音符后，再切换到“跟拍”。";
+
+/* ---- Support ---- */
+
+/* Accessibility label for a lesson or song rating, e.g. "2 of 3 stars" */
+"%lld of 3 stars" = "%lld颗星（共3颗）";
+
+/* ---- Feedback and website links (PianoTutorApp, SettingsView) ---- */
+
+/* Help menu item on the Mac that opens the app's website */
+"Middle C Website" = "Middle C网站";
+/* Help menu item on the Mac that opens the feedback board. Title case, as in Mac menus. */
+"Report a Problem or Suggest an Idea…" = "报告问题或提出建议…";
+/* Settings section heading, shown in capitals */
+"Feedback" = "反馈";
+"Found a problem, or have an idea for Middle C? Post it on the feedback board, where you can also vote for other people's ideas." = "发现了问题，或对Middle C有什么想法？请发布到反馈板上，你还可以为其他人的想法投票。";
+/* Button in Settings that opens the feedback board */
+"Report a problem or suggest an idea" = "报告问题或提出建议";
+/* Settings section heading, shown in capitals */
+"Website" = "网站";
+"Help with keyboards and the microphone, answers to common questions, and the privacy policy are on the Middle C website." = "键盘和麦克风的使用帮助、常见问题解答以及隐私政策，都在Middle C网站上。";
+
+/* ---- VoiceOver (KeyboardView, StaffView, LessonView) ---- */
+
+/* VoiceOver name of the on-screen keyboard */
+"Piano keyboard" = "钢琴键盘";
+/* VoiceOver: the keys to play next; the placeholder is a list of keys, such as "C4 and E4" */
+"Play %@." = "弹%@。";
+/* VoiceOver: a key to play and the finger to play it with, such as "E4, finger 3" */
+"%@, finger %lld" = "%1$@，用%2$lld指";
+/* VoiceOver: the keys a lesson points out; the placeholder is a list of keys */
+"Marked: %@." = "已标出：%@。";
+/* VoiceOver: the keys held down; the placeholder is a list of keys */
+"Holding %@." = "正按着%@。";
+/* VoiceOver name of a music staff */
+"Music staff" = "五线谱";
+/* VoiceOver: an empty staff */
+"No notes" = "没有音符";
+/* Read out by VoiceOver after a key is found; the placeholder is the next note to find, such as D */
+"Right. Next, %@." = "对了。下一个：%@。";

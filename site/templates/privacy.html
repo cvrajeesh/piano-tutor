@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% set title = t.privacy.title %}
+{% set description = t.privacy.description %}
+
+{% block nav %}
+        <a href="./#features">{{ t.common.nav_features }}</a>
+        <a href="support.html">{{ t.common.nav_support }}</a>
+{% endblock %}
+
+{% block main %}
+  <main id="main" class="page">
+    <div class="wrap">
+      <h1>{{ t.privacy.heading }}</h1>
+      <p class="updated">{{ t.privacy.updated }}</p>
+      {% if t.privacy.translation_note %}
+      <p class="updated">{{ t.privacy.translation_note|replace("{english}", url(english, page)) }}</p>
+      {% endif %}
+      <p class="intro">{{ t.privacy.intro }}</p>
+
+      <h2>{{ t.privacy.collects_title }}</h2>
+      <p>{{ t.privacy.collects_text }}</p>
+
+      <h2>{{ t.privacy.mic_title }}</h2>
+      <p>{{ t.privacy.mic_text }}</p>
+
+      <h2>{{ t.privacy.midi_title }}</h2>
+      <p>{{ t.privacy.midi_text }}</p>
+
+      <h2>{{ t.privacy.stored_title }}</h2>
+      <p>{{ t.privacy.stored_text }}</p>
+
+      <h2 id="website">{{ t.privacy.website_title }}</h2>
+      <p>{{ t.privacy.website_text }}</p>
+      <p>{{ t.privacy.website_choice }}</p>
+
+      <h2>{{ t.privacy.children_title }}</h2>
+      <p>{{ t.privacy.children_text }}</p>
+
+      <h2>{{ t.privacy.changes_title }}</h2>
+      <p>{{ t.privacy.changes_text }}</p>
+
+      <h2>{{ t.privacy.contact_title }}</h2>
+      <p>{{ t.privacy.contact_text }}</p>
+    </div>
+  </main>
+{% endblock %}

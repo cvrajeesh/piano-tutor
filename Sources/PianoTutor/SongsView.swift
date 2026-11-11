@@ -30,7 +30,8 @@ struct SongsView: View {
     private func levelSection(_ level: Int) -> some View {
         let songs: [Song] = SongLibrary.songs.filter { $0.level == level }
         return VStack(alignment: .leading, spacing: 10) {
-            Text(SongLibrary.levelName(level).uppercased())
+            Text(SongLevel.name(level))
+                .textCase(.uppercase)
                 .scaledFont(11, weight: .bold)
                 .foregroundStyle(Theme.accent)
             ForEach(songs) { song in
@@ -93,11 +94,11 @@ struct SongRow: View {
 
     private var titles: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(song.title)
+            Text(song.title.courseLocalized)
                 .scaledFont(15, weight: .semibold)
                 .foregroundStyle(Theme.textPrimary)
                 .multilineTextAlignment(.leading)
-            Text(song.credit)
+            Text(song.credit.courseLocalized)
                 .scaledFont(12)
                 .foregroundStyle(Theme.textSecondary)
                 .lineLimit(1)
@@ -105,14 +106,20 @@ struct SongRow: View {
     }
 
     private var handsBadge: some View {
-        Text(song.score.hands.count > 1 ? "Both hands" : "Right hand")
-            .scaledFont(11, weight: .medium)
-            .foregroundStyle(Theme.textSecondary)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(Theme.panelRaised)
-            .clipShape(Capsule())
-            .fixedSize()
+        Group {
+            if song.score.hands.count > 1 {
+                Text("Both hands", comment: "Badge on a song written for both hands")
+            } else {
+                Text("Right hand", comment: "Badge on a song written for the right hand only")
+            }
+        }
+        .scaledFont(11, weight: .medium)
+        .foregroundStyle(Theme.textSecondary)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Theme.panelRaised)
+        .clipShape(Capsule())
+        .fixedSize()
     }
 }
 
@@ -125,9 +132,9 @@ enum HandChoice: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .right: return "Right"
-        case .left: return "Left"
-        case .both: return "Both"
+        case .right: return String(localized: "Right", comment: "Song option: play the right hand only")
+        case .left: return String(localized: "Left", comment: "Song option: play the left hand only")
+        case .both: return String(localized: "Both", comment: "Song option: play both hands")
         }
     }
 
@@ -186,22 +193,22 @@ struct SongSessionView: View {
         VStack(spacing: 0) {
             if screen.short {
                 // Not enough height for a row of its own, so the options share the top bar.
-                SessionTopBar(title: song.credit, stepCount: 0, stepIndex: 0, onClose: { model.activeSong = nil }) {
+                SessionTopBar(title: song.credit.courseLocalized, stepCount: 0, stepIndex: 0, onClose: { model.activeSong = nil }) {
                     options
                 }
             } else {
-                SessionTopBar(title: song.credit, stepCount: 0, stepIndex: 0, onClose: { model.activeSong = nil })
+                SessionTopBar(title: song.credit.courseLocalized, stepCount: 0, stepIndex: 0, onClose: { model.activeSong = nil })
                 options
                     .padding(.vertical, 10)
                     .background(Theme.panel.opacity(0.6))
             }
             ExerciseView(
-                title: song.title,
+                title: song.title.courseLocalized,
                 instruction: perform
-                    ? "Play in time with the clicks. Your best result is saved."
-                    : "The music waits for you. Switch to In time when you know the notes.",
+                    ? String(localized: "Play in time with the clicks. Your best result is saved.")
+                    : String(localized: "The music waits for you. Switch to In time when you know the notes.", comment: "\"In time\" is the name of the mode option; use the same words"),
                 baseConfig: config,
-                continueLabel: "Done",
+                continueLabel: String(localized: "Done", comment: "Button that closes a finished song"),
                 onContinue: { summary in
                     if summary.timed && twoHandedOrFull {
                         model.record(song: song.id, stars: summary.stars)
@@ -225,8 +232,8 @@ struct SongSessionView: View {
         return ScrollView(.horizontal) {
             HStack(spacing: screen.compact ? 10 : 18) {
                 Picker("Mode", selection: $perform) {
-                    Text("Practice").tag(false)
-                    Text("In time").tag(true)
+                    Text("Practice", comment: "Song option: the music waits for you").tag(false)
+                    Text("In time", comment: "Song option: play along with the metronome").tag(true)
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
@@ -244,9 +251,9 @@ struct SongSessionView: View {
                 }
 
                 Picker("Speed", selection: $speed) {
-                    Text("60%").tag(0.6)
-                    Text("80%").tag(0.8)
-                    Text("100%").tag(1.0)
+                    ForEach([0.6, 0.8, 1.0], id: \.self) { value in
+                        Text(value, format: .percent).tag(value)
+                    }
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()

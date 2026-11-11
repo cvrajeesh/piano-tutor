@@ -93,30 +93,48 @@ struct FreePlayView: View {
 
     private var names: some View {
         VStack(spacing: screen.compact ? 6 : 10) {
-            Text(heldPitches.isEmpty ? "–" : heldPitches.map { $0.name }.joined(separator: "  "))
+            Text(verbatim: heldPitches.isEmpty ? "–" : heldPitches.map { NoteNaming.current.name($0) }.joined(separator: "  "))
                 .scaledFont(screen.compact ? 32 : 40, weight: .bold)
                 .foregroundStyle(Theme.textPrimary)
                 .minimumScaleFactor(0.4)
                 .lineLimit(1)
-            Text(heldPitches.isEmpty ? "Press a key" : heldPitches.map { $0.fullName }.joined(separator: " "))
+            fullNames
                 .scaledFont(13)
                 .foregroundStyle(Theme.textSecondary)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
-            if Platform.hasComputerKeys && !model.midi.isConnected {
-                Text("Computer keys: A S D F G H J K play the white keys from Middle C, W E T Y U the black keys. Z and X shift the octave" + octaveNote + ".")
+            #if os(macOS)
+            if !model.midi.isConnected {
+                Text(computerKeysHelp)
                     .scaledFont(12)
                     .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.top, 10)
             }
+            #endif
         }
         .padding(screen.compact ? 12 : 20)
     }
 
-    private var octaveNote: String {
-        if input.octaveShift == 0 { return "" }
-        let sign: String = input.octaveShift > 0 ? "+" : ""
-        return " (now " + sign + String(input.octaveShift) + ")"
+    private var fullNames: Text {
+        if heldPitches.isEmpty {
+            return Text("Press a key")
+        }
+        return Text(verbatim: heldPitches.map { NoteNaming.current.fullName($0) }.joined(separator: " "))
     }
+
+    #if os(macOS)
+    /// Which computer keys play which notes, with the letters of the user's keyboard layout.
+    private var computerKeysHelp: String {
+        let white: String = ComputerKeyboard.labels(ComputerKeyboard.whiteKeys)
+        let black: String = ComputerKeyboard.labels(ComputerKeyboard.blackKeys)
+        let down: String = ComputerKeyboard.label(ComputerKeyboard.octaveDown)
+        let up: String = ComputerKeyboard.label(ComputerKeyboard.octaveUp)
+        if input.octaveShift == 0 {
+            return String(localized: "Computer keys: \(white) play the white keys from Middle C, \(black) the black keys. \(down) and \(up) shift the octave.", comment: "The placeholders are letters on computer keys in the user's keyboard layout, such as A S D F G H J K")
+        }
+        let shift: String = input.octaveShift.formatted(.number.sign(strategy: .always()))
+        return String(localized: "Computer keys: \(white) play the white keys from Middle C, \(black) the black keys. \(down) and \(up) shift the octave (now \(shift)).", comment: "The placeholders are letters on computer keys in the user's keyboard layout, such as A S D F G H J K. The last one is the octave shift, such as +1 or -2")
+    }
+    #endif
 }

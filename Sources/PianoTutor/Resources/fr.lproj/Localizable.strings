@@ -1,0 +1,286 @@
+/* Middle C: the app's own text, in English. This is the source for every translation.
+   Keys are the English text as written in the Swift code. See docs/localization.md. */
+
+/* ---- AppModel ---- */
+
+/* Option for hearing your playing through the device */
+"Always" = "Toujours";
+/* Option for hearing your playing through the device: decide automatically */
+"Automatic" = "Automatique";
+/* Option for hearing your playing through the device */
+"Never" = "Jamais";
+
+/* ---- AppModel, FreePlayView ---- */
+
+/* Section name in the sidebar and tab bar: play anything and see the notes */
+"Free Play" = "Jeu libre";
+
+/* ---- AppModel, LearnView ---- */
+
+/* Section name in the sidebar and tab bar: the course */
+"Learn" = "Apprendre";
+
+/* ---- AppModel, SettingsView ---- */
+
+/* Section name in the sidebar and tab bar */
+"Settings" = "Réglages";
+
+/* ---- AppModel, SongsView ---- */
+
+/* Section name in the sidebar and tab bar: the song library */
+"Songs" = "Morceaux";
+
+/* ---- ExerciseView ---- */
+
+/* Result of an exercise played in time. The last placeholder is the accuracy as a percentage, such as 85% */
+"%lld of %lld notes, %lld right on the beat (%@)" = "Notes : %1$lld sur %2$lld, dont %3$lld pile sur le temps (%4$@)";
+/* Result of an exercise played in time. The last placeholder is the accuracy as a percentage, such as 85% */
+"%lld of %lld notes, %lld right on the beat, %lld wrong (%@)" = "Notes : %1$lld sur %2$lld, dont %3$lld pile sur le temps ; fausses notes : %4$lld (%5$@)";
+/* Result headline for three stars */
+"Beautifully played" = "Superbement joué";
+"Close" = "Fermer";
+"Every note right first time." = "Toutes les notes justes du premier coup.";
+/* Button that plays the exercise again at its normal tempo */
+"Full speed" = "Vitesse normale";
+/* Result headline for an exercise that was not passed */
+"Nearly there" = "Presque !";
+"Ready?" = "On y va ?";
+"Restart" = "Recommencer";
+/* Button that moves on without passing the exercise */
+"Skip" = "Passer";
+/* Badge on an exercise played at a slower tempo, shown in capitals */
+"Slow" = "Lent";
+/* Button that plays the exercise again at a slower tempo */
+"Slower" = "Plus lent";
+"Try again" = "Réessayer";
+"Try it again, or slow the tempo down first." = "Essaie encore, ou ralentis d’abord le tempo.";
+/* Result headline for two stars */
+"Well done" = "Bien joué";
+/* Result headline for one star */
+"You got through it" = "Tu as tenu jusqu’au bout";
+"You will hear one measure of clicks before the first note." = "Tu entendras une mesure de clics avant la première note.";
+
+/* ---- ExerciseView, LearnView ---- */
+
+"Start" = "Commencer";
+
+/* ---- ExerciseView, LearnView, LessonView ---- */
+
+"Continue" = "Continuer";
+
+/* ---- ExerciseView, SongsView ---- */
+
+/* Badge for the mode where you play along with the metronome, shown in capitals */
+"In time" = "En rythme";
+/* Badge for the mode where the music waits for you, shown in capitals */
+"Practice" = "Entraînement";
+
+/* ---- FreePlayView ---- */
+
+/* The placeholders are letters on computer keys in the user's keyboard layout, such as A S D F G H J K. The last one is the octave shift, such as +1 or -2 */
+"Computer keys: %@ play the white keys from Middle C, %@ the black keys. %@ and %@ shift the octave (now %@)." = "Clavier de l’ordinateur : %1$@ jouent les touches blanches à partir du Do central, %2$@ les touches noires. %3$@ et %4$@ changent d’octave (actuellement %5$@).";
+/* The placeholders are letters on computer keys in the user's keyboard layout, such as A S D F G H J K */
+"Computer keys: %@ play the white keys from Middle C, %@ the black keys. %@ and %@ shift the octave." = "Clavier de l’ordinateur : %1$@ jouent les touches blanches à partir du Do central, %2$@ les touches noires. %3$@ et %4$@ changent d’octave.";
+"Play anything. The notes you hold appear on the staff with their names." = "Joue ce que tu veux. Les notes que tu tiens s’affichent sur la portée, avec leur nom.";
+"Press a key" = "Appuie sur une touche";
+
+/* ---- KeyboardView ---- */
+
+"Higher keys" = "Touches plus aiguës";
+"Lower keys" = "Touches plus graves";
+
+/* ---- LearnView ---- */
+
+"Connect the USB port on the back of your keyboard to your iPad (you may need a USB-C or Lightning adapter) and switch the keyboard on. It is recognised automatically. Until then you can play the on-screen keys." = "Branche le port USB à l’arrière de ton clavier sur ton iPad (il te faudra peut-être un adaptateur USB-C ou Lightning), puis allume le clavier. Il est reconnu automatiquement. En attendant, tu peux jouer sur le clavier à l’écran.";
+"Connect the USB port on the back of your keyboard to your iPhone (you may need a USB-C or Lightning adapter) and switch the keyboard on. It is recognised automatically. Until then you can play the on-screen keys." = "Branche le port USB à l’arrière de ton clavier sur ton iPhone (il te faudra peut-être un adaptateur USB-C ou Lightning), puis allume le clavier. Il est reconnu automatiquement. En attendant, tu peux jouer sur le clavier à l’écran.";
+"Connect your keyboard" = "Branche ton clavier";
+"No MIDI? Middle C can listen to a piano or any keyboard through the microphone. Turn it on in Settings." = "Pas de MIDI ? Middle C peut écouter un piano ou n’importe quel clavier avec le micro. Active-le dans les Réglages.";
+/* The placeholder is the letters on the computer keys that play the piano, as printed in the user's keyboard layout, such as "A S D F G H J K" */
+"Plug the USB port on the back of your keyboard into your Mac and switch the keyboard on. It is recognised automatically; no driver is needed. Until then you can click the on-screen keys or use the %@ row of your computer keyboard." = "Branche le port USB à l’arrière de ton clavier sur ton Mac, puis allume le clavier. Il est reconnu automatiquement, sans pilote à installer. En attendant, tu peux cliquer sur les touches à l’écran ou utiliser la rangée %@ du clavier de ton ordinateur.";
+/* Heading above each unit of the course, shown in capitals */
+"Unit %lld" = "Unité %lld";
+"Work through the lessons in order. Each one takes a few minutes." = "Suis les leçons dans l’ordre. Chacune prend quelques minutes.";
+
+/* ---- LessonView ---- */
+
+"Back to lessons" = "Retour aux leçons";
+"Lesson complete" = "Leçon terminée";
+/* Button that opens the next lesson; the placeholder is its title */
+"Next: %@" = "Suite : %@";
+/* Both placeholders are note names, such as C and D: the key that was played and the one to find */
+"That was %@. Look for %@." = "C’était un %1$@. Cherche un %2$@.";
+/* Shown when every key in a find-the-key drill has been found */
+"That's it!" = "C’est ça !";
+/* The placeholder is a note name, such as C */
+"You already found that one. Try a different %@." = "Tu as déjà trouvé celui-là. Essaie un autre %@.";
+
+/* ---- Localization ---- */
+
+/* Song library heading for the hardest songs */
+"A challenge" = "Un défi";
+/* Song library heading for the easiest songs */
+"First tunes" = "Premiers airs";
+/* Song library heading for songs of medium difficulty */
+"Getting going" = "On se lance";
+
+/* ---- MIDIManager ---- */
+
+/* Name shown for a connected keyboard that does not report its own name */
+"MIDI keyboard" = "Clavier MIDI";
+
+/* ---- MicrophoneInput ---- */
+
+"No microphone was found." = "Aucun micro n’a été trouvé.";
+/* The text in brackets is the system's description of the error */
+"The microphone could not be started (%@)." = "Impossible de démarrer le micro (%@).";
+
+/* ---- PianoTutorApp ---- */
+
+/* Connection status */
+"Keyboard connected" = "Clavier connecté";
+/* Connection status */
+"Microphone listening" = "Micro à l’écoute";
+/* Connection status */
+"No keyboard" = "Aucun clavier";
+/* Connection status detail while the microphone is listening */
+"Play your piano" = "Joue sur ton piano";
+/* Connection status detail when nothing is connected */
+"Using on-screen keys" = "Clavier à l’écran";
+
+/* ---- PlaySession ---- */
+
+/* Feedback on the staff: a note played before the beat */
+"Early" = "En avance";
+/* Feedback on the staff: a note played after the beat */
+"Late" = "En retard";
+/* Feedback on the staff: a note that was not played */
+"Missed" = "Manquée";
+/* Feedback on the staff when a wrong key is pressed in practice mode */
+"Not that one" = "Pas celle-là";
+/* Feedback on the staff: a note played right on the beat */
+"Perfect" = "Parfait";
+/* Feedback on the staff when a key that is not in the music is played in time */
+"Wrong note" = "Fausse note";
+
+/* ---- SettingsView ---- */
+
+/* Use the names of the macOS System Settings panes as they appear in this language */
+"Allow it in System Settings → Privacy & Security → Microphone, then switch this off and on again." = "Autorise-le dans Réglages Système → Confidentialité et sécurité → Micro, puis désactive et réactive cette option.";
+/* Use the names of the iOS Settings screens as they appear in this language */
+"Allow it in the Settings app → Privacy & Security → Microphone, then switch this off and on again." = "Autorise-le dans l’app Réglages → Confidentialité et sécurité → Micro, puis désactive et réactive cette option.";
+/* "Automatic" is the name of the first option above; use the same word */
+"Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen and computer keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the Mac." = "Avec « Automatique », le Mac reste silencieux pour un clavier MIDI, qui a déjà ses propres haut-parleurs, et joue un son de piano pour les touches à l’écran et le clavier de l’ordinateur. Les notes entendues par le micro ne sont jamais rejouées. Le métronome et l’accompagnement viennent toujours du Mac.";
+/* "Automatic" is the name of the first option above; use the same word */
+"Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the iPad." = "Avec « Automatique », l’iPad reste silencieux pour un clavier MIDI, qui a déjà ses propres haut-parleurs, et joue un son de piano pour les touches à l’écran. Les notes entendues par le micro ne sont jamais rejouées. Le métronome et l’accompagnement viennent toujours de l’iPad.";
+/* "Automatic" is the name of the first option above; use the same word */
+"Automatic stays silent for a MIDI keyboard, because it already has its own speakers, and plays a piano sound for the on-screen keys. Notes heard through the microphone are never played back. The metronome and accompaniment always come from the iPhone." = "Avec « Automatique », l’iPhone reste silencieux pour un clavier MIDI, qui a déjà ses propres haut-parleurs, et joue un son de piano pour les touches à l’écran. Les notes entendues par le micro ne sont jamais rejouées. Le métronome et l’accompagnement viennent toujours de l’iPhone.";
+"Cancel" = "Annuler";
+"Connect the keyboard's USB port to your iPad with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two." = "Relie le port USB du clavier à ton iPad avec un câble de données (certains câbles servent seulement à recharger), puis allume le clavier. Il apparaît ici en une ou deux secondes.";
+"Connect the keyboard's USB port to your iPhone with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two." = "Relie le port USB du clavier à ton iPhone avec un câble de données (certains câbles servent seulement à recharger), puis allume le clavier. Il apparaît ici en une ou deux secondes.";
+"Connect the keyboard's USB port to your Mac with a data cable (some cables only charge) and switch the keyboard on. It appears here within a second or two." = "Relie le port USB du clavier à ton Mac avec un câble de données (certains câbles servent seulement à recharger), puis allume le clavier. Il apparaît ici en une ou deux secondes.";
+"For an acoustic piano, or a keyboard without USB. Put the iPad near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact." = "Pour un piano acoustique ou un clavier sans USB. Pose l’iPad près du piano. Les notes jouées une par une sont reconnues partout ; les accords sont reconnus dans les leçons et les morceaux, où l’app sait quelles notes écouter. Le métronome peut la perturber : utilise un casque ou garde le volume bas. Un clavier MIDI reste plus rapide et plus précis.";
+"For an acoustic piano, or a keyboard without USB. Put the iPhone near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact." = "Pour un piano acoustique ou un clavier sans USB. Pose l’iPhone près du piano. Les notes jouées une par une sont reconnues partout ; les accords sont reconnus dans les leçons et les morceaux, où l’app sait quelles notes écouter. Le métronome peut la perturber : utilise un casque ou garde le volume bas. Un clavier MIDI reste plus rapide et plus précis.";
+"For an acoustic piano, or a keyboard without USB. Put the Mac near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact." = "Pour un piano acoustique ou un clavier sans USB. Pose le Mac près du piano. Les notes jouées une par une sont reconnues partout ; les accords sont reconnus dans les leçons et les morceaux, où l’app sait quelles notes écouter. Le métronome peut la perturber : utilise un casque ou garde le volume bas. Un clavier MIDI reste plus rapide et plus précis.";
+"Hear my playing through the iPad" = "Entendre mon jeu sur l’iPad";
+"Hear my playing through the iPhone" = "Entendre mon jeu sur l’iPhone";
+"Hear my playing through the Mac" = "Entendre mon jeu sur le Mac";
+/* "Late" and "Early" are the feedback words shown on the staff; use the same translations */
+"If notes you play on the beat are often marked Late, raise this. Wireless headphones and speakers usually need 100 ms or more. If they are marked Early, lower it." = "Si les notes que tu joues sur le temps sont souvent marquées « En retard », augmente ce réglage. Les casques et haut-parleurs sans fil demandent en général 100 ms ou plus. Si elles sont marquées « En avance », diminue-le.";
+"Keyboard" = "Clavier";
+"Language" = "Langue";
+"Listen to my piano when no MIDI keyboard is connected" = "Écouter mon piano quand aucun clavier MIDI n’est connecté";
+"Listening" = "À l’écoute";
+"Look again" = "Rechercher à nouveau";
+"Microphone" = "Micro";
+"Middle C is not allowed to use the microphone" = "Middle C n’est pas autorisé à utiliser le micro";
+/* iPhone and iPad only */
+"Middle C uses the language of your device. To use a different language for Middle C only, choose it on the app's page in the Settings app." = "Middle C utilise la langue de ton appareil. Pour choisir une autre langue pour Middle C uniquement, va sur la page de l’app dans Réglages.";
+/* Use the names of the macOS System Settings panes as they appear in this language */
+"Middle C uses the language of your Mac. To use a different language for Middle C only, add it in System Settings → General → Language & Region → Applications." = "Middle C utilise la langue de ton Mac. Pour choisir une autre langue pour Middle C uniquement, ajoute-la dans Réglages Système → Général → Langue et région → Applications.";
+"No MIDI keyboard found" = "Aucun clavier MIDI trouvé";
+"Noisy room: only listen for the right notes" = "Pièce bruyante : n’écouter que les bonnes notes";
+"Not listening: a MIDI keyboard is connected" = "Écoute désactivée : un clavier MIDI est connecté";
+/* Timing setting: how much to shift the judging of notes, in milliseconds */
+"Offset" = "Décalage";
+/* Button that opens the app's page in the iOS Settings app */
+"Open Settings" = "Ouvrir Réglages";
+/* The placeholder is a note name with its octave, such as C4 */
+"Play a key to check the connection. Last note received: %@." = "Joue une touche pour vérifier la connexion. Dernière note reçue : %@.";
+"Play a key to check the connection. No note received yet." = "Joue une touche pour vérifier la connexion. Aucune note reçue pour l’instant.";
+/* The placeholder is a note name with its octave, such as C4 */
+"Play a key to check. Last note heard: %@." = "Joue une touche pour vérifier. Dernière note entendue : %@.";
+"Play a key to check. No note heard yet." = "Joue une touche pour vérifier. Aucune note entendue pour l’instant.";
+"Progress" = "Progression";
+"Reset all stars and completed lessons?" = "Effacer toutes les étoiles et les leçons terminées ?";
+"Reset progress" = "Réinitialiser";
+"Reset progress…" = "Réinitialiser la progression…";
+"Sound" = "Son";
+"Talking and other sounds are mostly told apart from the piano, but not always. With this on, nothing the microphone hears is ever marked as a wrong note; the music simply waits for the right one." = "Les voix et les autres bruits sont en général distingués du piano, mais pas toujours. Avec cette option, rien de ce qu’entend le micro n’est marqué comme fausse note : la musique attend simplement la bonne.";
+"Timing" = "Synchronisation";
+"Unlock all lessons" = "Débloquer toutes les leçons";
+"Volume" = "Volume";
+"Waiting for permission to use the microphone" = "En attente de l’autorisation d’utiliser le micro";
+
+/* ---- SongsView ---- */
+
+/* Song option: play both hands */
+"Both" = "Les deux";
+/* Badge on a song written for both hands */
+"Both hands" = "Deux mains";
+/* Button that closes a finished song */
+"Done" = "Terminé";
+"Hands" = "Mains";
+"Key hints" = "Touches éclairées";
+/* Song option: play the left hand only */
+"Left" = "Gauche";
+"Metronome" = "Métronome";
+"Mode" = "Mode";
+"Note names" = "Noms des notes";
+"Play in time with the clicks. Your best result is saved." = "Joue en rythme avec les clics. Ton meilleur résultat est enregistré.";
+"Practise any tune at your own speed, one hand at a time or both together." = "Travaille chaque morceau à ton rythme, une main à la fois ou les deux ensemble.";
+/* Song option: play the right hand only */
+"Right" = "Droite";
+/* Badge on a song written for the right hand only */
+"Right hand" = "Main droite";
+"Speed" = "Vitesse";
+/* "In time" is the name of the mode option; use the same words */
+"The music waits for you. Switch to In time when you know the notes." = "La musique t’attend. Passe en mode « En rythme » quand tu connais les notes.";
+
+/* ---- Support ---- */
+
+/* Accessibility label for a lesson or song rating, e.g. "2 of 3 stars" */
+"%lld of 3 stars" = "Étoiles : %lld sur 3";
+
+/* ---- Feedback and website links (PianoTutorApp, SettingsView) ---- */
+
+/* Help menu item on the Mac that opens the app's website */
+"Middle C Website" = "Site web de Middle C";
+/* Help menu item on the Mac that opens the feedback board. Title case, as in Mac menus. */
+"Report a Problem or Suggest an Idea…" = "Signaler un problème ou suggérer une idée…";
+/* Settings section heading, shown in capitals */
+"Feedback" = "Suggestions";
+"Found a problem, or have an idea for Middle C? Post it on the feedback board, where you can also vote for other people's ideas." = "Tu as trouvé un problème ou tu as une idée pour Middle C ? Fais-en part sur l’espace de suggestions, où tu peux aussi voter pour les idées des autres.";
+/* Button in Settings that opens the feedback board */
+"Report a problem or suggest an idea" = "Signaler un problème ou suggérer une idée";
+/* Settings section heading, shown in capitals */
+"Website" = "Site web";
+"Help with keyboards and the microphone, answers to common questions, and the privacy policy are on the Middle C website." = "L’aide sur les claviers et le micro, les réponses aux questions fréquentes et la politique de confidentialité se trouvent sur le site web de Middle C.";
+
+/* ---- VoiceOver (KeyboardView, StaffView, LessonView) ---- */
+
+/* VoiceOver name of the on-screen keyboard */
+"Piano keyboard" = "Clavier de piano";
+/* VoiceOver: the keys to play next; the placeholder is a list of keys, such as "C4 and E4" */
+"Play %@." = "Joue %@.";
+/* VoiceOver: a key to play and the finger to play it with, such as "E4, finger 3" */
+"%@, finger %lld" = "%1$@, doigt %2$lld";
+/* VoiceOver: the keys a lesson points out; the placeholder is a list of keys */
+"Marked: %@." = "À repérer : %@.";
+/* VoiceOver: the keys held down; the placeholder is a list of keys */
+"Holding %@." = "Tu tiens %@.";
+/* VoiceOver name of a music staff */
+"Music staff" = "Portée musicale";
+/* VoiceOver: an empty staff */
+"No notes" = "Aucune note";
+/* Read out by VoiceOver after a key is found; the placeholder is the next note to find, such as D */
+"Right. Next, %@." = "C’est ça. Ensuite, %@.";

@@ -1,9 +1,11 @@
 name: Website
 
-# Publishes the website at https://middlec.liskovlabs.com. The pages live in site/;
-# the images are made from docs/screenshots and the app icon by
-# scripts/site-images.py, so changing any of those on main redeploys the site.
-# Pull requests that touch them build the site without deploying it, as a check.
+# Publishes the website at https://middlec.liskovlabs.com, in every language. The page
+# templates and their translations (site/locales) live in site/, and the unit and song names
+# come from the app's translations; scripts/build-site.py renders them into build/site and
+# checks that every language is complete and every link works. The images are made from
+# docs/screenshots and the app icon by scripts/site-images.py. Changing any of those on main
+# redeploys the site. Pull requests that touch them build the site without deploying it, as a check.
 #
 # One-time setup: Settings → Pages → Source: "GitHub Actions", then set the custom
 # domain to middlec.liskovlabs.com and tick "Enforce HTTPS" once the certificate is
@@ -18,6 +20,8 @@ on:
       - "Support/Icon/icon.svg"
       - "Support/iOS/Assets.xcassets/AppIcon.appiconset/AppIcon.png"
       - "scripts/site-images.py"
+      - "scripts/build-site.py"
+      - "Sources/PianoTutor/Resources/*.lproj/*.strings"
       - ".github/workflows/pages.yml"
   pull_request:
     paths: *site-paths
@@ -44,30 +48,16 @@ jobs:
       - name: Make the images
         run: uv run scripts/site-images.py
 
-      - name: Check that every linked file exists
-        run: |
-          missing=0
-          for page in site/*.html; do
-            for ref in $(grep -oE '(src|href)="[^"#:?]+"' "$page" | sed -E 's/^[a-z]+="//; s/"$//'); do
-              case "$ref" in
-                ./|/) continue ;;
-                /*) target="site$ref" ;;
-                *) target="site/$ref" ;;
-              esac
-              if [ ! -e "$target" ]; then
-                echo "::error file=$page::Missing file: $ref"
-                missing=1
-              fi
-            done
-          done
-          exit $missing
+      # Fails if a language is missing text or a page links to a file that doesn't exist.
+      - name: Build the pages in every language
+        run: uv run scripts/build-site.py
 
       - uses: actions/configure-pages@v5
         if: github.event_name != 'pull_request'
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: build/site
 
   deploy:
     needs: build
