@@ -31,6 +31,9 @@ struct PianoTutorApp: App {
             .commands {
                 CommandGroup(replacing: .newItem) {}
                 CommandGroup(after: .help) {
+                    Button("Middle C Website") {
+                        NSWorkspace.shared.open(Links.website)
+                    }
                     Button("Report a Problem or Suggest an Idea…") {
                         NSWorkspace.shared.open(Links.feedback)
                     }

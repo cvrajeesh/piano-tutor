@@ -19,6 +19,7 @@ struct SettingsView: View {
                 timingSection
                 progressSection
                 feedbackSection
+                websiteSection
             }
             .padding(screen.compact ? 16 : 32)
             .frame(maxWidth: 720, alignment: .leading)
@@ -164,6 +165,16 @@ struct SettingsView: View {
             note("Found a problem, or have an idea for Middle C? Post it on the feedback board, where you can also vote for other people's ideas.")
             Link(destination: Links.feedback) {
                 Label("Report a problem or suggest an idea", systemImage: "bubble.left.and.bubble.right")
+            }
+            .buttonStyle(SecondaryButtonStyle())
+        }
+    }
+
+    private var websiteSection: some View {
+        section("Website") {
+            note("Help with keyboards and the microphone, answers to common questions, and the privacy policy are on the Middle C website.")
+            Link(destination: Links.website) {
+                Label("middlec.liskovlabs.com", systemImage: "globe")
             }
             .buttonStyle(SecondaryButtonStyle())
         }
