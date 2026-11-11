@@ -99,8 +99,8 @@ struct KeyboardView: View {
         if wrong.contains(midi) { return Theme.bad }
         if good.contains(midi) { return Theme.good }
         if let target = targets[midi] { return Theme.hand(target.hand) }
-        if let mark = mark(for: midi) {
-            if let hand = mark.hand { return Theme.hand(hand) }
+        if let found = mark(for: midi) {
+            if let hand = found.hand { return Theme.hand(hand) }
             return Theme.accent
         }
         if held.contains(midi) {
@@ -123,7 +123,7 @@ struct KeyboardView: View {
 
     private func labelColor(for midi: Int) -> Color {
         if targets[midi] != nil { return .white }
-        if let mark = mark(for: midi), mark.hand == nil { return Theme.ink }
+        if let found = mark(for: midi), found.hand == nil { return Theme.ink }
         return .white
     }
 
