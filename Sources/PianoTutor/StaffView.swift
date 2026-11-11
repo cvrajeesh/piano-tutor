@@ -77,6 +77,24 @@ struct StaffView: View {
                 renderer.draw(in: context, now: HostClock.now)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Music staff")
+        .accessibilityValue(showPlayhead ? "" : spokenNotes)
+        .accessibilityAddTraits(.isImage)
+    }
+
+    /// The notes in order, for a staff that stands still (an example in a lesson, or Free Play).
+    /// A scrolling exercise is left out: it is too long to read, and the keyboard says what to play next.
+    private var spokenNotes: String {
+        let notes: [NoteEvent] = layout.score.notes.sorted { $0.start < $1.start }
+        if notes.isEmpty { return "No notes" }
+        return notes.map { note in
+            note.pitches
+                .map { $0.midi }
+                .sorted()
+                .map { Announcer.spokenName(ofKey: $0) }
+                .joined(separator: " and ")
+        }.joined(separator: ", ")
     }
 }
 

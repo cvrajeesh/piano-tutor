@@ -143,6 +143,21 @@ private struct TouchSurface: UIViewRepresentable {
 }
 #endif
 
+/// Lets VoiceOver users play the keys by touch, as on a real instrument, instead of exploring them.
+private struct DirectTouch: ViewModifier {
+    func body(content: Content) -> some View {
+        #if os(iOS)
+        if #available(iOS 17.0, *) {
+            content.accessibilityAddTraits(.allowsDirectInteraction)
+        } else {
+            content
+        }
+        #else
+        content
+        #endif
+    }
+}
+
 /// The on-screen keyboard. It mirrors what is played, lights up the next keys
 /// and can be clicked or, on a touch screen, played with several fingers.
 struct KeyboardView: View {
@@ -187,12 +202,37 @@ struct KeyboardView: View {
             )
             #endif
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Piano keyboard")
+        .accessibilityValue(spokenState)
+        .modifier(DirectTouch())
         .onDisappear {
             for note in pressed {
                 onRelease(note)
             }
             pressed = []
         }
+    }
+
+    /// What VoiceOver says about the keys: which to play next (or which are marked), and which are held down.
+    private var spokenState: String {
+        var parts: [String] = []
+        if !targets.isEmpty {
+            let keys: [String] = targets.keys.sorted().map { midi in
+                var text: String = Announcer.spokenName(ofKey: midi)
+                if let finger = targets[midi]?.finger {
+                    text += ", finger " + String(finger)
+                }
+                return text
+            }
+            parts.append("Play " + keys.joined(separator: " and "))
+        } else if !marks.isEmpty {
+            parts.append("Marked: " + marks.map { Announcer.spokenName(ofKey: $0.midi) }.joined(separator: ", "))
+        }
+        if !held.isEmpty {
+            parts.append("Holding " + held.sorted().map { Announcer.spokenName(ofKey: $0) }.joined(separator: ", "))
+        }
+        return parts.joined(separator: ". ")
     }
 
     /// Called with the position of every finger (or the mouse) that is down on the keys.
@@ -373,7 +413,7 @@ struct KeyboardPanel: View {
         Button(action: action) {
             Image(systemName: symbol)
                 .font(.system(size: 13, weight: .bold))
-                .foregroundColor(Theme.textPrimary)
+                .foregroundStyle(Theme.textPrimary)
                 .frame(width: KeyboardPanel.arrowWidth)
                 .frame(maxHeight: .infinity)
                 .background(Theme.panelRaised)

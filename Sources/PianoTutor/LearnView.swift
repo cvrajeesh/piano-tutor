@@ -27,11 +27,11 @@ struct LearnView: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Learn")
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
+                    .scaledFont(30, weight: .bold)
+                    .foregroundStyle(Theme.textPrimary)
                 Text("Work through the lessons in order. Each one takes a few minutes.")
-                    .font(.system(size: 14, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
+                    .scaledFont(14)
+                    .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 8)
@@ -61,18 +61,18 @@ struct ConnectHint: View {
         HStack(alignment: .top, spacing: 14) {
             Image(systemName: "cable.connector")
                 .font(.system(size: 22))
-                .foregroundColor(Theme.accent)
+                .foregroundStyle(Theme.accent)
             VStack(alignment: .leading, spacing: 5) {
                 Text("Connect your keyboard")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
+                    .scaledFont(15, weight: .semibold)
+                    .foregroundStyle(Theme.textPrimary)
                 Text(ConnectHint.message)
-                    .font(.system(size: 13, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
+                    .scaledFont(13)
+                    .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
                 Text("No MIDI? Middle C can listen to a piano or any keyboard through the microphone. Turn it on in Settings.")
-                    .font(.system(size: 13, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
+                    .scaledFont(13)
+                    .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -94,14 +94,14 @@ struct UnitSection: View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
                 Text("UNIT " + String(number))
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                    .foregroundColor(Theme.accent)
+                    .scaledFont(11, weight: .bold)
+                    .foregroundStyle(Theme.accent)
                 Text(unit.title)
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
+                    .scaledFont(20, weight: .bold)
+                    .foregroundStyle(Theme.textPrimary)
                 Text(unit.summary)
-                    .font(.system(size: 13, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
+                    .scaledFont(13)
+                    .foregroundStyle(Theme.textSecondary)
             }
             LazyVGrid(columns: columns, alignment: .leading, spacing: 14) {
                 ForEach(unit.lessons) { lesson in
@@ -130,21 +130,21 @@ struct LessonCard: View {
                     } else {
                         Image(systemName: "lock.fill")
                             .font(.system(size: 13))
-                            .foregroundColor(Color(white: 0.5))
+                            .foregroundStyle(Color(white: 0.5))
                     }
                     Spacer()
                     if stars > 0 {
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(Theme.good)
+                            .foregroundStyle(Theme.good)
                     }
                 }
                 Text(lesson.title)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
+                    .scaledFont(15, weight: .semibold)
+                    .foregroundStyle(Theme.textPrimary)
                     .multilineTextAlignment(.leading)
                 Text(lesson.summary)
-                    .font(.system(size: 12, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
+                    .scaledFont(12)
+                    .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.leading)
                     .lineLimit(2)
                 Spacer(minLength: 0)

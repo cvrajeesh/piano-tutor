@@ -133,10 +133,12 @@ struct MainView: View {
             HStack(spacing: 10) {
                 Image(systemName: "pianokeys.inverse")
                     .font(.system(size: 22))
-                    .foregroundColor(Theme.accent)
+                    .foregroundStyle(Theme.accent)
                 Text("Middle C")
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
+                    .scaledFont(20, weight: .bold)
+                    .foregroundStyle(Theme.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
             .padding(.bottom, 22)
 
@@ -148,10 +150,12 @@ struct MainView: View {
                         Image(systemName: section.symbol)
                             .frame(width: 22)
                         Text(section.title)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
                         Spacer()
                     }
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundColor(model.section == section ? Theme.ink : Theme.textPrimary)
+                    .scaledFont(15, weight: .medium)
+                    .foregroundStyle(model.section == section ? Theme.ink : Theme.textPrimary)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 9)
                     .background(model.section == section ? Theme.accent : Color.clear)
@@ -169,6 +173,8 @@ struct MainView: View {
         .frame(width: 220)
         .frame(maxHeight: .infinity)
         .background(Theme.panel)
+        // A fixed-width column: past this size the section names would break in the middle of words.
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
     private var rail: some View {
@@ -179,7 +185,7 @@ struct MainView: View {
                 } label: {
                     Image(systemName: section.symbol)
                         .font(.system(size: 17, weight: .medium))
-                        .foregroundColor(model.section == section ? Theme.ink : Theme.textPrimary)
+                        .foregroundStyle(model.section == section ? Theme.ink : Theme.textPrimary)
                         .frame(width: 44, height: 40)
                         .background(model.section == section ? Theme.accent : Color.clear)
                         .clipShape(RoundedRectangle(cornerRadius: 9))
@@ -211,7 +217,7 @@ struct MainView: View {
                         Text(section.title)
                             .font(.system(size: 10, weight: .medium, design: .rounded))
                     }
-                    .foregroundColor(model.section == section ? Theme.accent : Theme.textSecondary)
+                    .foregroundStyle(model.section == section ? Theme.accent : Theme.textSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.top, 8)
                     .padding(.bottom, 4)
@@ -256,11 +262,11 @@ struct ConnectionBadge: View {
                 .padding(.top, 4)
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundColor(Theme.textPrimary)
+                    .scaledFont(12, weight: .semibold)
+                    .foregroundStyle(Theme.textPrimary)
                 Text(model.midi.sourceNames.first ?? (model.mic.isListening ? "Play your piano" : "Using on-screen keys"))
-                    .font(.system(size: 11, design: .rounded))
-                    .foregroundColor(Theme.textSecondary)
+                    .scaledFont(11)
+                    .foregroundStyle(Theme.textSecondary)
                     .lineLimit(2)
             }
         }
