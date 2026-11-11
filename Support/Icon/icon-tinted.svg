@@ -1,0 +1,11 @@
+<!-- Middle C app icon: iOS 18 tinted appearance. Greyscale; the system applies the tint colour. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1C1C1C"/><stop offset="1" stop-color="#000000"/></linearGradient></defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect x="196" y="200" width="200" height="624" rx="34" fill="#FFFFFF"/>
+  <rect x="412" y="200" width="200" height="624" rx="34" fill="#8C8C8C"/>
+  <rect x="628" y="200" width="200" height="624" rx="34" fill="#8C8C8C"/>
+  <rect x="340" y="184" width="128" height="390" rx="26" fill="#262626"/>
+  <rect x="556" y="184" width="128" height="390" rx="26" fill="#262626"/>
+  <ellipse cx="296" cy="716" rx="58" ry="42" transform="rotate(-22 296 716)" fill="#262626"/>
+</svg>

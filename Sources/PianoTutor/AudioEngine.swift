@@ -38,7 +38,7 @@ final class AudioEngine {
         do {
             try engine.start()
         } catch {
-            NSLog("Piano Tutor: could not start audio (%@)", error.localizedDescription)
+            NSLog("Middle C: could not start audio (%@)", error.localizedDescription)
             return
         }
 
@@ -59,7 +59,7 @@ final class AudioEngine {
             )
             bankLoaded = true
         } catch {
-            NSLog("Piano Tutor: could not load the sound bank (%@)", error.localizedDescription)
+            NSLog("Middle C: could not load the sound bank (%@)", error.localizedDescription)
         }
     }
 
