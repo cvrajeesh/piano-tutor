@@ -18,6 +18,8 @@ struct SettingsView: View {
                 soundSection
                 timingSection
                 progressSection
+                feedbackSection
+                supportSection
             }
             .padding(screen.compact ? 16 : 32)
             .frame(maxWidth: 720, alignment: .leading)
@@ -155,6 +157,37 @@ struct SettingsView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             }
+        }
+    }
+
+    private var feedbackSection: some View {
+        section("Feedback") {
+            note("Found a problem, or have an idea for Middle C? Post it on the feedback board, where you can also vote for other people's ideas.")
+            Link(destination: Links.feedback) {
+                Label("Report a problem or suggest an idea", systemImage: "bubble.left.and.bubble.right")
+            }
+            .buttonStyle(SecondaryButtonStyle())
+        }
+    }
+
+    private var supportSection: some View {
+        section("Support Middle C") {
+            note("Middle C has no ads and no tracking. If you enjoy learning with it, a coffee helps fund its development.")
+            Link(destination: Links.buyMeACoffee) {
+                HStack(spacing: 8) {
+                    BuyMeACoffeeLogo()
+                        .frame(height: 22)
+                    Text("Buy me a coffee")
+                }
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                .foregroundColor(BuyMeACoffeeLogo.ink)
+                .padding(.leading, 14)
+                .padding(.trailing, 18)
+                .padding(.vertical, 8)
+                .background(BuyMeACoffeeLogo.yellow)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            .buttonStyle(.plain)
         }
     }
 }

@@ -30,6 +30,14 @@ struct PianoTutorApp: App {
             .defaultSize(width: 1280, height: 820)
             .commands {
                 CommandGroup(replacing: .newItem) {}
+                CommandGroup(after: .help) {
+                    Button("Report a Problem or Suggest an Idea…") {
+                        NSWorkspace.shared.open(Links.feedback)
+                    }
+                    Button("Buy Me a Coffee…") {
+                        NSWorkspace.shared.open(Links.buyMeACoffee)
+                    }
+                }
             }
         #else
         window

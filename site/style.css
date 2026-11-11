@@ -296,6 +296,19 @@ main section { padding: clamp(72px, 10vw, 120px) 0; scroll-margin-top: 64px; }
 .cta img { width: 96px; height: 96px; border-radius: 22px; margin: 0 auto 28px; box-shadow: 0 20px 40px -16px rgba(0, 0, 0, 0.8); }
 .cta p { margin: 16px auto 0; max-width: 560px; color: var(--text-dim); font-size: 1.12rem; }
 .cta .actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+.cta .tip { margin-top: 36px; font-size: 0.98rem; color: var(--text-faint); }
+.cta .bmc { margin-top: 14px; }
+
+/* Buy Me a Coffee button, in Buy Me a Coffee's own colours */
+.bmc {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 9px 20px 9px 16px; border-radius: 12px;
+  background: #ffdd00; color: #0d0c22;
+  font-weight: 650; font-size: 1rem; line-height: 1.2; text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.bmc:hover { color: #0d0c22; transform: translateY(-1px); box-shadow: 0 10px 26px -10px rgba(255, 221, 0, 0.6); }
+.bmc img { width: 20px; height: 28px; margin: 0; border-radius: 0; box-shadow: none; }
 
 /* ---------- Footer ---------- */
 
