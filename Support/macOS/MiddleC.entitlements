@@ -5,5 +5,9 @@
     <!-- Required for the Mac App Store. CoreMIDI and audio output work inside the sandbox. -->
     <key>com.apple.security.app-sandbox</key>
     <true/>
+    <!-- Lets the app hear an acoustic piano through the microphone (Settings → Microphone).
+         Needs NSMicrophoneUsageDescription, which project.yml sets for this target. -->
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
 </dict>
 </plist>

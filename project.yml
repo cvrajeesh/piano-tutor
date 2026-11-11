@@ -98,6 +98,8 @@ targets:
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.education
         INFOPLIST_KEY_NSPrincipalClass: NSApplication
         INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        # Needed together with the audio-input entitlement in MiddleC.entitlements.
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "Middle C listens to your piano to tell which notes you play. The sound is analysed on this device and is never recorded or sent anywhere."
 schemes:
   PianoTutor-iOS:
     build:
