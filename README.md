@@ -62,7 +62,16 @@ open PianoTutor.xcodeproj
 ```
 
 Choose the **PianoTutor-iOS** scheme and a simulator, and press Run. To run on
-your own device, select your team under Signing & Capabilities first.
+your own device, create `Support/iOS/Local.xcconfig` (ignored by git) with your
+Apple developer team, then generate the project again:
+
+```
+DEVELOPMENT_TEAM = ABCDE12345
+APP_BUNDLE_ID = com.example.pianotutor
+```
+
+`APP_BUNDLE_ID` is optional; set it if `com.pianotutor.app` is not available to
+your team.
 
 - **iPad** shows the same layout as the Mac. All 61 keys are shown when they fit.
 - **iPhone** works upright or on its side. The on-screen keyboard shows as many

@@ -21,13 +21,18 @@ targets:
     sources:
       - path: Sources/PianoTutor
       - path: Support/iOS
+        excludes:
+          - "*.xcconfig"
     dependencies:
       - package: PianoTutor
         product: PianoTutorCore
+    # Team and bundle identifier; see Support/iOS/Signing.xcconfig.
+    configFiles:
+      Debug: Support/iOS/Signing.xcconfig
+      Release: Support/iOS/Signing.xcconfig
     settings:
       base:
         PRODUCT_NAME: PianoTutor
-        PRODUCT_BUNDLE_IDENTIFIER: com.pianotutor.app
         MARKETING_VERSION: 0.1.0
         CURRENT_PROJECT_VERSION: 1
         SWIFT_VERSION: "5.0"
