@@ -1,9 +1,23 @@
 name: Build
 
+# Skip the build when a push or pull request only touches files the build never
+# reads: docs, screenshots, the release tooling and the release workflow. Anything
+# else (a new source folder, Package.swift, project.yml, Support/, this file) still
+# builds. Run it by hand from the Actions tab to build regardless.
 on:
   push:
     branches: [main, "claude/**"]
+    paths-ignore: &ignored-paths
+      - "**.md"
+      - "docs/**"
+      - "fastlane/**"
+      - "Gemfile"
+      - "Gemfile.lock"
+      - ".ruby-version"
+      - ".gitignore"
+      - ".github/workflows/release.yml"
   pull_request:
+    paths-ignore: *ignored-paths
   workflow_dispatch:
 
 concurrency:
