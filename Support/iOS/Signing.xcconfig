@@ -2,9 +2,10 @@
 // (it is ignored by git), for example:
 //
 //   DEVELOPMENT_TEAM = ABCDE12345
-//   APP_BUNDLE_ID = com.example.pianotutor
+//
+// Set APP_BUNDLE_ID there too only to sign with a bundle identifier other than the one below.
 //
 CODE_SIGN_STYLE = Automatic
-APP_BUNDLE_ID = middlec.liskovlabs.com
+APP_BUNDLE_ID = com.liskovlabs.middlec
 #include? "Local.xcconfig"
 PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_ID)

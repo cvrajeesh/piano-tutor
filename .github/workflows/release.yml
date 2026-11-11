@@ -12,6 +12,9 @@ name: Release
 #   MATCH_GIT_URL, MATCH_PASSWORD            signing repo and its passphrase
 #   MATCH_GIT_BASIC_AUTHORIZATION            base64 of "github-user:token" with read access to the signing repo
 #   TEAM_ID                                  Apple developer team
+#
+# Repository variable (optional):
+#   APP_BUNDLE_ID                            overrides the bundle ID in the Fastfile
 
 on:
   push:
@@ -55,6 +58,7 @@ jobs:
       MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
       TEAM_ID: ${{ secrets.TEAM_ID }}
+      APP_BUNDLE_ID: ${{ vars.APP_BUNDLE_ID }}
       FASTLANE_SKIP_UPDATE_CHECK: "1"
       FASTLANE_HIDE_CHANGELOG: "1"
     steps:
