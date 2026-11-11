@@ -48,7 +48,7 @@ targets:
       base:
         PRODUCT_NAME: PianoTutor
         # Release Please bumps this when its release PR is merged; don't edit it by hand.
-        MARKETING_VERSION: &marketingVersion 0.1.0 # x-release-please-version
+        MARKETING_VERSION: &marketingVersion 0.2.0 # x-release-please-version
         # fastlane overrides this with the next free build number when it uploads.
         CURRENT_PROJECT_VERSION: 1
         SWIFT_VERSION: "5.0"
