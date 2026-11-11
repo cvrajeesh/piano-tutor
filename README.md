@@ -112,6 +112,11 @@ Actions. See [`docs/release-process.md`](docs/release-process.md) for the whole
 process, and [`docs/app-store-setup.md`](docs/app-store-setup.md) for the
 one-time setup.
 
+The App Store page is kept in the repository too: the text, in nine languages, in `fastlane/metadata`,
+and screenshots that `scripts/store-assets.py` makes from `docs/screenshots` with
+captions. fastlane uploads them with each release. See
+[`docs/app-store-listing.md`](docs/app-store-listing.md).
+
 ## Connecting a Casio CT-S300
 
 1. Connect the keyboard's USB port (micro-USB, on the back) to your Mac. Use a cable that carries data; some cables only charge.
@@ -173,8 +178,9 @@ screams mixed in, rather than against recordings of real rooms.
 | `Tests/PianoTutorCoreTests` | Unit tests for the core, including checks that every translation is complete |
 | `scripts/build-app.sh` | Builds the macOS `.app` bundle |
 | `project.yml`, `Support/iOS`, `Support/macOS` | XcodeGen definition and resources for the iPhone, iPad and Mac App Store apps |
-| `fastlane`, `Gemfile` | Build, signing and App Store upload lanes |
-| `.github/workflows` | `ci.yml` builds and tests every push; `release.yml` publishes; `pages.yml` deploys the website |
+| `fastlane`, `Gemfile` | Build, signing and App Store upload lanes, and the store listing (`fastlane/metadata`) |
+| `scripts/store-assets.py` | Checks the store text and makes the App Store screenshots |
+| `.github/workflows` | `ci.yml` builds and tests every push; `release.yml` publishes; `store-listing.yml` checks the store listing; `pages.yml` deploys the website |
 | `site` | The website, [middlec.liskovlabs.com](https://middlec.liskovlabs.com): page templates, their text in every language (`site/locales`), and the stylesheet |
 | `scripts/build-site.py`, `scripts/check-translations.py` | Build the website in every language; check translations against English |
 

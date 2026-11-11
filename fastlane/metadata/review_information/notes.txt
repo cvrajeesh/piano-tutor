@@ -1,0 +1,13 @@
+Middle C teaches beginners to play the piano. No account or sign-in is needed.
+
+You don't need a piano or keyboard to review the app:
+- Lessons, songs and Free Play show a 61-key on-screen keyboard. Tap (or click) the keys that light up to play through a lesson or song.
+- On a Mac, the computer keyboard also plays notes: A S D F G H J K are the white keys from Middle C, W E T Y U the black keys.
+
+To try a lesson: Learn > Start. Lessons unlock in order; Settings > Progress > "Unlock all lessons" opens them all. To try a song: Songs > any song. Practice mode waits for the right key; In time mode counts in with a metronome and judges each note.
+
+Optional hardware and permissions:
+- USB-MIDI keyboards (for example a Casio CT-S300) are detected automatically through CoreMIDI when plugged in. No driver or setup is needed.
+- The microphone is used only if the user turns on Settings > Microphone > "Listen to my piano when no MIDI keyboard is connected", to recognise notes played on an acoustic piano. The audio is analysed on the device in real time and is never recorded, stored or sent anywhere. The app asks for microphone access only when that setting is turned on.
+
+The app collects no data, has no analytics or ads, and works offline. The links to the website and the feedback board open in the browser.

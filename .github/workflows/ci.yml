@@ -12,6 +12,7 @@ on:
       - "docs/**"
       - "site/**"
       - "scripts/site-images.py"
+      - "scripts/store-assets.py"
       - "fastlane/**"
       - "Gemfile"
       - "Gemfile.lock"
@@ -24,6 +25,7 @@ on:
       - ".github/workflows/release-please.yml"
       - ".github/workflows/pr-title.yml"
       - ".github/workflows/pages.yml"
+      - ".github/workflows/store-listing.yml"
   pull_request:
     paths-ignore: *ignored-paths
   workflow_dispatch:

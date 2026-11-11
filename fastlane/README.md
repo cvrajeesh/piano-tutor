@@ -13,6 +13,16 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
+### privacy
+
+```sh
+[bundle exec] fastlane privacy
+```
+
+Upload the App Privacy answers in fastlane/app_privacy_details.json (Apple ID login; not on CI)
+
+----
+
 ## iOS
 
 ### ios certificates
@@ -45,7 +55,15 @@ Build and upload to TestFlight
 [bundle exec] fastlane ios release
 ```
 
-Build and upload to the App Store. Pass submit:true to submit for review
+Build and upload to the App Store with the store listing. Pass submit:true to submit for review
+
+### ios metadata
+
+```sh
+[bundle exec] fastlane ios metadata
+```
+
+Upload the store listing and screenshots to the version in project.yml, without a build
 
 ----
 
@@ -82,7 +100,15 @@ Build and upload to TestFlight
 [bundle exec] fastlane mac release
 ```
 
-Build and upload to the App Store. Pass submit:true to submit for review
+Build and upload to the App Store with the store listing. Pass submit:true to submit for review
+
+### mac metadata
+
+```sh
+[bundle exec] fastlane mac metadata
+```
+
+Upload the store listing and screenshots to the version in project.yml, without a build
 
 ----
 

@@ -1,0 +1,1 @@
+Branche ton clavier et joue. Middle C entend chaque note, t'attend pendant que tu cherches les touches, puis lance le décompte quand tu es prêt.

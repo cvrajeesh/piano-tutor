@@ -1,0 +1,46 @@
+name: Store listing
+
+# Checks the App Store text in fastlane/metadata against Apple's limits and makes the
+# App Store screenshots, whenever a pull request or push changes them or what they're
+# made from. The screenshots are attached to the run as the store-screenshots artifact
+# for a look before they're uploaded. Nothing is sent to App Store Connect; the
+# Release workflow does that. See docs/app-store-listing.md.
+
+on:
+  push:
+    branches: [main]
+    paths: &listing-paths
+      - "fastlane/metadata/**"
+      - "fastlane/screenshot_captions.json"
+      - "docs/screenshots/**"
+      - "scripts/store-assets.py"
+      - ".github/workflows/store-listing.yml"
+  pull_request:
+    paths: *listing-paths
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: store-listing-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    # macOS, for the San Francisco font the captions use.
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Check the text and make the screenshots
+        run: uv run scripts/store-assets.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: store-screenshots
+          path: fastlane/screenshots
+          retention-days: 14
