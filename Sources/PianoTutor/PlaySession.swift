@@ -92,7 +92,9 @@ final class PlaySession: ObservableObject, StaffSource {
     private let audio: AudioEngine
     private let scheduler: EventScheduler
     private let input: InputHub
+    private let mic: MicrophoneInput
     private let timingOffset: TimeInterval
+    private let inputLag: TimeInterval
     private let groups: [NoteGroup]
 
     private var trainer: StepTrainer?
@@ -124,7 +126,9 @@ final class PlaySession: ObservableObject, StaffSource {
         self.audio = model.audio
         self.scheduler = model.scheduler
         self.input = model.input
+        self.mic = model.mic
         self.timingOffset = model.timingOffset
+        self.inputLag = model.inputLag
         self.groups = config.score.groups(for: config.hands)
         resetVisuals()
     }
@@ -196,16 +200,21 @@ final class PlaySession: ObservableObject, StaffSource {
             beat += 1
         }
 
+        // The microphone hears the clicks too; it is told when to expect them.
+        var appSounds: [ClosedRange<TimeInterval>] = batch.map { ($0.0 - 0.06)...($0.0 + 0.15) }
+
         // The app plays the hand that is not being practised.
         for note in score.notes where !config.hands.contains(note.hand) {
             let onTime: TimeInterval = zeroTime + note.start * spb
-            let offTime: TimeInterval = zeroTime + (note.start + note.duration) * spb - 0.03
+            let offTime: TimeInterval = max(zeroTime + (note.start + note.duration) * spb - 0.03, onTime)
             for midi in note.midiNotes {
                 batch.append((onTime, { audio.noteOn(midi, velocity: 72) }))
                 batch.append((offTime, { audio.noteOff(midi) }))
             }
+            appSounds.append((onTime - 0.06)...(offTime + 0.25))
         }
         scheduler.schedule(batch)
+        mic.setGuards(appSounds)
 
         let newTimer = Timer(timeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
             self?.tick()
@@ -224,6 +233,8 @@ final class PlaySession: ObservableObject, StaffSource {
         subscription = nil
         scheduler.cancelAll()
         audio.allNotesOff()
+        mic.setGuards([])
+        input.expectedNotes = []
         if phase == .running {
             phase = .idle
         }
@@ -238,6 +249,8 @@ final class PlaySession: ObservableObject, StaffSource {
         timer?.invalidate()
         timer = nil
         scheduler.cancelAll()
+        mic.setGuards([])
+        input.expectedNotes = []
         targets = [:]
         progress = 1
         if config.mode == .wait {
@@ -322,7 +335,8 @@ final class PlaySession: ObservableObject, StaffSource {
         guard phase == .running, let judge = judge else { return }
         let elapsed: Double = HostClock.now - zeroTime
 
-        let missed: [Int] = judge.advance(to: elapsed - timingOffset)
+        // With the microphone a note is reported a little after it was played; wait for it.
+        let missed: [Int] = judge.advance(to: elapsed - timingOffset - inputLag)
         if !missed.isEmpty {
             for id in missed {
                 visuals[id] = .missed
@@ -334,6 +348,19 @@ final class PlaySession: ObservableObject, StaffSource {
         while nextGroup < groups.count && groups[nextGroup].start * secondsPerBeat < elapsed - 0.15 {
             nextGroup += 1
         }
+
+        // The notes due about now, for the microphone.
+        var due: Set<Int> = []
+        var index: Int = max(nextGroup - 2, 0)
+        while index < groups.count {
+            let offset: Double = groups[index].start * secondsPerBeat - (elapsed - timingOffset)
+            if offset > 0.3 { break }
+            if offset > -0.3 - inputLag {
+                due.formUnion(groups[index].midiNotes)
+            }
+            index += 1
+        }
+        input.expectedNotes = due
         if nextGroup != shownGroup {
             shownGroup = nextGroup
             if config.keyHints && nextGroup < groups.count {
@@ -361,8 +388,10 @@ final class PlaySession: ObservableObject, StaffSource {
                 visuals[id] = .active
             }
             targets = config.keyHints ? keyTargets(for: group) : [:]
+            input.expectedNotes = group.midiNotes
         } else {
             targets = [:]
+            input.expectedNotes = []
         }
     }
 

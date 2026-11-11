@@ -15,6 +15,8 @@ struct NoteInput {
         case computerKeys
         /// A click or a touch on the on-screen keys.
         case mouse
+        /// A piano heard through the microphone.
+        case microphone
     }
 
     let kind: Kind
@@ -24,7 +26,7 @@ struct NoteInput {
     let source: Source
 }
 
-/// Merges notes from the MIDI keyboard, the on-screen keys and the computer keyboard into one stream.
+/// Merges notes from the MIDI keyboard, the microphone, the on-screen keys and the computer keyboard into one stream.
 final class InputHub: ObservableObject {
     @Published private(set) var held: Set<Int> = []
     @Published private(set) var octaveShift: Int = 0
@@ -33,6 +35,17 @@ final class InputHub: ObservableObject {
 
     /// Called for every note before listeners, used to play the sound.
     var monitor: ((NoteInput) -> Void)?
+
+    /// The notes the current exercise is waiting for. The microphone needs to know them to
+    /// recognise chords; the other inputs ignore them.
+    var expectedNotes: Set<Int> = [] {
+        didSet {
+            if expectedNotes != oldValue {
+                onExpectedNotes?(expectedNotes)
+            }
+        }
+    }
+    var onExpectedNotes: ((Set<Int>) -> Void)?
 
     #if os(macOS)
     private var keyMonitor: Any?

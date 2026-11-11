@@ -10,7 +10,7 @@ struct LearnView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 26) {
                 header
-                if !model.midi.isConnected {
+                if !model.midi.isConnected && !model.mic.isListening {
                     ConnectHint()
                 }
                 ForEach(Array(Curriculum.units.enumerated()), id: \.element.id) { index, unit in
@@ -67,6 +67,10 @@ struct ConnectHint: View {
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundColor(Theme.textPrimary)
                 Text(ConnectHint.message)
+                    .font(.system(size: 13, design: .rounded))
+                    .foregroundColor(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text("No MIDI? Middle C can listen to a piano or any keyboard through the microphone. Turn it on in Settings.")
                     .font(.system(size: 13, design: .rounded))
                     .foregroundColor(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
