@@ -1,4 +1,4 @@
-# Piano Tutor
+# Middle C
 
 A native app for Mac, iPad and iPhone for learning to play the keyboard. Plug in a USB-MIDI keyboard
 (it was written with the Casio CT-S300 in mind), follow the lessons, and the app
@@ -46,14 +46,14 @@ More screens, in both orientations, are in [`docs/screenshots`](docs/screenshots
 
 ```bash
 ./scripts/build-app.sh
-open "build/Piano Tutor.app"
+open "build/Middle C.app"
 ```
 
 The script builds a release binary and wraps it in an app bundle. You can move
-`Piano Tutor.app` to your Applications folder.
+`Middle C.app` to your Applications folder.
 
 Every push also builds the app on GitHub Actions; the result is attached to the
-workflow run as the `PianoTutor-app` artifact. A downloaded copy is not
+workflow run as the `MiddleC-app` artifact. A downloaded copy is not
 notarised, so macOS blocks it on first launch: right-click the app and choose
 **Open**, or allow it under System Settings → Privacy & Security. An app you
 build yourself with the script above opens normally.
@@ -106,7 +106,7 @@ your team.
 
 1. Connect the keyboard's USB port (micro-USB, on the back) to your Mac. Use a cable that carries data; some cables only charge.
 2. Switch the keyboard on.
-3. Open Piano Tutor. The sidebar shows "Keyboard connected" with the device name. No driver is needed.
+3. Open Middle C. The sidebar shows "Keyboard connected" with the device name. No driver is needed.
 
 In **Settings** you can check which note the app last received.
 

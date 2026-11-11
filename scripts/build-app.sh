@@ -1,5 +1,5 @@
 #!/bin/bash
-# Builds "Piano Tutor.app" into ./build using only the Swift toolchain
+# Builds "Middle C.app" into ./build using only the Swift toolchain
 # (Xcode or the Xcode Command Line Tools).
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 swift build -c release
 BIN_DIR="$(swift build -c release --show-bin-path)"
 
-APP="build/Piano Tutor.app"
+APP="build/Middle C.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 

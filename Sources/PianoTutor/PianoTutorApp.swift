@@ -37,7 +37,7 @@ struct PianoTutorApp: App {
     }
 
     private var window: some Scene {
-        WindowGroup("Piano Tutor") {
+        WindowGroup("Middle C") {
             RootView()
                 .environmentObject(model)
                 .environmentObject(model.input)
@@ -126,7 +126,7 @@ struct MainView: View {
                 Image(systemName: "pianokeys.inverse")
                     .font(.system(size: 22))
                     .foregroundColor(Theme.accent)
-                Text("Piano Tutor")
+                Text("Middle C")
                     .font(.system(size: 20, weight: .bold, design: .rounded))
                     .foregroundColor(Theme.textPrimary)
             }

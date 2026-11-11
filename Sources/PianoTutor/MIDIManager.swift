@@ -31,7 +31,7 @@ final class MIDIManager: ObservableObject {
         guard !started else { return }
         started = true
 
-        let clientStatus = MIDIClientCreateWithBlock("Piano Tutor" as CFString, &client) { [weak self] notification in
+        let clientStatus = MIDIClientCreateWithBlock("Middle C" as CFString, &client) { [weak self] notification in
             let id = notification.pointee.messageID
             if id == .msgSetupChanged || id == .msgObjectAdded || id == .msgObjectRemoved {
                 DispatchQueue.main.async {

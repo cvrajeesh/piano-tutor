@@ -29,13 +29,13 @@ jobs:
       - name: Package app
         run: |
           ./scripts/build-app.sh
-          ditto -c -k --keepParent "build/Piano Tutor.app" "build/PianoTutor.zip"
+          ditto -c -k --keepParent "build/Middle C.app" "build/MiddleC.zip"
 
       - name: Upload app
         uses: actions/upload-artifact@v4
         with:
-          name: PianoTutor-app
-          path: build/PianoTutor.zip
+          name: MiddleC-app
+          path: build/MiddleC.zip
           retention-days: 14
 
   ios:
