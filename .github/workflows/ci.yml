@@ -56,3 +56,11 @@ jobs:
             -scheme PianoTutor-iOS \
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO
+
+      - name: Build the Mac App Store target
+        run: |
+          xcodebuild build \
+            -project PianoTutor.xcodeproj \
+            -scheme PianoTutor-macOS \
+            -destination 'generic/platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO

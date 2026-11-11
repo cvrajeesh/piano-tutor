@@ -6,3 +6,9 @@ xcuserdata/
 DerivedData/
 .DS_Store
 Support/iOS/Local.xcconfig
+fastlane/.env
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+*.p8

@@ -1,0 +1,106 @@
+name: Release
+
+# Builds, signs and uploads the iOS and Mac App Store apps with fastlane.
+#
+# - Pushing a tag such as v0.2.0 sends both apps to TestFlight. The tag must match
+#   MARKETING_VERSION in project.yml.
+# - Run it by hand (Actions → Release → Run workflow) to choose the platform, upload
+#   to the App Store instead, and optionally submit for review.
+#
+# Repository secrets it needs (see "Publishing to the App Store" in README.md):
+#   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8    App Store Connect API key
+#   MATCH_GIT_URL, MATCH_PASSWORD            signing repo and its passphrase
+#   MATCH_GIT_BASIC_AUTHORIZATION            base64 of "github-user:token" with read access to the signing repo
+#   TEAM_ID                                  Apple developer team
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Which app
+        type: choice
+        options: [both, ios, mac]
+        default: both
+      lane:
+        description: "beta: TestFlight, release: App Store"
+        type: choice
+        options: [beta, release]
+        default: beta
+      submit:
+        description: Submit for review (release only)
+        type: boolean
+        default: false
+
+# One upload per platform at a time, so two runs never pick the same build number.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: ${{ matrix.platform }} ${{ inputs.lane || 'beta' }}
+    runs-on: macos-26
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.platform != 'both') && format('["{0}"]', inputs.platform) || '["ios","mac"]') }}
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_PATH: ${{ github.workspace }}/build/AuthKey.p8
+      MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+      TEAM_ID: ${{ secrets.TEAM_ID }}
+      FASTLANE_SKIP_UPDATE_CHECK: "1"
+      FASTLANE_HIDE_CHANGELOG: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the tag matches the app version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          version=$(sed -n 's/.*MARKETING_VERSION: &marketingVersion //p' project.yml)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match MARKETING_VERSION $version in project.yml"
+            exit 1
+          fi
+
+      - name: Xcode version
+        run: xcodebuild -version
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Install XcodeGen
+        run: which xcodegen || brew install xcodegen
+
+      - name: Write the App Store Connect key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p build
+          printf '%s\n' "$ASC_KEY_P8" > "$ASC_KEY_PATH"
+
+      - name: fastlane ${{ matrix.platform }} ${{ inputs.lane || 'beta' }}
+        run: bundle exec fastlane ${{ matrix.platform }} ${{ inputs.lane || 'beta' }} submit:${{ inputs.submit || false }}
+
+      - name: Keep the build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiddleC-${{ matrix.platform }}-${{ github.run_number }}
+          path: |
+            build/fastlane/*.ipa
+            build/fastlane/*.pkg
+            build/fastlane/*.dSYM.zip
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Remove the key
+        if: always()
+        run: rm -f "$ASC_KEY_PATH"

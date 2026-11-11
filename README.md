@@ -102,6 +102,67 @@ your team.
   and run `xcodegen generate` again.
 - There is no app icon yet.
 
+## Publishing to the App Store
+
+Releases are built, signed and uploaded with [fastlane](https://fastlane.tools).
+The iPhone/iPad app and the Mac app share one bundle identifier, so one App Store
+record covers both (universal purchase). The Mac App Store build is the sandboxed
+`PianoTutor-macOS` target in `project.yml`, not the SwiftPM build.
+
+| Command | What it does |
+| --- | --- |
+| `bundle exec fastlane ios beta` / `mac beta` | Build, sign and upload to TestFlight |
+| `bundle exec fastlane ios release` / `mac release` | Upload to the App Store; add `submit:true` to submit for review |
+| `bundle exec fastlane ios build` / `mac build` | Signed `.ipa` / `.pkg` in `build/fastlane`, no upload |
+| `bundle exec fastlane ios certificates` / `mac certificates` | Create or fetch the signing certificate and profile |
+
+The version shown in the store is `MARKETING_VERSION` in `project.yml`. The build
+number is set automatically to one more than the latest build on TestFlight.
+Store text and screenshots are edited in App Store Connect.
+
+### One-time setup
+
+1. **App Store Connect.** Create the app record with the bundle identifier
+   (`middlec.liskovlabs.com`) and add both the iOS and macOS platforms.
+2. **API key.** Under Users and Access → Integrations → App Store Connect API,
+   create a key with the **Admin** role (match needs it to create certificates;
+   **App Manager** is enough once they exist). Save the `.p8` as
+   `~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8`.
+3. **Signing repository.** Create an empty **private** git repository for
+   [match](https://docs.fastlane.tools/actions/match/), which keeps the
+   certificates and profiles there, encrypted with a passphrase you choose.
+4. **Local settings.** Use Ruby 3.2 or later (`.ruby-version` asks for 3.2.0), then:
+
+   ```bash
+   bundle install
+   cp fastlane/.env.example fastlane/.env   # fill in the key, repo and passphrase
+   bundle exec fastlane ios certificates
+   bundle exec fastlane mac certificates
+   ```
+
+   This creates the Apple Distribution and Mac Installer Distribution certificates
+   and the App Store profiles, and stores them in the signing repository. The team
+   comes from `Support/iOS/Local.xcconfig` unless you set `TEAM_ID`.
+
+### GitHub Actions
+
+`.github/workflows/release.yml` runs the same lanes on GitHub. Pushing a tag
+that matches the version (for example `v0.1.0`) sends both apps to TestFlight.
+Run the workflow by hand from the Actions tab to choose a platform, upload to
+the App Store instead, or submit for review. Add these repository secrets:
+
+| Secret | Value |
+| --- | --- |
+| `ASC_KEY_ID`, `ASC_ISSUER_ID` | From the App Store Connect API page |
+| `ASC_KEY_P8` | The contents of the `.p8` file |
+| `MATCH_GIT_URL` | HTTPS URL of the signing repository |
+| `MATCH_PASSWORD` | The match passphrase |
+| `MATCH_GIT_BASIC_AUTHORIZATION` | `echo -n "github-user:token" \| base64`, with a token that can read the signing repository |
+| `TEAM_ID` | Your Apple developer team ID |
+
+On CI, match only reads the signing repository. Create or renew certificates on
+your Mac with the `certificates` lanes.
+
 ## Connecting a Casio CT-S300
 
 1. Connect the keyboard's USB port (micro-USB, on the back) to your Mac. Use a cable that carries data; some cables only charge.
@@ -126,7 +187,9 @@ black keys, and `Z` / `X` shift the octave.
 | `Sources/PianoTutor` | The app: MIDI input, audio, the scrolling staff, the keyboard and the screens |
 | `Tests/PianoTutorCoreTests` | Unit tests for the core |
 | `scripts/build-app.sh` | Builds the macOS `.app` bundle |
-| `project.yml`, `Support/iOS` | XcodeGen definition and resources for the iPhone and iPad app |
+| `project.yml`, `Support/iOS`, `Support/macOS` | XcodeGen definition and resources for the iPhone, iPad and Mac App Store apps |
+| `fastlane`, `Gemfile` | Build, signing and App Store upload lanes |
+| `.github/workflows` | `ci.yml` builds and tests every push; `release.yml` publishes |
 
 ## Adding your own music
 
