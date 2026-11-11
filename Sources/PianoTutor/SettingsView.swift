@@ -72,7 +72,12 @@ struct SettingsView: View {
             if model.useMicrophone {
                 microphoneStatus
             }
-            note("For an acoustic piano, or a keyboard without USB. Put the " + Platform.deviceName + " near the piano in a quiet room. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact.")
+            note("For an acoustic piano, or a keyboard without USB. Put the " + Platform.deviceName + " near the piano. One note at a time is recognised anywhere; chords are recognised in lessons and songs, where the app knows which notes to listen for. The metronome can confuse it, so use headphones or keep the volume low. A MIDI keyboard is still quicker and more exact.")
+            if model.useMicrophone {
+                Toggle("Noisy room: only listen for the right notes", isOn: $model.micRightNotesOnly)
+                    .foregroundColor(Theme.textPrimary)
+                note("Talking and other sounds are mostly told apart from the piano, but not always. With this on, nothing the microphone hears is ever marked as a wrong note; the music simply waits for the right one.")
+            }
         }
     }
 

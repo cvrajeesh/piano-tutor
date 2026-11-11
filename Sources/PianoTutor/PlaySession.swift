@@ -95,6 +95,8 @@ final class PlaySession: ObservableObject, StaffSource {
     private let mic: MicrophoneInput
     private let timingOffset: TimeInterval
     private let inputLag: TimeInterval
+    private let micRightNotesOnly: Bool
+    private let micRange: ClosedRange<Int>?
     private let groups: [NoteGroup]
 
     private var trainer: StepTrainer?
@@ -129,6 +131,9 @@ final class PlaySession: ObservableObject, StaffSource {
         self.mic = model.mic
         self.timingOffset = model.timingOffset
         self.inputLag = model.inputLag
+        self.micRightNotesOnly = model.micRightNotesOnly
+        // A learner's slips land near the right keys; a "note" far outside the piece is a voice.
+        self.micRange = config.score.keyRange(hands: config.hands).map { ($0.lowerBound - 4)...($0.upperBound + 4) }
         self.groups = config.score.groups(for: config.hands)
         resetVisuals()
     }
@@ -278,8 +283,18 @@ final class PlaySession: ObservableObject, StaffSource {
         }
     }
 
+    /// Whether a note that is not in the music should be shown as a mistake. What the microphone
+    /// hears is not always the piano, so its wrong notes are only believed when they are plausible.
+    private func believable(_ note: NoteInput) -> Bool {
+        guard note.source == .microphone else { return true }
+        if micRightNotesOnly { return false }
+        if let range = micRange, !range.contains(note.midi) { return false }
+        return true
+    }
+
     private func handleWait(_ note: NoteInput) {
         guard let trainer = trainer, let group = trainer.current else { return }
+        if !group.midiNotes.contains(note.midi) && !believable(note) { return }
         let response: StepTrainer.Response = trainer.noteOn(note.midi)
         switch response {
         case .wrong:
@@ -312,7 +327,8 @@ final class PlaySession: ObservableObject, StaffSource {
         guard let judge = judge else { return }
         let time: Double = note.time - zeroTime - timingOffset
         if time < -0.3 { return }  // still counting in
-        switch judge.noteOn(note.midi, at: time) {
+        let trusted: Bool = believable(note)
+        switch judge.noteOn(note.midi, at: time, countStray: trusted) {
         case .hit(let eventID, let grade, _):
             goodKeys.insert(note.midi)
             if case .hit = judge.state(ofEvent: eventID) {
@@ -325,6 +341,7 @@ final class PlaySession: ObservableObject, StaffSource {
             case .late: setFeedback("Late", Theme.accent)
             }
         case .stray:
+            guard trusted else { return }
             wrongKeys.insert(note.midi)
             streak = 0
             setFeedback("Wrong note", Theme.bad)

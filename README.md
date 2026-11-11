@@ -138,12 +138,21 @@ What to expect:
   expected notes are believed, so a wrong note there goes unpunished rather than a click
   being taken for one. Headphones, or a low volume, work best. While you play the
   on-screen keys the microphone is ignored.
-- It needs a reasonably quiet room, and it is not as quick or exact as MIDI.
+- **Talking, shouting and other noise** are mostly ignored. A note only counts if it starts
+  with an attack and then holds exactly the pitch of a key, which voices rarely do, and in a
+  lesson or song a "wrong note" far from the keys the piece uses is passed over. Someone
+  singing in tune can still fool it. For a really noisy room there is
+  **Settings → Microphone → Noisy room**: nothing the microphone hears is then marked as a
+  wrong note, and the music simply waits for the right one.
+- A wrong key is shown a little later than a right one (about an eighth of a second),
+  because it takes that long to be sure it was the piano.
+- It is not as quick or exact as MIDI.
 
-The listening is done by `NoteDetector` in `PianoTutorCore`: the period of the sound
-(the YIN method) gives a single note, and the strength of each expected note's first two
-partials confirms a chord. It has been tested with synthesised and sampled piano sound,
-not yet with a real microphone in a real room.
+The listening is done by `NoteDetector` in `PianoTutorCore`. Expected notes are looked for
+at their own pitches (the strength of the first two partials, and the exact frequency from
+how the phase advances); any other note comes from the period of the sound (the YIN method).
+It was tuned against synthesised and sampled piano sound, with synthesised speech and
+screams mixed in, rather than against recordings of real rooms.
 
 ## Project layout
 

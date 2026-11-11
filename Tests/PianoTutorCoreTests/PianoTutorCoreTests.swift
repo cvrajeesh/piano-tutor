@@ -386,3 +386,54 @@ final class NoteDetectorTests: XCTestCase {
         }
     }
 }
+
+extension NoteDetectorTests {
+    /// Something like a voice: a pitch that slides and wavers, and swells instead of being struck.
+    private func voice(from start: Double, pitch: Double, seconds: Double, into samples: inout [Float]) {
+        var phase: Double = 0
+        let first: Int = Int(start * sampleRate)
+        for index in 0..<Int(seconds * sampleRate) where first + index < samples.count {
+            let t: Double = Double(index) / sampleRate
+            let frequency: Double = pitch * (1 + 0.03 * sin(2 * Double.pi * 5 * t) + 0.1 * t)
+            phase += 2 * Double.pi * frequency / sampleRate
+            let envelope: Double = min(t / 0.12, 1) * min((seconds - t) / 0.05, 1)
+            let wave: Double = sin(phase) + 0.6 * sin(2 * phase) + 0.4 * sin(3 * phase) + 0.3 * sin(4 * phase)
+            samples[first + index] += Float(0.08 * envelope * wave)
+        }
+    }
+
+    func testVoicesAreNotNotes() {
+        var samples = audio([], seconds: 5)
+        for (index, pitch) in [180.0, 240, 300, 520, 1400, 1900].enumerated() {
+            voice(from: 0.3 + Double(index) * 0.75, pitch: pitch, seconds: 0.5, into: &samples)
+        }
+        XCTAssertEqual(listen(samples, expected: [64]), [])
+        XCTAssertEqual(listen(samples), [])
+    }
+
+    func testExpectedNoteIsHeardOverAVoice() {
+        var samples = audio([Strike(time: 0.6, notes: [64], length: 0.6)], seconds: 2)
+        voice(from: 0.3, pitch: 1400, seconds: 1.2, into: &samples)
+        XCTAssertEqual(listen(samples, expected: [64]).map { $0.midi }, [64])
+    }
+
+    func testRingingNoteIsNotHeardAgainWhenSomethingElseMakesANoise() {
+        // E is expected twice running; while the first is still ringing, a voice starts up.
+        var samples = audio([Strike(time: 0.4, notes: [64], length: 2)], seconds: 2.4)
+        voice(from: 1.0, pitch: 500, seconds: 0.6, into: &samples)
+        XCTAssertEqual(listen(samples, expected: [64]).map { $0.midi }, [64])
+    }
+}
+
+final class LenientJudgeTests: XCTestCase {
+    func testDoubtfulNotesAreNotCountedAsMistakes() throws {
+        let score = try Score(right: "C4 D4")
+        let judge = PerformanceJudge(score: score, hands: [.right], secondsPerBeat: 1)
+        XCTAssertEqual(judge.noteOn(77, at: 0.5, countStray: false), .stray)
+        XCTAssertEqual(judge.strays, 0)
+        XCTAssertEqual(judge.noteOn(77, at: 0.5), .stray)
+        XCTAssertEqual(judge.strays, 1)
+        // A doubtful note that does match still counts as played.
+        XCTAssertEqual(judge.noteOn(60, at: 0, countStray: false), .hit(eventID: 0, grade: .perfect, offset: 0))
+    }
+}

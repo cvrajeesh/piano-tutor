@@ -84,6 +84,12 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// For noisy rooms: notes heard by the microphone that are not in the music are passed
+    /// over instead of being marked as mistakes.
+    @Published var micRightNotesOnly: Bool {
+        didSet { defaults.set(micRightNotesOnly, forKey: Keys.micRightNotesOnly) }
+    }
+
     let midi = MIDIManager()
     let mic = MicrophoneInput()
     let audio = AudioEngine()
@@ -101,6 +107,7 @@ final class AppModel: ObservableObject {
         static let timingOffset = "timingOffsetMs"
         static let unlockAll = "unlockAll"
         static let useMicrophone = "useMicrophone"
+        static let micRightNotesOnly = "micRightNotesOnly"
     }
 
     init() {
@@ -117,6 +124,7 @@ final class AppModel: ObservableObject {
         timingOffsetMs = store.double(forKey: Keys.timingOffset)
         unlockAll = store.bool(forKey: Keys.unlockAll)
         useMicrophone = store.bool(forKey: Keys.useMicrophone)
+        micRightNotesOnly = store.bool(forKey: Keys.micRightNotesOnly)
     }
 
     /// Starts audio and MIDI. Safe to call more than once.

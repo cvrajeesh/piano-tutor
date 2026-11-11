@@ -2,10 +2,15 @@ import Foundation
 
 /// Turns microphone audio into note-on and note-off events, for playing without a MIDI keyboard.
 ///
-/// A single note is found by its period (the YIN method), which works across the whole keyboard
-/// and does not depend on how loud the fundamental is. Several notes at once cannot be told apart
-/// that way, so chords are handled differently: when the music is waiting for a chord (`expected`),
-/// the detector checks whether each of those notes is sounding instead of guessing from scratch.
+/// The notes the music is waiting for (`expected`) are looked for directly, each at its own
+/// pitch. That finds chords, and it still works while other sounds are going on. Any other note
+/// is found by the period of the sound (the YIN method), which needs the piano to be the only
+/// thing sounding and cannot tell several notes apart.
+///
+/// A room is rarely quiet, and a voice has a pitch too. So a note only counts if it looks like a
+/// piano: it begins with an attack, and it then stays exactly on one key's pitch, which speech,
+/// shouting and even most singing do not. A note that is not expected, and would be shown as a
+/// mistake, has to pass the strictest form of that test.
 ///
 /// Feed it mono samples in any chunk size. It is not thread-safe; use it from one thread.
 public final class NoteDetector {
@@ -55,6 +60,7 @@ public final class NoteDetector {
     private let partialWindow: Int
     private let shortestChordWindow: Int
     private let keep: Int
+    private let warmUp: Int
 
     private static let lowestNote: Int = 33
     private static let highestNote: Int = 100
@@ -94,7 +100,8 @@ public final class NoteDetector {
         tauMax = Int(rate / 62) + 2
         partialWindow = Int(rate * 0.093)
         shortestChordWindow = Int(rate * 0.070)
-        keep = max(partialWindow, yinWindow + tauMax) + hop
+        warmUp = max(partialWindow, yinWindow + tauMax) + hop
+        keep = warmUp + 32 * hop
 
         inBuffer = Array(repeating: 0, count: half)
         inBase = -half
@@ -130,7 +137,11 @@ public final class NoteDetector {
     // Single-note tracking
     private var candidate: Int? = nil
     private var candidateCount: Int = 0
-    private var candidatePosition: Int = 0
+    /// The measured pitch (in fractional keys) for each hop the candidate has lasted.
+    private var candidatePitches: [Double] = []
+    private var candidateInTune: [Bool] = []
+    /// The same, measured precisely from the phase of the fundamental, in cents off the key.
+    private var candidateTuning: [Double] = []
     private var powerHistory: [(hop: Int, note: Int, power: Float)] = []
 
     /// Notices when a level jumps above where it was heading. The comparison is with a slowly
@@ -174,9 +185,31 @@ public final class NoteDetector {
         var position: Int
         var hop: Int
         var guarded: Bool
+        /// Every jump in loudness that belongs to this attack, the first one included.
+        var strikes: [(hop: Int, position: Int)]
+
+        init(position: Int, hop: Int, guarded: Bool) {
+            self.position = position
+            self.hop = hop
+            self.guarded = guarded
+            self.strikes = [(hop: hop, position: position)]
+        }
+
+        /// When a note that was first noticed at `hop` must have been struck.
+        func position(before hop: Int) -> Int {
+            return strikes.last(where: { $0.hop <= hop })?.position ?? position
+        }
+
         var emitted: Set<Int> = []
         var chordFound: Bool = false
         var presence: [Int: Int] = [:]
+        var strength: [Int: Float] = [:]
+        /// How far off its key each expected note sounded at the last hop, in cents.
+        var tuning: [Int: Double] = [:]
+        /// How strong each expected note was before the attack.
+        var before: [Int: Float] = [:]
+        /// Loudness at each hop since the attack.
+        var levels: [Double] = []
     }
 
     private var attack: Attack? = nil
@@ -184,6 +217,7 @@ public final class NoteDetector {
     /// Notes that were dropped because they had become very quiet.
     private var faded: Set<Int> = []
     private var lastAttackHop: Int = -1000
+    private var jumpHop: Int = -1000
 
     // MARK: Input
 
@@ -237,6 +271,9 @@ public final class NoteDetector {
         attack = nil
         candidate = nil
         candidateCount = 0
+        candidatePitches = []
+        candidateInTune = []
+        candidateTuning = []
         powerHistory = []
         quietHops = 0
         faded = []
@@ -246,7 +283,7 @@ public final class NoteDetector {
 
     private func analyze(mode: Mode, events: inout [Event]) {
         hopIndex += 1
-        guard buffer.count >= keep else { return }
+        guard buffer.count >= warmUp else { return }
         let total: Int = bufferBase + buffer.count
         let level: Double = levelNow()
 
@@ -265,6 +302,10 @@ public final class NoteDetector {
         // A hammer blow adds more to the high partials than to the overall loudness, so both are watched.
         let louder: Bool = loudness.add(level, hopSeconds: hopSeconds)
         let brighter: Bool = brightness.add(brightnessNow(), hopSeconds: hopSeconds)
+        // A quiet note starts from below the gate; the jump is remembered until it gets above it.
+        if louder || brighter {
+            jumpHop = hopIndex
+        }
 
         if mode == .muted {
             releaseAll(at: total, events: &events)
@@ -289,58 +330,89 @@ public final class NoteDetector {
             }
         }
 
-        if level >= gate && (louder || brighter) && hopIndex - lastAttackHop >= 4 {
+        if level >= gate && hopIndex - jumpHop <= 3 && hopIndex - lastAttackHop >= 4 {
+            jumpHop = -1000
             lastAttackHop = hopIndex
             faded = []
-            if var current = attack, hopIndex - current.hop < 6, current.emitted.isEmpty {
-                // Still working on an attack that began a moment ago (a rolled chord).
+            let position: Int = (total - hop / 2) * factor
+            if var current = attack, hopIndex - current.hop < 16, current.emitted.isEmpty {
+                // Still working out what an attack a moment ago was (a rolled chord, an echo,
+                // or a shout just before the key went down). Remember this one as well.
                 current.guarded = current.guarded || mode == .guarded
+                current.strikes.append((hop: hopIndex, position: position))
                 attack = current
             } else {
-                attack = Attack(position: (total - hop / 2) * factor, hop: hopIndex, guarded: mode == .guarded)
+                attack = Attack(position: position, hop: hopIndex, guarded: mode == .guarded)
             }
         }
-        if let current = attack, hopIndex - current.hop > 30 {
+        if let current = attack, hopIndex - (current.strikes.last?.hop ?? current.hop) > 30 {
             attack = nil
         }
         let guarded: Bool = mode == .guarded || (attack?.guarded ?? false)
         let chordExpected: Bool = expected.count >= 2
+        attack?.levels.append(level)
 
         // One clear pitch?
-        var single: Int? = nil
-        var singlePower: Float = 0
-        if level >= gate, let found = singlePitch(strict: chordExpected) {
-            single = found.note
-            singlePower = found.power
+        var single: SinglePitch? = nil
+        if level >= gate {
+            single = singlePitch(strict: chordExpected)
         }
         setCandidate(single, total: total)
-        if let note = single {
-            powerHistory.append((hop: hopIndex, note: note, power: singlePower))
+        if let found = single {
+            powerHistory.append((hop: hopIndex, note: found.note, power: found.power))
             if powerHistory.count > 40 { powerHistory.removeFirst() }
         }
 
-        // Are the notes of the expected chord sounding?
-        if var current = attack, !expected.isEmpty, chordExpected || guarded {
+        // Something was struck: is it one of the notes the music is waiting for? Each of them is
+        // looked for at its own pitch, which still works while people are talking over the piano.
+        if var current = attack, !expected.isEmpty {
             let age: Int = hopIndex - current.hop
+            for note in expected where current.before[note] == nil {
+                // How strong the note was just before the attack, in case it was still ringing.
+                let back: Int = min((age + 1) * hop, buffer.count - partialWindow)
+                current.before[note] = fundamental(of: note, length: partialWindow, back: back)
+            }
             var vetoed: Bool = false
-            if let note = single, !expected.contains(note), candidateCount >= 2, !guarded {
-                // One clear note that is not part of the chord: a wrong key, not the chord.
-                vetoed = true
+            if let found = single, !expected.contains(found.note), candidateCount >= 2, !guarded {
+                // One clear lower note whose partials are the expected notes: the wrong key
+                // (C3 instead of C4 and G4), not the expected ones.
+                let partials: Set<Int> = [12, 19, 24, 28, 31, 34, 36]
+                vetoed = expected.allSatisfy { partials.contains($0 - found.note) }
             }
             if age >= 6 && !vetoed {
                 let since: Int = total - current.position / factor
                 let length: Int = min(max(since, shortestChordWindow), partialWindow)
-                let present: [Int] = notesPresent(among: expected, length: length)
+                let present: [Int: Float] = notesPresent(among: expected, length: length)
                 for note in expected {
-                    current.presence[note] = present.contains(note) ? current.presence[note, default: 0] + 1 : 0
+                    guard let strength = present[note], strength >= 1.25 * (current.before[note] ?? 0),
+                          let tuning = centsOffKey(note, length: length), abs(tuning) <= 33 || note < 43,
+                          !isOvertone(note, strength: strength, length: length) else {
+                        current.presence[note] = 0
+                        current.strength[note] = nil
+                        current.tuning[note] = nil
+                        continue
+                    }
+                    // A piano string keeps sounding evenly and at one pitch;
+                    // a voice passing through the pitch does neither.
+                    var even: Bool = true
+                    if let last = current.strength[note], strength > 1.4 * last || strength < 0.5 * last {
+                        even = false
+                    }
+                    if let last = current.tuning[note], abs(tuning - last) > 6, note >= 43 {
+                        even = false
+                    }
+                    current.presence[note] = even ? current.presence[note, default: 0] + 1 : 1
+                    current.strength[note] = strength
+                    current.tuning[note] = tuning
                 }
-                for note in expected.sorted() where current.presence[note, default: 0] >= 2 && !current.emitted.contains(note) {
+                for note in expected.sorted() where current.presence[note, default: 0] >= 4 && !current.emitted.contains(note) {
                     if !current.chordFound {
                         for other in sounding.sorted() where !expected.contains(other) {
                             turnOff(other, at: total, events: &events)
                         }
                     }
-                    turnOn(note, position: current.position, level: level, total: total, events: &events)
+                    // It has been there for four hops, and needed a few more to show.
+                    turnOn(note, position: current.position(before: hopIndex - 7), level: level, total: total, events: &events)
                     current.emitted.insert(note)
                     current.chordFound = true
                 }
@@ -348,64 +420,78 @@ public final class NoteDetector {
             attack = current
         }
 
-        // Report the single note once it has held steady.
-        guard let note = candidate, candidateCount >= 3 else { return }
+        // Otherwise, one clear pitch that began with an attack is a note.
+        guard let found = single, let note = candidate, let current = attack else { return }
+        let age: Int = hopIndex - current.hop
         let wanted: Bool = expected.contains(note)
         let keepOthers: Bool = wanted && chordExpected
+        guard !current.emitted.contains(note), current.emitted.isEmpty || keepOthers else { return }
 
-        if !sounding.contains(note) {
-            var allowed: Bool = true
-            let fresh: Bool = attack.map { $0.emitted.isEmpty || keepOthers } ?? false
-            if !fresh {
-                // Nothing was struck, yet the pitch seems to have changed. That happens (a quiet
-                // legato note), but more often a fading sound is being misread: a chord cannot be
-                // followed this way at all, and a dying note tends to jump to one of its partials.
-                let intervals: Set<Int> = [12, 19, 24]
-                let partial: Bool = sounding.contains { intervals.contains(abs($0 - note)) }
-                if sounding.count >= 2 || partial || candidateCount < 6 || faded.contains(note) {
-                    allowed = false
-                }
-            }
-            if !wanted {
-                if guarded {
-                    allowed = false
-                } else if let current = attack {
-                    // Give the chord check time to finish before calling this a wrong note.
-                    if current.chordFound || (chordExpected && hopIndex - current.hop < 14) {
-                        allowed = false
-                    }
-                }
-            }
-            guard allowed else { return }
-            if !keepOthers {
-                releaseAll(at: total, events: &events)
-            }
-            var position: Int = candidatePosition
-            if let current = attack, hopIndex - current.hop <= 20, current.emitted.isEmpty || keepOthers {
-                position = current.position
-            }
-            turnOn(note, position: position, level: level, total: total, events: &events)
-            attack?.emitted.insert(note)
-        } else if let current = attack, !current.emitted.contains(note), hopIndex - current.hop >= 5, wanted || !guarded {
-            // The same key struck again.
-            guard grewLouder(note, power: singlePower, since: current.hop) else { return }
-            if !keepOthers {
-                for other in sounding.sorted() where other != note {
-                    turnOff(other, at: total, events: &events)
-                }
-            }
-            turnOn(note, position: current.position, level: level, total: total, events: &events)
-            attack?.emitted.insert(note)
+        if wanted {
+            guard candidateCount >= 3, pitchSpread(last: 3) <= 0.35, tuningIsSteady(last: 3) else { return }
+        } else {
+            // A note nobody asked for is shown as a mistake, so it has to be beyond doubt a piano
+            // and not a voice: struck, then fading, at a steady pitch that is in tune with a key.
+            guard !guarded, !current.chordFound else { return }
+            let hops: Int = 7
+            guard age >= (chordExpected ? 14 : hops + 2), candidateCount >= hops else { return }
+            guard candidateInTune.suffix(hops - 1).allSatisfy({ $0 }), pitchSpread(last: hops - 1) <= 0.1,
+                  tuningIsSteady(last: hops - 1) else { return }
+            guard wasStruck(current.levels) else { return }
         }
+        guard grewLouder(note, power: found.power, since: current.hop) else { return }
+
+        if !keepOthers {
+            for other in sounding.sorted() where other != note {
+                turnOff(other, at: total, events: &events)
+            }
+        }
+        turnOn(note, position: current.position(before: hopIndex - candidateCount), level: level, total: total, events: &events)
+        attack?.emitted.insert(note)
     }
 
-    private func setCandidate(_ note: Int?, total: Int) {
-        if note == candidate {
+    /// A struck string is loudest almost at once and fades from there; a voice swells.
+    /// (Some later growth is allowed for: a room's echoes add up for a moment.)
+    private func wasStruck(_ levels: [Double]) -> Bool {
+        guard levels.count > 5, let early = levels.prefix(5).max(), let later = levels.dropFirst(5).max() else { return true }
+        return later <= early + 5
+    }
+
+    /// Whether the candidate has stayed on its key, at one pitch, for the last few hops.
+    /// A piano string does; a voice, even a sung note, drifts by more than this.
+    private func tuningIsSteady(last count: Int) -> Bool {
+        let recent = candidateTuning.suffix(count)
+        guard recent.count == count, let low = recent.min(), let high = recent.max() else { return false }
+        if (candidate ?? 0) < 43 { return true }
+        return low >= -33 && high <= 33 && high - low <= 8
+    }
+
+    /// How far the pitch has wandered over the last few hops, in semitones.
+    private func pitchSpread(last count: Int) -> Double {
+        let recent = candidatePitches.suffix(count)
+        guard let low = recent.min(), let high = recent.max() else { return 0 }
+        return high - low
+    }
+
+    private func setCandidate(_ found: SinglePitch?, total: Int) {
+        if found?.note == candidate {
             candidateCount += 1
         } else {
-            candidate = note
+            candidate = found?.note
             candidateCount = 1
-            candidatePosition = max(total - (yinWindow + tauMax) / 2, 0) * factor
+            candidatePitches = []
+            candidateInTune = []
+            candidateTuning = []
+        }
+        if let found = found {
+            candidatePitches.append(found.exact)
+            candidateInTune.append(found.inTune)
+            candidateTuning.append(centsOffKey(found.note, length: partialWindow) ?? 100)
+            if candidatePitches.count > 12 {
+                candidatePitches.removeFirst()
+                candidateInTune.removeFirst()
+                candidateTuning.removeFirst()
+            }
         }
     }
 
@@ -478,16 +564,27 @@ public final class NoteDetector {
         return 10 * log10(Double(sum) / Double(levelWindow) + 1e-12)
     }
 
+    private struct SinglePitch {
+        let note: Int
+        let power: Float
+        /// The pitch in fractional keys, where it can be measured that finely.
+        let exact: Double
+        let inTune: Bool
+    }
+
     /// The note being played if the sound has one clear pitch.
     /// `strict` is used while a chord is expected: two or three notes together can repeat with the
     /// period of a much lower note, so that note is only believed if its own fundamental is there.
-    private func singlePitch(strict: Bool) -> (note: Int, power: Float)? {
+    private func singlePitch(strict: Bool) -> SinglePitch? {
         guard let period = yinPeriod() else { return nil }
         var pitch: Double = rate / period
-        var note: Int = Int((69 + 12 * log2(pitch / 440)).rounded())
+        let exact: Double = 69 + 12 * log2(pitch / 440)
+        var note: Int = Int(exact.rounded())
         guard note >= NoteDetector.lowestNote && note <= NoteDetector.highestNote else { return nil }
+        var inTune: Bool = abs(exact - Double(note)) <= 0.3
+        let high: Bool = pitch > 700
 
-        if pitch > 700 {
+        if high {
             // Up here a period is only a few samples long; let the spectrum settle between neighbours.
             var best: Int = note
             var bestAmplitude: Float = amplitude(at: NoteDetector.frequency(of: note), length: partialWindow)
@@ -502,6 +599,12 @@ public final class NoteDetector {
                 note = best
                 pitch = NoteDetector.frequency(of: best)
             }
+            // A period this short cannot be timed finely, but the spectrum can tell a pitch that
+            // sits on the key from one that is between keys or sliding about.
+            let onKey: Float = amplitude(at: NoteDetector.frequency(of: note), length: partialWindow)
+            let sharp: Float = amplitude(at: NoteDetector.frequency(of: note) * pow(2, 50.0 / 1200), length: partialWindow)
+            let flat: Float = amplitude(at: NoteDetector.frequency(of: note) * pow(2, -50.0 / 1200), length: partialWindow)
+            inTune = onKey >= 2 * max(sharp, flat)
         }
 
         var partials: [Float] = []
@@ -519,7 +622,7 @@ public final class NoteDetector {
         for value in partials {
             power += value * value
         }
-        return (note, power)
+        return SinglePitch(note: note, power: power, exact: high ? Double(note) : exact, inTune: inTune)
     }
 
     /// The period of the sound in samples, by the YIN method, or nil if it is not periodic enough.
@@ -569,9 +672,16 @@ public final class NoteDetector {
     }
 
     /// How strong a sine of this frequency is in the last `length` samples (Hann window).
-    private func amplitude(at frequency: Double, length: Int) -> Float {
-        guard frequency < 0.45 * rate, length > 8, buffer.count >= length else { return 0 }
-        let offset: Int = buffer.count - length
+    /// `back` moves the window that many samples into the past.
+    private func amplitude(at frequency: Double, length: Int, back: Int = 0) -> Float {
+        let value = partial(at: frequency, length: length, back: back)
+        return Float(4 * (value.real * value.real + value.imaginary * value.imaginary).squareRoot() / Double(length))
+    }
+
+    /// The sum behind `amplitude`: the windowed sound multiplied by a turning phase.
+    private func partial(at frequency: Double, length: Int, back: Int) -> (real: Double, imaginary: Double) {
+        guard frequency < 0.45 * rate, length > 8, back >= 0, buffer.count >= length + back else { return (0, 0) }
+        let offset: Int = buffer.count - length - back
         let turn: Double = 2 * Double.pi * frequency / rate
         let turnCos: Double = cos(turn)
         let turnSin: Double = sin(turn)
@@ -597,7 +707,38 @@ public final class NoteDetector {
                 wc = nextWC
             }
         }
-        return Float(4 * (real * real + imaginary * imaginary).squareRoot() / Double(length))
+        return (real, imaginary)
+    }
+
+    /// How far the sound near this key's pitch is from the key itself, in hundredths of a semitone.
+    /// The spectrum of so short a stretch is far too blurred to say, but how much the partial's
+    /// phase moves on from one hop to the next gives its frequency precisely. This is what tells
+    /// a piano from a voice that happens to pass by the same pitch.
+    private func centsOffKey(_ note: Int, length: Int) -> Double? {
+        let pitch: Double = NoteDetector.frequency(of: note)
+        guard buffer.count >= length + hop else { return nil }
+        let now = partial(at: pitch, length: length, back: 0)
+        let earlier = partial(at: pitch, length: length, back: hop)
+        let expectedTurn: Double = 2 * Double.pi * pitch * Double(hop) / rate
+        var difference: Double = atan2(now.imaginary, now.real) - atan2(earlier.imaginary, earlier.real) - expectedTurn
+        difference -= 2 * Double.pi * (difference / (2 * Double.pi)).rounded()
+        let offset: Double = difference / (2 * Double.pi * hopSeconds)
+        return 1200 * log2(max(pitch + offset, 1) / pitch)
+    }
+
+    /// Whether what looks like this note is really an overtone of a lower sound: a deeper voice,
+    /// or the same key an octave down. Then there is as much sound at a half or a third of its pitch.
+    private func isOvertone(_ note: Int, strength: Float, length: Int) -> Bool {
+        let pitch: Double = NoteDetector.frequency(of: note)
+        for (divisor, interval) in [(2.0, 12), (3.0, 19)] {
+            // Unless that lower note is itself being played.
+            if expected.contains(note - interval) || sounding.contains(note - interval) { continue }
+            if pitch / divisor < 70 { continue }
+            if amplitude(at: pitch / divisor, length: length) >= 0.7 * strength {
+                return true
+            }
+        }
+        return false
     }
 
     /// Mean power of the last `length` samples under the same window as `amplitude`.
@@ -616,21 +757,29 @@ public final class NoteDetector {
         return Float(sum / max(weight, 1e-12))
     }
 
-    /// Which of these notes are sounding. A note counts if both its fundamental and its
-    /// second partial stand out; pianos are rarely in perfect tune, so each is looked for a little
-    /// to either side as well.
-    private func notesPresent(among notes: Set<Int>, length: Int) -> [Int] {
-        guard buffer.count >= length else { return [] }
+    /// The strength of a note's fundamental, allowing for a piano that is a little out of tune.
+    private func fundamental(of note: Int, length: Int, back: Int = 0) -> Float {
+        let pitch: Double = NoteDetector.frequency(of: note)
+        var best: Float = 0
+        for cents in [-20.0, 0.0, 20.0] {
+            best = max(best, amplitude(at: pitch * pow(2, cents / 1200), length: length, back: back))
+        }
+        return best
+    }
+
+    /// Which of these notes are sounding, with the strength of each one's fundamental. A note
+    /// counts if both its fundamental and its second partial stand out; pianos are rarely in
+    /// perfect tune, so each is looked for a little to either side as well.
+    private func notesPresent(among notes: Set<Int>, length: Int) -> [Int: Float] {
+        guard buffer.count >= length else { return [:] }
         var measured: [(note: Int, first: Float, second: Float, hasSecond: Bool)] = []
         var strongest: Float = 0
         for note in notes {
             let pitch: Double = NoteDetector.frequency(of: note)
-            var first: Float = 0
+            var first: Float = fundamental(of: note, length: length)
             var second: Float = 0
             for cents in [-20.0, 0.0, 20.0] {
-                let tuned: Double = pitch * pow(2, cents / 1200)
-                first = max(first, amplitude(at: tuned, length: length))
-                second = max(second, amplitude(at: 2 * tuned, length: length))
+                second = max(second, amplitude(at: 2 * pitch * pow(2, cents / 1200), length: length))
             }
             if pitch >= 180 {
                 // The peak has to be on this key, not spilling over from the key next to it.
@@ -645,12 +794,12 @@ public final class NoteDetector {
             measured.append((note, first, second, hasSecond))
             strongest = max(strongest, first, second)
         }
-        // The chord's partials have to account for a fair share of the sound.
-        guard strongest > 0, strongest * strongest / 2 >= 0.03 * windowedPower(length: length) else { return [] }
-        var present: [Int] = []
+        // The notes' partials have to account for a fair share of the sound.
+        guard strongest > 0, strongest * strongest / 2 >= 0.01 * windowedPower(length: length) else { return [:] }
+        var present: [Int: Float] = [:]
         for entry in measured {
             if entry.first >= 0.1 * strongest && (!entry.hasSecond || entry.second >= 0.03 * strongest) {
-                present.append(entry.note)
+                present[entry.note] = entry.first
             }
         }
         return present
