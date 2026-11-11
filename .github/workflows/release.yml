@@ -7,7 +7,7 @@ name: Release
 # - Run it by hand (Actions → Release → Run workflow) to choose the platform, upload
 #   to the App Store, and optionally submit for review.
 #
-# Repository secrets it needs (see "Publishing to the App Store" in README.md):
+# Repository secrets it needs (see docs/release-process.md):
 #   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8    App Store Connect API key
 #   MATCH_GIT_URL, MATCH_PASSWORD            signing repo and its passphrase
 #   MATCH_GIT_BASIC_AUTHORIZATION            base64 of "github-user:token" with read access to the signing repo
