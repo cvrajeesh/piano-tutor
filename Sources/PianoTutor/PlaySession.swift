@@ -300,7 +300,7 @@ final class PlaySession: ObservableObject, StaffSource {
         case .wrong:
             wrongKeys.insert(note.midi)
             streak = 0
-            setFeedback("Not that one", Theme.bad)
+            setFeedback(String(localized: "Not that one", comment: "Feedback on the staff when a wrong key is pressed in practice mode"), Theme.bad)
         case .partial:
             goodKeys.insert(note.midi)
         case .advanced, .finished:
@@ -336,15 +336,15 @@ final class PlaySession: ObservableObject, StaffSource {
             }
             streak += 1
             switch grade {
-            case .perfect: setFeedback("Perfect", Theme.good)
-            case .early: setFeedback("Early", Theme.accent)
-            case .late: setFeedback("Late", Theme.accent)
+            case .perfect: setFeedback(String(localized: "Perfect", comment: "Feedback on the staff: a note played right on the beat"), Theme.good)
+            case .early: setFeedback(String(localized: "Early", comment: "Feedback on the staff: a note played before the beat"), Theme.accent)
+            case .late: setFeedback(String(localized: "Late", comment: "Feedback on the staff: a note played after the beat"), Theme.accent)
             }
         case .stray:
             guard trusted else { return }
             wrongKeys.insert(note.midi)
             streak = 0
-            setFeedback("Wrong note", Theme.bad)
+            setFeedback(String(localized: "Wrong note", comment: "Feedback on the staff when a key that is not in the music is played in time"), Theme.bad)
         }
     }
 
@@ -359,7 +359,7 @@ final class PlaySession: ObservableObject, StaffSource {
                 visuals[id] = .missed
             }
             streak = 0
-            setFeedback("Missed", Theme.bad)
+            setFeedback(String(localized: "Missed", comment: "Feedback on the staff: a note that was not played"), Theme.bad)
         }
 
         while nextGroup < groups.count && groups[nextGroup].start * secondsPerBeat < elapsed - 0.15 {

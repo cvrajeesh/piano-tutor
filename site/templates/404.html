@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ t.notfound.title|plain }}</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#121724">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/consent.js" defer></script>
+</head>
+<body>
+  <main class="page cta" style="min-height: 80vh; display: grid; place-items: center">
+    <div class="wrap">
+      <img src="/images/icon-256.png" alt="" width="96" height="96">
+      <h1 id="heading">{{ t.notfound.heading }}</h1>
+      <p id="text">{{ t.notfound.text }}</p>
+      <div class="actions"><a class="btn" id="home" href="/">{{ t.notfound.home }}</a></div>
+    </div>
+  </main>
+  <script>
+    // GitHub Pages has one 404 page for the whole site, so it takes the language of the
+    // folder the missing page was in (/fr/…), or else the browser's, and links home in it.
+    (function () {
+      var strings = {{ strings|tojson }};
+      var folder = location.pathname.split("/")[1].toLowerCase();
+      var chosen = null;
+      Object.keys(strings).forEach(function (tag) {
+        if (strings[tag].path && strings[tag].path === folder + "/") chosen = tag;
+      });
+      if (!chosen) {
+        var wanted = navigator.languages || [navigator.language || "en"];
+        for (var i = 0; i < wanted.length && !chosen; i++) {
+          var pref = wanted[i].toLowerCase();
+          Object.keys(strings).forEach(function (tag) {
+            var t = tag.toLowerCase();
+            if (chosen) return;
+            if (pref === t || (pref.split("-")[0] === t.split("-")[0] && !/^zh-(hant|tw|hk|mo)/.test(pref))) chosen = tag;
+          });
+        }
+      }
+      if (!chosen || chosen === "en") return;
+      var s = strings[chosen];
+      document.documentElement.lang = chosen;
+      document.title = s.title;
+      document.getElementById("heading").textContent = s.heading;
+      document.getElementById("text").textContent = s.text;
+      var home = document.getElementById("home");
+      home.textContent = s.home;
+      home.href = "/" + s.path;
+    })();
+  </script>
+</body>
+</html>

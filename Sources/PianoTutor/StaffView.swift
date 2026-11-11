@@ -87,14 +87,13 @@ struct StaffView: View {
     /// A scrolling exercise is left out: it is too long to read, and the keyboard says what to play next.
     private var spokenNotes: String {
         let notes: [NoteEvent] = layout.score.notes.sorted { $0.start < $1.start }
-        if notes.isEmpty { return "No notes" }
-        return notes.map { note in
-            note.pitches
-                .map { $0.midi }
-                .sorted()
-                .map { Announcer.spokenName(ofKey: $0) }
-                .joined(separator: " and ")
-        }.joined(separator: ", ")
+        if notes.isEmpty { return String(localized: "No notes", comment: "VoiceOver: an empty staff") }
+        // A chord is a list joined with "and"; the notes one after another are separated as
+        // the language separates items ("C4, D4, E4", "ド4、レ4、ミ4").
+        let spoken: [String] = notes.map { note in
+            Announcer.list(note.pitches.map { $0.midi }.sorted().map { Announcer.spokenName(ofKey: $0) })
+        }
+        return spoken.formatted(.list(type: .and, width: .narrow))
     }
 }
 
@@ -373,7 +372,7 @@ struct StaffRenderer {
             let center = CGPoint(x: noteX, y: headY)
 
             drawLedgerLines(context, clef: note.clef, position: head.position, at: noteX, color: noteColor)
-            drawHead(context, center: center, value: note.shape.value, color: noteColor, label: showNoteNames ? head.pitch.letterName : nil)
+            drawHead(context, center: center, value: note.shape.value, color: noteColor, label: showNoteNames ? NoteNaming.current.headLabel(head.pitch) : nil)
 
             if let accidental = head.accidental {
                 drawAccidental(context, accidental, x: noteX - sp * 0.95, y: headY, color: noteColor)
@@ -443,10 +442,13 @@ struct StaffRenderer {
         }
 
         if let label = label {
-            let text = Text(label)
-                .font(.system(size: sp * 0.74, weight: .heavy, design: .rounded))
-                .foregroundColor(labelColor)
-            context.draw(text, at: center)
+            // A letter fills the head; a longer name such as Sol or ファ is drawn smaller to fit.
+            let width: CGFloat = sp * (value == .whole ? 1.3 : 1.05) * scale
+            context.drawFitted(at: center, size: sp * 0.74, maxWidth: width, minimumScale: 0.5) { size in
+                Text(verbatim: label)
+                    .font(.system(size: size, weight: .heavy, design: .rounded))
+                    .foregroundColor(labelColor)
+            }
         }
     }
 

@@ -1,0 +1,5 @@
+/* Middle C: Info.plist text that the system shows, in English. The app's name, Middle C,
+   is a brand and is not translated. See docs/localization.md. */
+
+/* Shown by iOS and macOS when the app first asks to use the microphone. */
+"NSMicrophoneUsageDescription" = "Middle Cは、どの音を弾いたかを判断するためにピアノの音を聴き取ります。音はこのデバイス上で分析され、録音されたり、どこかへ送信されたりすることはありません。";

@@ -25,17 +25,41 @@ enum HostClock {
 /// Web pages the app links to. No tip or donation links: App Store guideline 3.1.1
 /// only allows tips through In-App Purchase. Buy Me a Coffee is on the website.
 enum Links {
-    static let website = URL(string: "https://middlec.liskovlabs.com/")!
     static let feedback = URL(string: "https://middlec.userjot.com")!
+
+    /// The website in the app's language: https://middlec.liskovlabs.com/fr/ when the app runs
+    /// in French. English, and any language the site doesn't have, use the home page.
+    static let website: URL = {
+        let folders: [String: String] = [
+            "es": "es/", "fr": "fr/", "de": "de/", "it": "it/", "pt-BR": "pt-br/",
+            "ja": "ja/", "zh-Hans": "zh-hans/", "ko": "ko/",
+        ]
+        let language: String = Bundle.main.preferredLocalizations.first ?? "en"
+        return URL(string: "https://middlec.liskovlabs.com/" + (folders[language] ?? ""))!
+    }()
+
+    /// The address shown on the website button, without the scheme.
+    static var websiteName: String {
+        return (Links.website.host ?? "") + Links.website.path
+    }
 }
 
-/// Names the device in instructions ("Connect the keyboard to your iPad").
 enum Platform {
-    static var deviceName: String {
+    enum Device {
+        case mac
+        case iPad
+        case iPhone
+    }
+
+    /// The kind of device, for instructions that name it ("Connect the keyboard to your iPad").
+    /// Each such instruction is written out in full for every device, rather than having the
+    /// name slotted into one sentence, because in many languages the words around it change
+    /// with the noun (German "deinen Mac" but "dein iPad").
+    static var device: Device {
         #if os(macOS)
-        return "Mac"
+        return .mac
         #else
-        return UIDevice.current.userInterfaceIdiom == .phone ? "iPhone" : "iPad"
+        return UIDevice.current.userInterfaceIdiom == .phone ? .iPhone : .iPad
         #endif
     }
 
@@ -65,10 +89,16 @@ enum Announcer {
         #endif
     }
 
-    /// How VoiceOver should say a key: "Middle C" for C4, otherwise for example "F♯3".
+    /// How VoiceOver should say a key: "Middle C" for C4, otherwise for example "F♯3",
+    /// in the app's language and note names ("Do central", "Fa♯3").
     static func spokenName(ofKey midi: Int) -> String {
-        if midi == 60 { return "Middle C" }
-        return Pitch.fromMIDI(midi).fullName
+        if midi == 60 { return "Middle C".courseLocalized }
+        return NoteNaming.current.fullName(midi: midi)
+    }
+
+    /// Several things as a list in the app's language: "C4, E4 and G4", « Do4, Mi4 et Sol4 ».
+    static func list(_ items: [String]) -> String {
+        return items.formatted(.list(type: .and))
     }
 }
 
@@ -173,6 +203,26 @@ enum Theme {
     }
 }
 
+extension GraphicsContext {
+    /// Draws text centred on a point, shrinking it when it is wider than `maxWidth`. Labels
+    /// drawn on keys and note heads change length from one language to another.
+    func drawFitted(
+        at point: CGPoint,
+        size: CGFloat,
+        maxWidth: CGFloat,
+        minimumScale: CGFloat = 0.45,
+        _ text: (CGFloat) -> Text
+    ) {
+        let unbounded = CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        var resolved: ResolvedText = resolve(text(size))
+        let width: CGFloat = resolved.measure(in: unbounded).width
+        if width > maxWidth && width > 0 {
+            resolved = resolve(text(max(size * maxWidth / width, size * minimumScale)))
+        }
+        draw(resolved, at: point)
+    }
+}
+
 /// A row of up to three stars.
 struct StarsView: View {
     let stars: Int
@@ -187,7 +237,7 @@ struct StarsView: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(String(stars) + " of 3 stars")
+        .accessibilityLabel(Text("\(stars) of 3 stars", comment: "Accessibility label for a lesson or song rating, e.g. \"2 of 3 stars\""))
     }
 }
 

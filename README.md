@@ -10,6 +10,7 @@ listens to what you play.
 - **Song library** – 18 traditional and classical tunes, playable with either hand or both, at 60%, 80% or full speed.
 - **Free play** – see the name and staff position of whatever you play.
 - **Microphone input** – no MIDI? The app can listen to an acoustic piano, or any keyboard, and work out which keys you play.
+- **Nine languages** – English, Spanish, French, German, Italian, Brazilian Portuguese, Japanese, Simplified Chinese and Korean, with note names written the local way (Do Re Mi, C D E, or H for B in German). See [`docs/localization.md`](docs/localization.md).
 - **61-key on-screen keyboard** matching the CT-S300 (C2–C7), with finger numbers and key hints. On iPhone and iPad it is multi-touch, and on small screens it shows the section of the keyboard the music needs.
 
 Written in Swift with SwiftUI, CoreMIDI and AVFoundation. No third-party code;
@@ -168,32 +169,40 @@ screams mixed in, rather than against recordings of real rooms.
 | --- | --- |
 | `Sources/PianoTutorCore` | Pure Swift: pitches, the text notation parser, staff layout, scoring, note detection for the microphone, and all lesson and song content |
 | `Sources/PianoTutor` | The app: MIDI and microphone input, audio, the scrolling staff, the keyboard and the screens |
-| `Tests/PianoTutorCoreTests` | Unit tests for the core |
+| `Sources/PianoTutor/Resources/*.lproj` | The app's text in every language, one folder per language (see [`docs/localization.md`](docs/localization.md)) |
+| `Tests/PianoTutorCoreTests` | Unit tests for the core, including checks that every translation is complete |
 | `scripts/build-app.sh` | Builds the macOS `.app` bundle |
 | `project.yml`, `Support/iOS`, `Support/macOS` | XcodeGen definition and resources for the iPhone, iPad and Mac App Store apps |
 | `fastlane`, `Gemfile` | Build, signing and App Store upload lanes |
 | `.github/workflows` | `ci.yml` builds and tests every push; `release.yml` publishes; `pages.yml` deploys the website |
-| `site` | The website, [middlec.liskovlabs.com](https://middlec.liskovlabs.com) |
+| `site` | The website, [middlec.liskovlabs.com](https://middlec.liskovlabs.com): page templates, their text in every language (`site/locales`), and the stylesheet |
+| `scripts/build-site.py`, `scripts/check-translations.py` | Build the website in every language; check translations against English |
 
 ## Website
 
-`site/` is a static site with no build step: the home page, a support page and
-the privacy policy (use those two URLs in App Store Connect). Its images are
-made from the app icon and `docs/screenshots` by `scripts/site-images.py`, and
-aren't committed.
+The website has a home page, a support page and the privacy policy (use those
+two URLs in App Store Connect), in every language the app speaks: English at
+the root, the others under `/fr/`, `/de/`, `/ja/` and so on. The pages are
+templates in `site/templates`, with their text in one file per language in
+`site/locales`; `scripts/build-site.py` renders them into `build/site`. Its images
+are made from the app icon and `docs/screenshots` by `scripts/site-images.py`, and
+aren't committed. See [`docs/localization.md`](docs/localization.md) for changing
+the text or adding a language.
 
-Publishing is automatic: `.github/workflows/pages.yml` makes the images, checks
-that every linked file exists, and deploys to GitHub Pages whenever `main`
+Publishing is automatic: `.github/workflows/pages.yml` makes the images, builds
+the pages (which fails if a language is missing text or a link is broken), and deploys to GitHub Pages whenever `main`
 changes `site/`, the screenshots or the app icon. A pull request that touches
 them runs the same build without deploying. Run the Website workflow by hand
 from the Actions tab to redeploy at any time.
 
 To preview locally (needs [uv](https://docs.astral.sh/uv/), which fetches Pillow
-for the script; or `pip install pillow` and use `python3` instead of `uv run`):
+and Jinja for the scripts; or `pip install pillow jinja2` and use `python3` instead
+of `uv run`):
 
 ```bash
 uv run scripts/site-images.py
-python3 -m http.server -d site    # then open http://localhost:8000
+uv run scripts/build-site.py
+python3 -m http.server -d build/site    # then open http://localhost:8000
 ```
 
 One-time setup:
@@ -204,7 +213,8 @@ One-time setup:
    GitHub has issued the certificate.
 
 When the app is on the App Store, swap the "Coming soon" badge at the end of
-`site/index.html` for Apple's official App Store badge, linked to the app.
+`site/templates/index.html` for Apple's official App Store badge, linked to the
+app, in the visitor's language (Apple provides the badge in every language).
 
 ## Adding your own music
 

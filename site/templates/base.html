@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="{{ lang.tag }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title|plain }}</title>
+  <meta name="description" content="{{ description|plain }}">
+  <link rel="canonical" href="{{ url(lang, page) }}">
+  {% for other in languages %}
+  <link rel="alternate" hreflang="{{ other.tag }}" href="{{ url(other, page) }}">
+  {% endfor %}
+  <link rel="alternate" hreflang="x-default" href="{{ url(english, page) }}">
+  <meta name="theme-color" content="#121724">
+  <link rel="icon" href="{{ root }}favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ root }}apple-touch-icon.png">
+  <link rel="stylesheet" href="{{ root }}style.css">
+  <script src="{{ root }}consent.js" defer></script>
+{% block head %}{% endblock %}
+</head>
+<body>
+  <a class="skip" href="#main">{{ t.common.skip }}</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./"><img src="{{ root }}images/icon-256.png" alt="" width="32" height="32">Middle C</a>
+      <nav class="site-nav" aria-label="{{ t.common.nav_main|plain }}">
+{% block nav %}{% endblock %}
+        <details class="lang-menu">
+          <summary aria-label="{{ t.common.language|plain }}: {{ lang.name }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>{{ lang.name }}</span>
+          </summary>
+          <ul>
+            {% for other in languages %}
+            <li><a href="{{ (root ~ other.path ~ ('' if page == 'index.html' else page)) or './' }}" hreflang="{{ other.tag }}" lang="{{ other.tag }}"{% if other is sameas lang %} aria-current="page"{% endif %}>{{ other.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </details>
+      </nav>
+    </div>
+  </header>
+
+{% block main %}{% endblock %}
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>© 2026 Liskov Labs</span>
+      <nav aria-label="{{ t.common.nav_footer|plain }}">
+        <a href="support.html">{{ t.common.nav_support }}</a>
+        <a href="privacy.html">{{ t.common.nav_privacy }}</a>
+        <a href="https://middlec.userjot.com" rel="noopener">{{ t.common.nav_feedback }}</a>
+        <a href="https://buymeacoffee.com/liskovlabs" rel="noopener">{{ t.common.coffee }}</a>
+        <a href="#" data-cookie-settings>{{ t.common.cookie_settings }}</a>
+      </nav>
+      <nav class="lang-list" aria-label="{{ t.common.language|plain }}">
+        {% for other in languages %}
+        <a href="{{ (root ~ other.path ~ ('' if page == 'index.html' else page)) or './' }}" hreflang="{{ other.tag }}" lang="{{ other.tag }}"{% if other is sameas lang %} aria-current="page"{% endif %}>{{ other.name }}</a>
+        {% endfor %}
+      </nav>
+    </div>
+  </footer>
+
+  <!-- The cookie banner, in this page's language; consent.js shows it. -->
+  <template id="cookie-banner">
+    <section class="cookie-banner" aria-label="{{ t.common.cookie_label|plain }}">
+      <p>{{ t.common.cookie_text }} <a href="privacy.html#website">{{ t.common.cookie_more }}</a></p>
+      <div class="cookie-actions">
+        <button type="button" class="btn small ghost" data-choice="denied">{{ t.common.cookie_decline }}</button>
+        <button type="button" class="btn small" data-choice="granted">{{ t.common.cookie_accept }}</button>
+      </div>
+    </section>
+  </template>
+
+  <script>
+    // Offers this page in the visitor's language when their browser prefers one we have.
+    // It never redirects: the choice stays with the visitor, and closing it is remembered.
+    (function () {
+      var offers = {{ suggestions|tojson }};
+      var current = document.documentElement.lang.toLowerCase();
+      try { if (localStorage.getItem("middlec.languageOffer") === "closed") return; } catch (e) {}
+      var wanted = navigator.languages || [navigator.language || ""];
+      function matches(pref, tag) {
+        pref = pref.toLowerCase(); tag = tag.toLowerCase();
+        if (pref === tag) return true;
+        var base = pref.split("-")[0];
+        if (base === "zh") return tag === "zh-hans" && !/^zh-(hant|tw|hk|mo)/.test(pref);
+        return base === tag.split("-")[0];
+      }
+      for (var i = 0; i < wanted.length; i++) {
+        if (matches(wanted[i], current)) return;
+        for (var j = 0; j < offers.length; j++) {
+          if (!matches(wanted[i], offers[j].tag)) continue;
+          var offer = offers[j];
+          var bar = document.createElement("div");
+          bar.className = "lang-offer";
+          bar.lang = offer.tag;
+          var link = document.createElement("a");
+          link.href = offer.href;
+          link.hreflang = offer.tag;
+          link.textContent = offer.text;
+          var close = document.createElement("button");
+          close.type = "button";
+          close.setAttribute("aria-label", offer.close);
+          close.textContent = "×";
+          close.onclick = function () {
+            bar.remove();
+            try { localStorage.setItem("middlec.languageOffer", "closed"); } catch (e) {}
+          };
+          bar.appendChild(link);
+          bar.appendChild(close);
+          document.body.insertBefore(bar, document.body.firstChild);
+          return;
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

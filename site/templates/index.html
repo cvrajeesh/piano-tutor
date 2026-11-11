@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% set title = t.index.title %}
+{% set description = t.index.description %}
+
+{% block head %}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Middle C">
+  <meta property="og:title" content="{{ t.index.title|plain }}">
+  <meta property="og:description" content="{{ t.index.og_description|plain }}">
+  <meta property="og:url" content="{{ url(lang, page) }}">
+  <meta property="og:locale" content="{{ lang.og }}">
+  {% for other in languages if other is not sameas lang %}
+  <meta property="og:locale:alternate" content="{{ other.og }}">
+  {% endfor %}
+  <meta property="og:image" content="https://middlec.liskovlabs.com/images/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Middle C",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "macOS 13, iOS 16, iPadOS 16",
+    "description": {{ t.index.ld_description|striptags|tojson }},
+    "inLanguage": {{ lang.tag|tojson }},
+    "availableLanguage": {{ languages|map(attribute="tag")|list|tojson }},
+    "url": {{ url(lang, page)|tojson }},
+    "publisher": { "@type": "Organization", "name": "Liskov Labs" }
+  }
+  </script>
+{% endblock %}
+
+{% block nav %}
+        <a href="#features">{{ t.common.nav_features }}</a>
+        <a href="#course">{{ t.common.nav_course }}</a>
+        <a href="#songs">{{ t.common.nav_songs }}</a>
+        <a href="#faq">{{ t.common.nav_faq }}</a>
+        <a class="btn small" href="#get">{{ t.common["get"] }}</a>
+{% endblock %}
+
+{% block main %}
+  <main id="main">
+
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap">
+        <div class="hero-copy">
+          <span class="eyebrow">{{ t.index.hero_eyebrow }}</span>
+          <h1 id="hero-title">{{ t.index.hero_title }}</h1>
+          <p class="lede">{{ t.index.hero_lede }}</p>
+          <div class="actions">
+            <a class="btn" href="#get">{{ t.common["get"] }}</a>
+            <a class="btn ghost" href="#features">{{ t.index.hero_more }}</a>
+          </div>
+          <p class="platforms">{{ t.index.hero_platforms }}</p>
+        </div>
+
+        <div class="hero-shots">
+          <img class="mac-shot" src="{{ root }}images/mac-practice.webp" width="1600" height="1025"
+               alt="{{ t.index.hero_mac_alt|plain }}">
+          <div class="phone">
+            <img src="{{ root }}images/iphone-song.webp" width="640" height="1391"
+                 alt="{{ t.index.hero_phone_alt|plain }}">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Inputs -->
+    <section aria-labelledby="inputs-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">{{ t.index.inputs_eyebrow }}</span>
+          <h2 id="inputs-title">{{ t.index.inputs_title }}</h2>
+          <p>{{ t.index.inputs_text }}</p>
+        </div>
+        <div class="inputs">
+          <div class="input">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v4M15 2v4"/><rect x="6" y="6" width="12" height="7" rx="2"/><path d="M12 13v4a3 3 0 0 1-3 3H7"/></svg>
+            </div>
+            <h3>{{ t.index.midi_title }}</h3>
+            <p>{{ t.index.midi_text }}</p>
+          </div>
+          <div class="input">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg>
+            </div>
+            <h3>{{ t.index.acoustic_title }}</h3>
+            <p>{{ t.index.acoustic_text }}</p>
+          </div>
+          <div class="input">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v9M12 4v9M17 4v9M7 13v7M12 13v7M17 13v7"/></svg>
+            </div>
+            <h3>{{ t.index.none_title }}</h3>
+            <p>{{ t.index.none_text }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" aria-labelledby="features-title" style="padding-top: 0">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">{{ t.index.features_eyebrow }}</span>
+          <h2 id="features-title">{{ t.index.features_title }}</h2>
+        </div>
+
+        <div class="feature">
+          <div class="feature-copy">
+            <span class="tag grey">{{ t.index.practice_tag }}</span>
+            <h3 style="font-size: 1.7rem">{{ t.index.practice_title }}</h3>
+            <p>{{ t.index.practice_text }}</p>
+            <ul>
+              <li>{{ t.index.practice_point_1 }}</li>
+              <li>{{ t.index.practice_point_2 }}</li>
+              <li>{{ t.index.practice_point_3 }}</li>
+            </ul>
+          </div>
+          <div class="feature-media">
+            <img class="mac-shot" src="{{ root }}images/ipad-song.webp" width="1400" height="973" loading="lazy"
+                 alt="{{ t.index.practice_alt|plain }}">
+          </div>
+        </div>
+
+        <div class="feature flip">
+          <div class="feature-copy">
+            <span class="tag">{{ t.index.intime_tag }}</span>
+            <h3 style="font-size: 1.7rem">{{ t.index.intime_title }}</h3>
+            <p>{{ t.index.intime_text }}</p>
+            <div class="judgement" aria-label="{{ t.index.judgement_label|plain }}">
+              <span class="on">{{ t.index.judge_on }}</span>
+              <span class="early">{{ t.index.judge_early }}</span>
+              <span class="late">{{ t.index.judge_late }}</span>
+              <span class="miss">{{ t.index.judge_missed }}</span>
+            </div>
+          </div>
+          <div class="feature-media">
+            <img class="mac-shot" src="{{ root }}images/mac-in-time.webp" width="1400" height="897" loading="lazy"
+                 alt="{{ t.index.intime_alt|plain }}">
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-copy">
+            <span class="tag grey">{{ t.index.free_tag }}</span>
+            <h3 style="font-size: 1.7rem">{{ t.index.free_title }}</h3>
+            <p>{{ t.index.free_text }}</p>
+          </div>
+          <div class="feature-media duo">
+            <div class="phone"><img src="{{ root }}images/iphone-free-play.webp" width="640" height="1391" loading="lazy" alt="{{ t.index.free_alt|plain }}"></div>
+            <div class="phone"><img src="{{ root }}images/iphone-learn.webp" width="640" height="1391" loading="lazy" alt="{{ t.index.learn_alt|plain }}"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Course -->
+    <section id="course" class="paper" aria-labelledby="course-title">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">{{ t.index.course_eyebrow }}</span>
+          <h2 id="course-title">{{ t.index.course_title }}</h2>
+          <p>{{ t.index.course_text }}</p>
+        </div>
+        <div class="staff-rule" aria-hidden="true"></div>
+        <ol class="units">
+          {% for unit in units %}
+          <li class="unit"><span class="num">{{ t.index.unit|n(loop.index) }}</span><h3>{{ unit.title }}</h3><p>{{ unit.summary }}</p><div class="count">{{ t.index.lessons|n(unit.lessons) }}</div></li>
+          {% endfor %}
+        </ol>
+      </div>
+    </section>
+
+    <!-- Songs -->
+    <section id="songs" aria-labelledby="songs-title">
+      <div class="wrap">
+        <div class="section-head center" style="text-align:center">
+          <span class="eyebrow">{{ t.index.songs_eyebrow }}</span>
+          <h2 id="songs-title">{{ t.index.songs_title }}</h2>
+          <p>{{ t.index.songs_text }}</p>
+        </div>
+        <div class="song-groups">
+          {% for level in levels %}
+          <div class="song-group">
+            <h3>{{ level.name }}</h3>
+            <ul>
+              {% for song in level.songs %}
+              <li><span>{{ song.title }}</span><small>{{ song.credit }}</small></li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endfor %}
+        </div>
+        <p class="speeds">{{ t.index.speeds }}</p>
+      </div>
+    </section>
+
+    <!-- Devices -->
+    <section aria-labelledby="devices-title" style="padding-top: 0">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">{{ t.index.devices_eyebrow }}</span>
+          <h2 id="devices-title">{{ t.index.devices_title }}</h2>
+          <p>{{ t.index.devices_text }}</p>
+        </div>
+        <div class="devices">
+          <div class="device">
+            <div class="device-img"><img src="{{ root }}images/mac-learn.webp" width="1400" height="897" loading="lazy" alt="{{ t.index.mac_alt|plain }}"></div>
+            <div class="device-body">
+              <h3>Mac</h3>
+              <p>{{ t.index.mac_text }}</p>
+              <p class="req">{{ t.index.mac_req }}</p>
+            </div>
+          </div>
+          <div class="device">
+            <div class="device-img"><img src="{{ root }}images/ipad-songs.webp" width="1400" height="973" loading="lazy" alt="{{ t.index.ipad_alt|plain }}"></div>
+            <div class="device-body">
+              <h3>iPad</h3>
+              <p>{{ t.index.ipad_text }}</p>
+              <p class="req">{{ t.index.ipad_req }}</p>
+            </div>
+          </div>
+          <div class="device">
+            <div class="device-img portrait"><img src="{{ root }}images/iphone-practice.webp" width="640" height="1391" loading="lazy" alt="{{ t.index.iphone_alt|plain }}"></div>
+            <div class="device-body">
+              <h3>iPhone</h3>
+              <p>{{ t.index.iphone_text }}</p>
+              <p class="req">{{ t.index.iphone_req }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy -->
+    <section class="privacy-band" aria-labelledby="privacy-title">
+      <div class="wrap privacy-grid">
+        <div>
+          <span class="eyebrow">{{ t.index.privacy_eyebrow }}</span>
+          <h2 id="privacy-title">{{ t.index.privacy_title }}</h2>
+          <p style="margin-top:16px;color:var(--text-dim);font-size:1.08rem">{{ t.index.privacy_text }}</p>
+        </div>
+        <ul class="privacy-points">
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg>
+            <div><b>{{ t.index.privacy_mic_title }}</b><span>{{ t.index.privacy_mic_text }}</span></div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <div><b>{{ t.index.privacy_accounts_title }}</b><span>{{ t.index.privacy_accounts_text }}</span></div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+            <div><b>{{ t.index.privacy_local_title }}</b><span>{{ t.index.privacy_local_text }}</span></div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" aria-labelledby="faq-title">
+      <div class="wrap">
+        <div class="section-head center" style="text-align:center">
+          <span class="eyebrow">{{ t.index.faq_eyebrow }}</span>
+          <h2 id="faq-title">{{ t.index.faq_title }}</h2>
+        </div>
+        <div class="faq">
+          {% for number in range(1, 8) %}
+          <details>
+            <summary>{{ t.index["faq_%d_q" % number] }}</summary>
+            <p>{{ t.index["faq_%d_a" % number] }}</p>
+          </details>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- Get it -->
+    <section id="get" class="cta" aria-labelledby="get-title">
+      <div class="wrap">
+        <img src="{{ root }}images/icon-256.png" alt="{{ t.index.icon_alt|plain }}" width="96" height="96">
+        <h2 id="get-title">{{ t.index.get_title }}</h2>
+        <p>{{ t.index.get_text }}</p>
+        <div class="actions">
+          <!-- When the app is live, replace this span with Apple's official App Store badge linking to
+               the app. Apple provides the badge in every language: use the one for {{ lang.tag }}. -->
+          <span class="store-badge" aria-disabled="true">
+            <span><small>{{ t.index.store_soon }}</small><strong>{{ t.index.store_name }}</strong></span>
+          </span>
+        </div>
+        <p class="tip">{{ t.index.coffee_tip }}</p>
+        <a class="bmc" href="https://buymeacoffee.com/liskovlabs" rel="noopener"><img src="{{ root }}bmc-logo.svg" alt="" width="20" height="28">{{ t.common.coffee }}</a>
+      </div>
+    </section>
+  </main>
+{% endblock %}

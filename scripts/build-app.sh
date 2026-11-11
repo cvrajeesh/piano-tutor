@@ -16,6 +16,9 @@ cp Support/Info.plist "$APP/Contents/Info.plist"
 cp Support/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 cp Sources/PianoTutor/Resources/Bravura.otf "$APP/Contents/Resources/Bravura.otf"
 cp Sources/PianoTutor/Resources/Bravura-LICENSE.txt "$APP/Contents/Resources/Bravura-LICENSE.txt"
+# Translations: one folder per language (en.lproj, fr.lproj …). macOS picks the app's
+# language from these, and Text("…") looks its strings up in them.
+cp -R Sources/PianoTutor/Resources/*.lproj "$APP/Contents/Resources/"
 
 # Ad-hoc signature so the app runs on Apple silicon.
 codesign --force --sign - "$APP"

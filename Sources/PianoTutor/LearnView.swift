@@ -39,7 +39,11 @@ struct LearnView: View {
                 Button {
                     model.activeLesson = next
                 } label: {
-                    Label(model.progress.lessonStars.isEmpty ? "Start" : "Continue", systemImage: "play.fill")
+                    if model.progress.lessonStars.isEmpty {
+                        Label("Start", systemImage: "play.fill")
+                    } else {
+                        Label("Continue", systemImage: "play.fill")
+                    }
                 }
                 .buttonStyle(PrimaryButtonStyle(small: screen.compact))
                 .fixedSize()
@@ -50,11 +54,19 @@ struct LearnView: View {
 
 struct ConnectHint: View {
     static var message: String {
-        if Platform.hasComputerKeys {
-            return "Plug the USB port on the back of your keyboard into your Mac and switch the keyboard on. It is recognised automatically; no driver is needed. Until then you can click the on-screen keys or use the A S D F G H J K row of your computer keyboard."
+        switch Platform.device {
+        case .mac:
+            #if os(macOS)
+            let row: String = ComputerKeyboard.labels(ComputerKeyboard.whiteKeys)
+            #else
+            let row: String = "A S D F G H J K"
+            #endif
+            return String(localized: "Plug the USB port on the back of your keyboard into your Mac and switch the keyboard on. It is recognised automatically; no driver is needed. Until then you can click the on-screen keys or use the \(row) row of your computer keyboard.", comment: "The placeholder is the letters on the computer keys that play the piano, as printed in the user's keyboard layout, such as \"A S D F G H J K\"")
+        case .iPad:
+            return String(localized: "Connect the USB port on the back of your keyboard to your iPad (you may need a USB-C or Lightning adapter) and switch the keyboard on. It is recognised automatically. Until then you can play the on-screen keys.")
+        case .iPhone:
+            return String(localized: "Connect the USB port on the back of your keyboard to your iPhone (you may need a USB-C or Lightning adapter) and switch the keyboard on. It is recognised automatically. Until then you can play the on-screen keys.")
         }
-        return "Connect the USB port on the back of your keyboard to your " + Platform.deviceName
-            + " (you may need a USB-C or Lightning adapter) and switch the keyboard on. It is recognised automatically. Until then you can play the on-screen keys."
     }
 
     var body: some View {
@@ -93,13 +105,14 @@ struct UnitSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
-                Text("UNIT " + String(number))
+                Text("Unit \(number)", comment: "Heading above each unit of the course, shown in capitals")
+                    .textCase(.uppercase)
                     .scaledFont(11, weight: .bold)
                     .foregroundStyle(Theme.accent)
-                Text(unit.title)
+                Text(unit.title.courseLocalized)
                     .scaledFont(20, weight: .bold)
                     .foregroundStyle(Theme.textPrimary)
-                Text(unit.summary)
+                Text(unit.summary.courseLocalized)
                     .scaledFont(13)
                     .foregroundStyle(Theme.textSecondary)
             }
@@ -138,15 +151,16 @@ struct LessonCard: View {
                             .foregroundStyle(Theme.good)
                     }
                 }
-                Text(lesson.title)
+                Text(lesson.title.courseLocalized)
                     .scaledFont(15, weight: .semibold)
                     .foregroundStyle(Theme.textPrimary)
                     .multilineTextAlignment(.leading)
-                Text(lesson.summary)
+                Text(lesson.summary.courseLocalized)
                     .scaledFont(12)
                     .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.leading)
-                    .lineLimit(2)
+                    // Three lines: summaries run longer in some languages than in English.
+                    .lineLimit(3)
                 Spacer(minLength: 0)
             }
             .padding(14)

@@ -78,7 +78,50 @@ p { margin: 0; text-wrap: pretty; }
 .site-nav a { color: var(--text-dim); text-decoration: none; font-size: 0.95rem; font-weight: 500; }
 .site-nav a:hover { color: var(--text); }
 .site-nav .btn { color: var(--bg); }
-@media (max-width: 760px) { .site-nav a:not(.btn) { display: none; } }
+@media (max-width: 760px) { .site-nav > a:not(.btn) { display: none; } }
+
+/* Language menu in the header */
+.lang-menu { position: relative; }
+.lang-menu summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  color: var(--text-dim); font-size: 0.95rem; font-weight: 500; padding: 6px 2px;
+}
+.lang-menu summary::-webkit-details-marker { display: none; }
+.lang-menu summary:hover, .lang-menu[open] summary { color: var(--text); }
+.lang-menu summary svg { width: 18px; height: 18px; flex: none; }
+@media (max-width: 760px) { .lang-menu summary span { display: none; } }
+.lang-menu ul {
+  position: absolute; right: 0; top: calc(100% + 10px); z-index: 60; min-width: 200px;
+  list-style: none; margin: 0; padding: 6px;
+  background: var(--bg-card); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.7);
+}
+.lang-menu li a { display: block; padding: 8px 12px; border-radius: 8px; color: var(--text-dim); }
+.lang-menu li a:hover { background: var(--bg-raised); color: var(--text); }
+.lang-menu li a[aria-current="page"] { color: var(--amber-light); font-weight: 650; }
+
+/* Offer of the page in the visitor's language */
+.lang-offer {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  padding: 10px var(--gutter); background: var(--bg-card); border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+}
+.lang-offer button {
+  background: none; border: 0; color: var(--text-dim); font-size: 1.3rem; line-height: 1;
+  cursor: pointer; padding: 2px 8px; border-radius: 6px;
+}
+.lang-offer button:hover { color: var(--text); }
+
+/* Text in Chinese, Japanese and Korean: no italics or letter-spacing, which these scripts
+   don't use, break lines between words in Korean and at phrase boundaries where supported. */
+:lang(ja) em, :lang(zh) em, :lang(ko) em { font-style: normal; }
+:lang(ja), :lang(zh) { line-break: strict; }
+:lang(ja) h1, :lang(ja) h2, :lang(ja) h3, :lang(zh) h1, :lang(zh) h2, :lang(zh) h3 { word-break: auto-phrase; letter-spacing: 0; }
+:lang(ko) { word-break: keep-all; }
+:lang(ja) .eyebrow, :lang(zh) .eyebrow, :lang(ko) .eyebrow { letter-spacing: 0.04em; }
+:lang(ja) body, :lang(ja) h1, :lang(ja) h2, :lang(ja) h3 { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, "Noto Sans JP", sans-serif; }
+:lang(zh) body, :lang(zh) h1, :lang(zh) h2, :lang(zh) h3 { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; }
+:lang(ko) body, :lang(ko) h1, :lang(ko) h2, :lang(ko) h3 { font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif; }
 
 /* ---------- Buttons ---------- */
 
@@ -317,6 +360,8 @@ main section { padding: clamp(72px, 10vw, 120px) 0; scroll-margin-top: 64px; }
 .site-footer nav { display: flex; flex-wrap: wrap; gap: 24px; }
 .site-footer a { color: var(--text-dim); text-decoration: none; }
 .site-footer a:hover { color: var(--text); }
+.site-footer .lang-list { flex-basis: 100%; gap: 8px 18px; font-size: 0.86rem; }
+.site-footer .lang-list a[aria-current="page"] { color: var(--amber-light); }
 
 /* ---------- Text pages (privacy, support) ---------- */
 

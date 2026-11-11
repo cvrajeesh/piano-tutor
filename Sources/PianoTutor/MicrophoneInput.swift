@@ -91,7 +91,7 @@ final class MicrophoneInput: ObservableObject {
         let input: AVAudioInputNode = engine.inputNode
         let format: AVAudioFormat = input.outputFormat(forBus: 0)
         guard format.sampleRate > 0, format.channelCount > 0 else {
-            state = .failed("No microphone was found.")
+            state = .failed(String(localized: "No microphone was found."))
             sessionHook?(false)
             return
         }
@@ -123,7 +123,7 @@ final class MicrophoneInput: ObservableObject {
             state = .listening
         } catch {
             halt()
-            state = .failed("The microphone could not be started (" + error.localizedDescription + ").")
+            state = .failed(String(localized: "The microphone could not be started (\(error.localizedDescription)).", comment: "The text in brackets is the system's description of the error"))
             sessionHook?(false)
         }
     }

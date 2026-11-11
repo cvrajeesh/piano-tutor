@@ -13,7 +13,7 @@ struct LessonView: View {
     var body: some View {
         VStack(spacing: 0) {
             SessionTopBar(
-                title: lesson.title,
+                title: lesson.title.courseLocalized,
                 stepCount: lesson.steps.count,
                 stepIndex: finished ? lesson.steps.count : stepIndex,
                 onClose: { model.activeLesson = nil }
@@ -42,15 +42,15 @@ struct LessonView: View {
             FindStepView(task: task, onDone: advance)
         case .practice(let spec):
             ExerciseView(
-                title: spec.title,
-                instruction: spec.instruction,
+                title: spec.title.courseLocalized,
+                instruction: spec.instruction.courseLocalized,
                 baseConfig: config(for: spec, mode: .wait),
                 onContinue: { summary in complete(summary) }
             )
         case .play(let spec):
             ExerciseView(
-                title: spec.title,
-                instruction: spec.instruction,
+                title: spec.title.courseLocalized,
+                instruction: spec.instruction.courseLocalized,
                 baseConfig: config(for: spec, mode: .tempo),
                 onContinue: { summary in complete(summary) }
             )
@@ -107,11 +107,11 @@ struct InfoStepView: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text(card.title)
+                    Text(card.title.courseLocalized)
                         .scaledFont(screen.compact ? 22 : 26, weight: .bold)
                         .foregroundStyle(Theme.textPrimary)
                     ForEach(Array(card.paragraphs.enumerated()), id: \.offset) { _, paragraph in
-                        Text(paragraph)
+                        Text(paragraph.courseLocalized)
                             .scaledFont(16)
                             .foregroundStyle(Theme.textSecondary)
                             .lineSpacing(4)
@@ -186,11 +186,11 @@ struct FindStepView: View {
         VStack(spacing: 0) {
             VStack(spacing: screen.short ? 6 : 18) {
                 Spacer(minLength: 0)
-                Text(task.title)
+                Text(task.title.courseLocalized)
                     .scaledFont(screen.short ? 20 : (screen.narrow ? 24 : 28), weight: .bold)
                     .foregroundStyle(Theme.textPrimary)
                     .multilineTextAlignment(.center)
-                Text(task.detail)
+                Text(task.detail.courseLocalized)
                     .scaledFont(screen.short ? 14 : 16)
                     .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.center)
@@ -198,8 +198,11 @@ struct FindStepView: View {
 
                 HStack(spacing: screen.compact ? 6 : 10) {
                     ForEach(Array(task.targets.enumerated()), id: \.offset) { position, target in
-                        Text(target.name)
+                        Text(NoteNaming.current.name(target.pitch))
                             .scaledFont(screen.compact ? 15 : 20, weight: .bold)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                            .padding(.horizontal, 3)
                             .foregroundStyle(position < index ? Theme.ink : Theme.textPrimary)
                             .frame(width: boxSize, height: boxSize)
                             .background(position < index ? Theme.good : (position == index ? Theme.panelRaised : Theme.panel))
@@ -257,7 +260,7 @@ struct FindStepView: View {
         }
 
         if matches && target.anyOctave && found.contains(note.midi) {
-            say("You already found that one. Try a different " + target.name + ".")
+            say(String(localized: "You already found that one. Try a different \(NoteNaming.current.name(target.pitch)).", comment: "The placeholder is a note name, such as C"))
             return
         }
 
@@ -267,18 +270,20 @@ struct FindStepView: View {
             index += 1
             if index >= task.targets.count {
                 done = true
-                say("That's it!")
+                say(String(localized: "That's it!", comment: "Shown when every key in a find-the-key drill has been found"))
             } else {
                 message = ""
                 // Nothing changes on screen but the boxes, so VoiceOver users hear the next target.
-                Announcer.announce("Right. Next, " + task.targets[index].name + ".")
+                let next: String = NoteNaming.current.name(task.targets[index].pitch)
+                Announcer.announce(String(localized: "Right. Next, \(next).", comment: "Read out by VoiceOver after a key is found; the placeholder is the next note to find, such as D"))
             }
         } else if note.source == .microphone && model.micRightNotesOnly {
             return
         } else {
             wrong.insert(note.midi)
-            let played: String = Pitch.fromMIDI(note.midi).name
-            say("That was " + played + ". Look for " + target.name + ".")
+            let played: String = NoteNaming.current.name(midi: note.midi)
+            let wanted: String = NoteNaming.current.name(target.pitch)
+            say(String(localized: "That was \(played). Look for \(wanted).", comment: "Both placeholders are note names, such as C and D: the key that was played and the one to find"))
         }
     }
 
@@ -304,7 +309,7 @@ struct LessonCompleteView: View {
             Text("Lesson complete")
                 .scaledFont(screen.short ? 24 : 30, weight: .bold)
                 .foregroundStyle(Theme.textPrimary)
-            Text(lesson.title)
+            Text(lesson.title.courseLocalized)
                 .scaledFont(16)
                 .foregroundStyle(Theme.textSecondary)
             // Side by side where there is room, stacked on an upright iPhone.
@@ -329,7 +334,7 @@ struct LessonCompleteView: View {
             .buttonStyle(SecondaryButtonStyle())
             .fixedSize()
         if let next = next {
-            Button("Next: " + next.title) {
+            Button(String(localized: "Next: \(next.title.courseLocalized)", comment: "Button that opens the next lesson; the placeholder is its title")) {
                 onNext(next)
             }
             .buttonStyle(PrimaryButtonStyle())

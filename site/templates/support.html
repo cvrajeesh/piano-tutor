@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% set title = t.support.title %}
+{% set description = t.support.description %}
+
+{% block nav %}
+        <a href="./#features">{{ t.common.nav_features }}</a>
+        <a href="privacy.html">{{ t.common.nav_privacy }}</a>
+{% endblock %}
+
+{% block main %}
+  <main id="main" class="page">
+    <div class="wrap">
+      <h1>{{ t.support.heading }}</h1>
+      <p class="intro">{{ t.support.intro }}</p>
+
+      <div class="callout">
+        <p><strong>{{ t.support.report_title }}</strong></p>
+        <p>{{ t.support.report_text }}</p>
+      </div>
+
+      <h2>{{ t.support.keyboard_title }}</h2>
+      <ul>
+        <li>{{ t.support.keyboard_1 }}</li>
+        <li>{{ t.support.keyboard_2 }}</li>
+        <li>{{ t.support.keyboard_3 }}</li>
+        <li>{{ t.support.keyboard_4 }}</li>
+      </ul>
+
+      <h2>{{ t.support.mic_title }}</h2>
+      <ul>
+        <li>{{ t.support.mic_1 }}</li>
+        <li>{{ t.support.mic_2 }}</li>
+        <li>{{ t.support.mic_3 }}</li>
+      </ul>
+
+      <h2>{{ t.support.late_title }}</h2>
+      <ul>
+        <li>{{ t.support.late_1 }}</li>
+        <li>{{ t.support.late_2 }}</li>
+      </ul>
+
+      <h2>{{ t.support.sound_title }}</h2>
+      <p>{{ t.support.sound_text }}</p>
+
+      <h2>{{ t.support.language_title }}</h2>
+      <p>{{ t.support.language_text }}</p>
+
+      <h2>{{ t.support.requirements_title }}</h2>
+      <ul>
+        <li>{{ t.support.requirements_mac }}</li>
+        <li>{{ t.support.requirements_ios }}</li>
+      </ul>
+
+      <h2>{{ t.support.privacy_title }}</h2>
+      <p>{{ t.support.privacy_text }}</p>
+
+      <div class="callout">
+        <p><strong>{{ t.support.coffee_title }}</strong></p>
+        <p>{{ t.support.coffee_text }}</p>
+        <p><a class="bmc" href="https://buymeacoffee.com/liskovlabs" rel="noopener"><img src="{{ root }}bmc-logo.svg" alt="" width="20" height="28">{{ t.common.coffee }}</a></p>
+      </div>
+    </div>
+  </main>
+{% endblock %}

@@ -15,6 +15,16 @@ options:
     iOS: "16.0"
     macOS: "13.0"
   createIntermediateGroups: true
+  # The app is written in English and translated into the languages in
+  # Sources/PianoTutor/Resources/*.lproj (see docs/localization.md).
+  developmentLanguage: en
+settings:
+  base:
+    # Translations live in one .strings file per language, rather than a String Catalog,
+    # so that every language can be edited and reviewed on its own.
+    LOCALIZATION_PREFERS_STRING_CATALOGS: NO
+    # Lets `xcodebuild -exportLocalizations` find the strings in the Swift code.
+    SWIFT_EMIT_LOC_STRINGS: YES
 packages:
   PianoTutor:
     path: .

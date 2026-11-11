@@ -3,6 +3,10 @@
  * Google Tag Manager is only loaded after the visitor accepts analytics
  * cookies. The choice is remembered in localStorage, and the "Cookie settings"
  * link in the footer shows the banner again so it can be changed.
+ *
+ * The banner's text comes from <template id="cookie-banner"> in the page, which
+ * scripts/build-site.py renders in the page's language. The English below is only
+ * a fallback for a page without it.
  */
 (function () {
   var GTM_ID = 'GTM-W59JB7XW';
@@ -72,17 +76,22 @@
 
   function showBanner() {
     if (!banner) {
-      banner = document.createElement('section');
-      banner.className = 'cookie-banner';
-      banner.setAttribute('aria-label', 'Cookie consent');
-      banner.innerHTML =
-        '<p>This website uses Google Analytics cookies to count visits. ' +
-        'They’re only set if you accept. The Middle C app never uses them. ' +
-        '<a href="/privacy.html#website">Learn more</a></p>' +
-        '<div class="cookie-actions">' +
-        '<button type="button" class="btn small ghost" data-choice="denied">Decline</button>' +
-        '<button type="button" class="btn small" data-choice="granted">Accept</button>' +
-        '</div>';
+      var template = document.getElementById('cookie-banner');
+      if (template && template.content.firstElementChild) {
+        banner = template.content.firstElementChild.cloneNode(true);
+      } else {
+        banner = document.createElement('section');
+        banner.className = 'cookie-banner';
+        banner.setAttribute('aria-label', 'Cookie consent');
+        banner.innerHTML =
+          '<p>This website uses Google Analytics cookies to count visits. ' +
+          'They’re only set if you accept. The Middle C app never uses them. ' +
+          '<a href="/privacy.html#website">Learn more</a></p>' +
+          '<div class="cookie-actions">' +
+          '<button type="button" class="btn small ghost" data-choice="denied">Decline</button>' +
+          '<button type="button" class="btn small" data-choice="granted">Accept</button>' +
+          '</div>';
+      }
       banner.addEventListener('click', function (e) {
         var btn = e.target.closest('[data-choice]');
         if (btn) choose(btn.getAttribute('data-choice'));

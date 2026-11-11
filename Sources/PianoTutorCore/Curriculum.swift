@@ -1,12 +1,29 @@
 import Foundation
 
+// The titles, summaries and other text in the course and the song library are English
+// source text. The app translates each one at display time with its Course string table
+// (Sources/PianoTutor/Resources/Course.xcstrings), using the English text as the key, and
+// a test checks that every one of them is translated. Changing a string here means
+// updating its translations too; see docs/localization.md.
+
+/// What is written on a key that a lesson points out.
+public enum KeyLabel: Hashable {
+    /// A finger number, 1 (thumb) to 5.
+    case finger(Int)
+    /// The note's name, written the learner's way (see `NoteNaming`).
+    case note(Pitch)
+    /// Words, such as "Middle C". This is English source text: the app translates it
+    /// with the Course string table, like the rest of the lesson text.
+    case text(String)
+}
+
 /// A key to point out on the on-screen keyboard.
 public struct KeyMark: Hashable {
     public let midi: Int
     public let hand: Hand?
-    public let label: String?
+    public let label: KeyLabel?
 
-    public init(midi: Int, hand: Hand? = nil, label: String? = nil) {
+    public init(midi: Int, hand: Hand? = nil, label: KeyLabel? = nil) {
         self.midi = midi
         self.hand = hand
         self.label = label
@@ -25,7 +42,8 @@ public struct FindTarget: Hashable {
     public let midi: Int
     /// When true, the same note name in any octave is accepted.
     public let anyOctave: Bool
-    public let name: String
+    /// The note as spelled in the lesson, so that B♭ is not shown as A♯.
+    public let pitch: Pitch
 }
 
 /// "Find this key" drill without notation.
@@ -127,8 +145,17 @@ func midiNumber(_ name: String) -> Int {
     return pitch.midi
 }
 
-func mark(_ name: String, _ label: String? = nil, hand: Hand? = nil) -> KeyMark {
+func mark(_ name: String, _ label: KeyLabel? = nil, hand: Hand? = nil) -> KeyMark {
     return KeyMark(midi: midiNumber(name), hand: hand, label: label)
+}
+
+/// A key labelled with its own note name.
+func named(_ name: String, hand: Hand? = nil) -> KeyMark {
+    guard let pitch = Pitch(name) else {
+        ContentLog.report("Unknown pitch '\(name)'")
+        return KeyMark(midi: 60, hand: hand, label: nil)
+    }
+    return KeyMark(midi: pitch.midi, hand: hand, label: .note(pitch))
 }
 
 func info(_ title: String, _ paragraphs: [String], marks: [KeyMark] = [], figure: Score? = nil) -> LessonStep {
@@ -138,8 +165,11 @@ func info(_ title: String, _ paragraphs: [String], marks: [KeyMark] = [], figure
 func find(_ title: String, _ detail: String, _ names: [String], anyOctave: Bool = false, hint: Bool = true, hand: Hand = .right) -> LessonStep {
     var targets: [FindTarget] = []
     for name in names {
-        let display: String = Pitch(name)?.name ?? name
-        targets.append(FindTarget(midi: midiNumber(name), anyOctave: anyOctave, name: display))
+        guard let pitch = Pitch(name) else {
+            ContentLog.report("Unknown pitch '\(name)'")
+            continue
+        }
+        targets.append(FindTarget(midi: pitch.midi, anyOctave: anyOctave, pitch: pitch))
     }
     return .find(FindTask(title: title, detail: detail, targets: targets, showHint: hint, hand: hand))
 }

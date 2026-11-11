@@ -12,10 +12,10 @@ enum SidebarSection: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .learn: return "Learn"
-        case .songs: return "Songs"
-        case .freePlay: return "Free Play"
-        case .settings: return "Settings"
+        case .learn: return String(localized: "Learn", comment: "Section name in the sidebar and tab bar: the course")
+        case .songs: return String(localized: "Songs", comment: "Section name in the sidebar and tab bar: the song library")
+        case .freePlay: return String(localized: "Free Play", comment: "Section name in the sidebar and tab bar: play anything and see the notes")
+        case .settings: return String(localized: "Settings", comment: "Section name in the sidebar and tab bar")
         }
     }
 
@@ -40,9 +40,9 @@ enum MonitorMode: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .auto: return "Automatic"
-        case .always: return "Always"
-        case .never: return "Never"
+        case .auto: return String(localized: "Automatic", comment: "Option for hearing your playing through the device: decide automatically")
+        case .always: return String(localized: "Always", comment: "Option for hearing your playing through the device")
+        case .never: return String(localized: "Never", comment: "Option for hearing your playing through the device")
         }
     }
 }
@@ -150,7 +150,7 @@ final class AppModel: ObservableObject {
         midi.onNote = { [weak self] message in
             guard let self = self else { return }
             if message.isOn {
-                self.lastNotes.midi = Pitch.fromMIDI(message.note).fullName
+                self.lastNotes.midi = NoteNaming.current.fullName(midi: message.note)
             }
             self.input.send(NoteInput(
                 kind: message.isOn ? .on : .off,
@@ -168,7 +168,7 @@ final class AppModel: ObservableObject {
         mic.onNote = { [weak self] note in
             guard let self = self else { return }
             if note.kind == .on {
-                self.lastNotes.heard = Pitch.fromMIDI(note.midi).fullName
+                self.lastNotes.heard = NoteNaming.current.fullName(midi: note.midi)
             }
             self.input.send(note)
         }
