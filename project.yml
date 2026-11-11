@@ -10,7 +10,7 @@
 # Releases are built, signed and uploaded by fastlane (see fastlane/Fastfile).
 name: PianoTutor
 options:
-  bundleIdPrefix: com.pianotutor
+  bundleIdPrefix: com.liskovlabs
   deploymentTarget:
     iOS: "16.0"
     macOS: "13.0"
