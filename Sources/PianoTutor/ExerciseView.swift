@@ -118,6 +118,7 @@ struct ExercisePlayer: View {
                 focus: session.config.score.keyRange(hands: session.config.hands)
             )
         }
+        .playingScreenTextLimit()
         .onAppear {
             if !isTempo {
                 session.start()
@@ -131,12 +132,12 @@ struct ExercisePlayer: View {
     private var titleRow: some View {
         HStack(spacing: 8) {
             Text(title)
-                .font(.system(size: screen.compact ? 17 : 20, weight: .bold, design: .rounded))
+                .scaledFont(screen.compact ? 17 : 20, weight: .bold)
                 .foregroundStyle(Theme.textPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             Text(isTempo ? "IN TIME" : "PRACTICE")
-                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .scaledFont(10, weight: .bold)
                 .foregroundStyle(Theme.ink)
                 .padding(.horizontal, 7)
                 .padding(.vertical, 3)
@@ -145,7 +146,7 @@ struct ExercisePlayer: View {
                 .fixedSize()
             if isSlow {
                 Text("SLOW")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .scaledFont(10, weight: .bold)
                     .foregroundStyle(Theme.textPrimary)
                     .padding(.horizontal, 7)
                     .padding(.vertical, 3)
@@ -158,7 +159,7 @@ struct ExercisePlayer: View {
 
     private var instructionText: some View {
         Text(instruction)
-            .font(.system(size: 13, design: .rounded))
+            .scaledFont(13)
             .foregroundStyle(Theme.textSecondary)
     }
 
@@ -166,7 +167,7 @@ struct ExercisePlayer: View {
     private var streakLabel: some View {
         if session.streak >= 3 {
             Label(String(session.streak) + " in a row", systemImage: "flame.fill")
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .scaledFont(13, weight: .semibold)
                 .foregroundStyle(Theme.accent)
                 .fixedSize()
         }
@@ -241,10 +242,10 @@ struct ExercisePlayer: View {
     private var startCard: some View {
         VStack(spacing: screen.short ? 8 : 12) {
             Text("Ready?")
-                .font(.system(size: screen.short ? 18 : 22, weight: .bold, design: .rounded))
+                .scaledFont(screen.short ? 18 : 22, weight: .bold)
                 .foregroundStyle(Theme.textPrimary)
             Text("You will hear one measure of clicks before the first note.")
-                .font(.system(size: 13, design: .rounded))
+                .scaledFont(13)
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
             Button("Start") {
@@ -297,15 +298,15 @@ struct ResultCard: View {
         VStack(spacing: screen.short ? 6 : 14) {
             StarsView(stars: summary.stars, size: screen.short ? 20 : 30)
             Text(headline)
-                .font(.system(size: screen.short ? 18 : 24, weight: .bold, design: .rounded))
+                .scaledFont(screen.short ? 18 : 24, weight: .bold)
                 .foregroundStyle(Theme.textPrimary)
             Text(detail)
-                .font(.system(size: 13, design: .rounded))
+                .scaledFont(13)
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)
             if !summary.passed && !screen.short {
                 Text("Try it again, or slow the tempo down first.")
-                    .font(.system(size: 13, design: .rounded))
+                    .scaledFont(13)
                     .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.center)
             }
@@ -361,7 +362,7 @@ struct SessionTopBar<Accessory: View>: View {
             .accessibilityLabel("Close")
 
             Text(title)
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .scaledFont(14, weight: .semibold)
                 .foregroundStyle(Theme.textSecondary)
                 .lineLimit(1)
 

@@ -108,11 +108,11 @@ struct InfoStepView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     Text(card.title)
-                        .font(.system(size: screen.compact ? 22 : 26, weight: .bold, design: .rounded))
+                        .scaledFont(screen.compact ? 22 : 26, weight: .bold)
                         .foregroundStyle(Theme.textPrimary)
                     ForEach(Array(card.paragraphs.enumerated()), id: \.offset) { _, paragraph in
                         Text(paragraph)
-                            .font(.system(size: 16, design: .rounded))
+                            .scaledFont(16)
                             .foregroundStyle(Theme.textSecondary)
                             .lineSpacing(4)
                             .fixedSize(horizontal: false, vertical: true)
@@ -158,6 +158,8 @@ struct FindStepView: View {
     @State private var good: Set<Int> = []
     @State private var message: String = ""
     @State private var done: Bool = false
+    /// Grows the target boxes with the text size, so that the names inside still fit.
+    @ScaledMetric(relativeTo: .title3) private var boxScale: CGFloat = 1
 
     private var current: FindTarget? {
         return index < task.targets.count ? task.targets[index] : nil
@@ -177,7 +179,7 @@ struct FindStepView: View {
 
     /// The side of one target box; they shrink to fit a narrow screen.
     private var boxSize: CGFloat {
-        return screen.compact ? 38 : 54
+        return (screen.compact ? 38 : 54) * boxScale
     }
 
     var body: some View {
@@ -185,11 +187,11 @@ struct FindStepView: View {
             VStack(spacing: screen.short ? 6 : 18) {
                 Spacer(minLength: 0)
                 Text(task.title)
-                    .font(.system(size: screen.short ? 20 : (screen.narrow ? 24 : 28), weight: .bold, design: .rounded))
+                    .scaledFont(screen.short ? 20 : (screen.narrow ? 24 : 28), weight: .bold)
                     .foregroundStyle(Theme.textPrimary)
                     .multilineTextAlignment(.center)
                 Text(task.detail)
-                    .font(.system(size: screen.short ? 14 : 16, design: .rounded))
+                    .scaledFont(screen.short ? 14 : 16)
                     .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
@@ -197,7 +199,7 @@ struct FindStepView: View {
                 HStack(spacing: screen.compact ? 6 : 10) {
                     ForEach(Array(task.targets.enumerated()), id: \.offset) { position, target in
                         Text(target.name)
-                            .font(.system(size: screen.compact ? 15 : 20, weight: .bold, design: .rounded))
+                            .scaledFont(screen.compact ? 15 : 20, weight: .bold)
                             .foregroundStyle(position < index ? Theme.ink : Theme.textPrimary)
                             .frame(width: boxSize, height: boxSize)
                             .background(position < index ? Theme.good : (position == index ? Theme.panelRaised : Theme.panel))
@@ -211,11 +213,11 @@ struct FindStepView: View {
                 .padding(.top, screen.short ? 2 : 8)
 
                 Text(message)
-                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .scaledFont(14, weight: .medium)
                     .foregroundStyle(done ? Theme.good : Theme.accent)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                    .frame(height: 20)
+                    .frame(minHeight: 20)
                 Spacer(minLength: 0)
             }
             .padding(screen.short ? 8 : (screen.narrow ? 16 : 30))
@@ -223,6 +225,7 @@ struct FindStepView: View {
 
             KeyboardPanel(targets: hintTargets, good: good, wrong: wrong, focus: focus)
         }
+        .playingScreenTextLimit()
         .onReceive(input.events) { note in
             handle(note)
         }
@@ -254,7 +257,7 @@ struct FindStepView: View {
         }
 
         if matches && target.anyOctave && found.contains(note.midi) {
-            message = "You already found that one. Try a different " + target.name + "."
+            say("You already found that one. Try a different " + target.name + ".")
             return
         }
 
@@ -262,18 +265,27 @@ struct FindStepView: View {
             good.insert(note.midi)
             found.append(note.midi)
             index += 1
-            message = ""
             if index >= task.targets.count {
                 done = true
-                message = "That's it!"
+                say("That's it!")
+            } else {
+                message = ""
+                // Nothing changes on screen but the boxes, so VoiceOver users hear the next target.
+                Announcer.announce("Right. Next, " + task.targets[index].name + ".")
             }
         } else if note.source == .microphone && model.micRightNotesOnly {
             return
         } else {
             wrong.insert(note.midi)
             let played: String = Pitch.fromMIDI(note.midi).name
-            message = "That was " + played + ". Look for " + target.name + "."
+            say("That was " + played + ". Look for " + target.name + ".")
         }
+    }
+
+    /// Shows the message under the targets and reads it out with VoiceOver.
+    private func say(_ text: String) {
+        message = text
+        Announcer.announce(text)
     }
 }
 
@@ -290,10 +302,10 @@ struct LessonCompleteView: View {
             Spacer()
             StarsView(stars: stars, size: screen.short ? 32 : 44)
             Text("Lesson complete")
-                .font(.system(size: screen.short ? 24 : 30, weight: .bold, design: .rounded))
+                .scaledFont(screen.short ? 24 : 30, weight: .bold)
                 .foregroundStyle(Theme.textPrimary)
             Text(lesson.title)
-                .font(.system(size: 16, design: .rounded))
+                .scaledFont(16)
                 .foregroundStyle(Theme.textSecondary)
             // Side by side where there is room, stacked on an upright iPhone.
             ViewThatFits(in: .horizontal) {

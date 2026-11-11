@@ -10,7 +10,7 @@ struct SettingsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 Text("Settings")
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .scaledFont(30, weight: .bold)
                     .foregroundStyle(Theme.textPrimary)
 
                 keyboardSection
@@ -28,7 +28,7 @@ struct SettingsView: View {
     private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title.uppercased())
-                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .scaledFont(11, weight: .bold)
                 .foregroundStyle(Theme.accent)
             content()
         }
@@ -165,7 +165,7 @@ private struct SettingsNote: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 12, design: .rounded))
+            .scaledFont(12)
             .foregroundStyle(Theme.textSecondary)
             .fixedSize(horizontal: false, vertical: true)
     }

@@ -39,10 +39,10 @@ struct FreePlayView: View {
             if !screen.short {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Free Play")
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .scaledFont(30, weight: .bold)
                         .foregroundStyle(Theme.textPrimary)
                     Text("Play anything. The notes you hold appear on the staff with their names.")
-                        .font(.system(size: 14, design: .rounded))
+                        .scaledFont(14)
                         .foregroundStyle(Theme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -53,7 +53,9 @@ struct FreePlayView: View {
             }
 
             GeometryReader { proxy in
-                if proxy.size.height > proxy.size.width {
+                let namesWidth: CGFloat = screen.short ? 200 : 280
+                // Side by side only leaves a usable staff when there is width to spare.
+                if proxy.size.height > proxy.size.width || proxy.size.width < namesWidth + 300 {
                     // Upright iPhone or iPad: names above the staff.
                     VStack(spacing: 12) {
                         names
@@ -67,7 +69,7 @@ struct FreePlayView: View {
                     HStack(spacing: screen.short ? 10 : 18) {
                         staff
                         names
-                            .frame(width: screen.short ? 200 : 280)
+                            .frame(width: namesWidth)
                             .frame(maxHeight: .infinity)
                             .background(Theme.panel)
                             .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -80,6 +82,7 @@ struct FreePlayView: View {
 
             KeyboardPanel()
         }
+        .playingScreenTextLimit()
     }
 
     private var staff: some View {
@@ -91,18 +94,18 @@ struct FreePlayView: View {
     private var names: some View {
         VStack(spacing: screen.compact ? 6 : 10) {
             Text(heldPitches.isEmpty ? "–" : heldPitches.map { $0.name }.joined(separator: "  "))
-                .font(.system(size: screen.compact ? 32 : 40, weight: .bold, design: .rounded))
+                .scaledFont(screen.compact ? 32 : 40, weight: .bold)
                 .foregroundStyle(Theme.textPrimary)
                 .minimumScaleFactor(0.4)
                 .lineLimit(1)
             Text(heldPitches.isEmpty ? "Press a key" : heldPitches.map { $0.fullName }.joined(separator: " "))
-                .font(.system(size: 13, design: .rounded))
+                .scaledFont(13)
                 .foregroundStyle(Theme.textSecondary)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
             if Platform.hasComputerKeys && !model.midi.isConnected {
                 Text("Computer keys: A S D F G H J K play the white keys from Middle C, W E T Y U the black keys. Z and X shift the octave" + octaveNote + ".")
-                    .font(.system(size: 12, design: .rounded))
+                    .scaledFont(12)
                     .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.top, 10)

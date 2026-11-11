@@ -11,10 +11,10 @@ struct SongsView: View {
             VStack(alignment: .leading, spacing: 24) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Songs")
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .scaledFont(30, weight: .bold)
                         .foregroundStyle(Theme.textPrimary)
                     Text("Practise any tune at your own speed, one hand at a time or both together.")
-                        .font(.system(size: 14, design: .rounded))
+                        .scaledFont(14)
                         .foregroundStyle(Theme.textSecondary)
                 }
                 ForEach(1...3, id: \.self) { level in
@@ -31,7 +31,7 @@ struct SongsView: View {
         let songs: [Song] = SongLibrary.songs.filter { $0.level == level }
         return VStack(alignment: .leading, spacing: 10) {
             Text(SongLibrary.levelName(level).uppercased())
-                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .scaledFont(11, weight: .bold)
                 .foregroundStyle(Theme.accent)
             ForEach(songs) { song in
                 SongRow(song: song)
@@ -42,39 +42,36 @@ struct SongsView: View {
 
 struct SongRow: View {
     @EnvironmentObject var model: AppModel
+    @Environment(\.dynamicTypeSize) private var typeSize
     let song: Song
 
     var body: some View {
         Button {
             model.activeSong = song
         } label: {
-            HStack(spacing: 14) {
-                Image(systemName: "music.note")
-                    .font(.system(size: 16))
-                    .foregroundStyle(Theme.accent)
-                    .frame(width: 34, height: 34)
-                    .background(Theme.panelRaised)
-                    .clipShape(Circle())
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(song.title)
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Theme.textPrimary)
-                        .multilineTextAlignment(.leading)
-                    Text(song.credit)
-                        .font(.system(size: 12, design: .rounded))
-                        .foregroundStyle(Theme.textSecondary)
-                        .lineLimit(1)
+            Group {
+                if typeSize.isAccessibilitySize {
+                    // Too big for one row: the details go under the title.
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 14) {
+                            icon
+                            titles
+                        }
+                        HStack(spacing: 10) {
+                            handsBadge
+                            StarsView(stars: model.stars(forSong: song.id), size: 13)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    HStack(spacing: 14) {
+                        icon
+                        titles
+                        Spacer(minLength: 0)
+                        handsBadge
+                        StarsView(stars: model.stars(forSong: song.id), size: 13)
+                    }
                 }
-                Spacer(minLength: 0)
-                Text(song.score.hands.count > 1 ? "Both hands" : "Right hand")
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(Theme.textSecondary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Theme.panelRaised)
-                    .clipShape(Capsule())
-                    .fixedSize()
-                StarsView(stars: model.stars(forSong: song.id), size: 13)
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
@@ -83,6 +80,39 @@ struct SongRow: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+
+    private var icon: some View {
+        Image(systemName: "music.note")
+            .font(.system(size: 16))
+            .foregroundStyle(Theme.accent)
+            .frame(width: 34, height: 34)
+            .background(Theme.panelRaised)
+            .clipShape(Circle())
+    }
+
+    private var titles: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(song.title)
+                .scaledFont(15, weight: .semibold)
+                .foregroundStyle(Theme.textPrimary)
+                .multilineTextAlignment(.leading)
+            Text(song.credit)
+                .scaledFont(12)
+                .foregroundStyle(Theme.textSecondary)
+                .lineLimit(1)
+        }
+    }
+
+    private var handsBadge: some View {
+        Text(song.score.hands.count > 1 ? "Both hands" : "Right hand")
+            .scaledFont(11, weight: .medium)
+            .foregroundStyle(Theme.textSecondary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Theme.panelRaised)
+            .clipShape(Capsule())
+            .fixedSize()
     }
 }
 
@@ -229,7 +259,7 @@ struct SongSessionView: View {
                 Toggle("Key hints", isOn: $keyHints)
             }
             .toggleStyle(.button)
-            .font(.system(size: 12, design: .rounded))
+            .scaledFont(12)
             .padding(.horizontal, screen.short ? 0 : (screen.narrow ? 12 : 20))
         }
         .scrollIndicators(.hidden)

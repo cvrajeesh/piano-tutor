@@ -27,10 +27,10 @@ struct LearnView: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Learn")
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .scaledFont(30, weight: .bold)
                     .foregroundStyle(Theme.textPrimary)
                 Text("Work through the lessons in order. Each one takes a few minutes.")
-                    .font(.system(size: 14, design: .rounded))
+                    .scaledFont(14)
                     .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -64,14 +64,14 @@ struct ConnectHint: View {
                 .foregroundStyle(Theme.accent)
             VStack(alignment: .leading, spacing: 5) {
                 Text("Connect your keyboard")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .scaledFont(15, weight: .semibold)
                     .foregroundStyle(Theme.textPrimary)
                 Text(ConnectHint.message)
-                    .font(.system(size: 13, design: .rounded))
+                    .scaledFont(13)
                     .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
                 Text("No MIDI? Middle C can listen to a piano or any keyboard through the microphone. Turn it on in Settings.")
-                    .font(.system(size: 13, design: .rounded))
+                    .scaledFont(13)
                     .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -94,13 +94,13 @@ struct UnitSection: View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
                 Text("UNIT " + String(number))
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .scaledFont(11, weight: .bold)
                     .foregroundStyle(Theme.accent)
                 Text(unit.title)
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .scaledFont(20, weight: .bold)
                     .foregroundStyle(Theme.textPrimary)
                 Text(unit.summary)
-                    .font(.system(size: 13, design: .rounded))
+                    .scaledFont(13)
                     .foregroundStyle(Theme.textSecondary)
             }
             LazyVGrid(columns: columns, alignment: .leading, spacing: 14) {
@@ -139,11 +139,11 @@ struct LessonCard: View {
                     }
                 }
                 Text(lesson.title)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .scaledFont(15, weight: .semibold)
                     .foregroundStyle(Theme.textPrimary)
                     .multilineTextAlignment(.leading)
                 Text(lesson.summary)
-                    .font(.system(size: 12, design: .rounded))
+                    .scaledFont(12)
                     .foregroundStyle(Theme.textSecondary)
                     .multilineTextAlignment(.leading)
                     .lineLimit(2)
