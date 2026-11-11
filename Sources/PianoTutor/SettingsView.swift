@@ -18,6 +18,7 @@ struct SettingsView: View {
                 soundSection
                 timingSection
                 progressSection
+                feedbackSection
                 supportSection
             }
             .padding(screen.compact ? 16 : 32)
@@ -156,6 +157,16 @@ struct SettingsView: View {
                 }
                 Button("Cancel", role: .cancel) {}
             }
+        }
+    }
+
+    private var feedbackSection: some View {
+        section("Feedback") {
+            note("Found a problem, or have an idea for Middle C? Post it on the feedback board, where you can also vote for other people's ideas.")
+            Link(destination: Links.feedback) {
+                Label("Report a problem or suggest an idea", systemImage: "bubble.left.and.bubble.right")
+            }
+            .buttonStyle(SecondaryButtonStyle())
         }
     }
 
