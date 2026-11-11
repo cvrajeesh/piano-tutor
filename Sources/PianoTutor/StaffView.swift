@@ -6,8 +6,9 @@ import PianoTutorCore
 enum MusicFont {
     static let isAvailable: Bool = register()
 
+    /// A fixed size: the glyphs must match the staff, which does not follow Dynamic Type.
     static func font(size: CGFloat) -> Font {
-        return Font.custom("Bravura", size: size)
+        return Font.custom("Bravura", fixedSize: size)
     }
 
     private static func register() -> Bool {

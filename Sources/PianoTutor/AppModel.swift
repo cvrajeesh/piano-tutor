@@ -52,13 +52,19 @@ struct ProgressStore: Codable {
     var songStars: [String: Int] = [:]
 }
 
+/// The last note received from each input, shown in Settings to check the connection.
+/// Kept out of `AppModel` so that playing a note only refreshes the views that show it.
+final class LastNotes: ObservableObject {
+    @Published fileprivate(set) var midi: String?
+    @Published fileprivate(set) var heard: String?
+}
+
 final class AppModel: ObservableObject {
     @Published var section: SidebarSection = .learn
     @Published var activeLesson: Lesson?
     @Published var activeSong: Song?
     @Published private(set) var progress: ProgressStore
-    @Published private(set) var lastMIDINote: String?
-    @Published private(set) var lastHeardNote: String?
+    let lastNotes = LastNotes()
 
     @Published var monitorMode: MonitorMode {
         didSet { defaults.set(monitorMode.rawValue, forKey: Keys.monitorMode) }
@@ -144,7 +150,7 @@ final class AppModel: ObservableObject {
         midi.onNote = { [weak self] message in
             guard let self = self else { return }
             if message.isOn {
-                self.lastMIDINote = Pitch.fromMIDI(message.note).fullName
+                self.lastNotes.midi = Pitch.fromMIDI(message.note).fullName
             }
             self.input.send(NoteInput(
                 kind: message.isOn ? .on : .off,
@@ -162,7 +168,7 @@ final class AppModel: ObservableObject {
         mic.onNote = { [weak self] note in
             guard let self = self else { return }
             if note.kind == .on {
-                self.lastHeardNote = Pitch.fromMIDI(note.midi).fullName
+                self.lastNotes.heard = Pitch.fromMIDI(note.midi).fullName
             }
             self.input.send(note)
         }
