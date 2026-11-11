@@ -89,7 +89,7 @@ DEVELOPMENT_TEAM = ABCDE12345
 APP_BUNDLE_ID = com.example.pianotutor
 ```
 
-`APP_BUNDLE_ID` is optional; set it if `middlec.liskovlabs.com` is not available to
+`APP_BUNDLE_ID` is optional; set it if `com.liskovlabs.middlec` is not available to
 your team.
 
 - **iPad** shows the same layout as the Mac. All 61 keys are shown when they fit.
@@ -127,7 +127,7 @@ A step-by-step walkthrough of this setup is in
 [`docs/app-store-setup.md`](docs/app-store-setup.md).
 
 1. **App Store Connect.** Create the app record with the bundle identifier
-   (`middlec.liskovlabs.com`) and add both the iOS and macOS platforms.
+   (`com.liskovlabs.middlec`) and add both the iOS and macOS platforms.
 2. **API key.** Under Users and Access → Integrations → App Store Connect API,
    create a key with the **Admin** role (match needs it to create certificates;
    **App Manager** is enough once they exist). Save the `.p8` as

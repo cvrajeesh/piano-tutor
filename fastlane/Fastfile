@@ -39,7 +39,7 @@ end
 
 def bundle_id
   ENV["APP_BUNDLE_ID"].to_s.strip.then { |id| id unless id.empty? } ||
-    local_setting("APP_BUNDLE_ID") || "middlec.liskovlabs.com"
+    local_setting("APP_BUNDLE_ID") || "com.liskovlabs.middlec"
 end
 
 def team

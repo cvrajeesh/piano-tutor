@@ -29,7 +29,7 @@ offers bundle IDs that already exist.
 1. Go to developer.apple.com → Account → **Certificates, Identifiers & Profiles**
    → **Identifiers** → **+**.
 2. Choose **App IDs** → **App** → Continue.
-3. Description: `Middle C`. Bundle ID: **Explicit**, `middlec.liskovlabs.com`.
+3. Description: `Middle C`. Bundle ID: **Explicit**, `com.liskovlabs.middlec`.
 4. Leave the capabilities unticked, then Continue → Register.
 
 The bundle ID is permanent once an app uses it. To use a different one, set
@@ -44,7 +44,7 @@ project and the Fastfile read it from there.
 3. Name: `Middle C`. Store names are unique worldwide; if it's taken, use something
    like `Middle C – Piano Lessons`. The name under the icon on the device doesn't
    change.
-4. Primary language: your choice. Bundle ID: pick `middlec.liskovlabs.com` from the list.
+4. Primary language: your choice. Bundle ID: pick `com.liskovlabs.middlec` from the list.
 5. SKU: any internal string, e.g. `middlec`. User access: Full Access.
 
 If the app already exists with only iOS, open it and use **Add macOS App** (the
