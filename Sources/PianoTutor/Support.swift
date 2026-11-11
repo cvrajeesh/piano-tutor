@@ -22,9 +22,9 @@ enum HostClock {
     }
 }
 
-/// Web pages the app links to.
+/// Web pages the app links to. No tip or donation links: App Store guideline 3.1.1
+/// only allows tips through In-App Purchase. Buy Me a Coffee is on the website.
 enum Links {
-    static let buyMeACoffee = URL(string: "https://buymeacoffee.com/liskovlabs")!
     static let feedback = URL(string: "https://middlec.userjot.com")!
 }
 

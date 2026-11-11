@@ -34,9 +34,6 @@ struct PianoTutorApp: App {
                     Button("Report a Problem or Suggest an Idea…") {
                         NSWorkspace.shared.open(Links.feedback)
                     }
-                    Button("Buy Me a Coffee…") {
-                        NSWorkspace.shared.open(Links.buyMeACoffee)
-                    }
                 }
             }
         #else
