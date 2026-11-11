@@ -143,8 +143,16 @@ xcodebuild -importLocalizations -project PianoTutor.xcodeproj -localizationPath 
   Hymne à la joie), and the original title otherwise.
 - The privacy policy says in every translation that the English version is the one that applies.
 
+## The App Store listing
+
+The App Store text and screenshot captions are translated too, in `fastlane/metadata` and
+`fastlane/screenshot_captions.json`. They use the same terms and tone as the app, so when
+a mode, unit or song title changes here, change it there as well. See
+[App Store listing](app-store-listing.md#languages).
+
 ## Not translated yet
 
-- The screenshots on the website and in `docs/screenshots` show the English app.
-- There is no App Store listing in the repository yet; when there is one (for example with
-  fastlane `deliver` metadata), it needs the same languages, with localized screenshots.
+- The screenshots on the website and in `docs/screenshots` show the English app, and so
+  do the App Store screenshots, under translated captions. Captures of the translated app
+  go in `docs/screenshots/<locale>/<device>/`, where the App Store screenshots pick them
+  up (see [App Store listing](app-store-listing.md#screenshots-of-the-translated-app)).
