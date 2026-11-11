@@ -105,110 +105,11 @@ team, add `APP_BUNDLE_ID` to the same file with your own, in reverse-DNS form
 
 ## Publishing to the App Store
 
-Releases are built, signed and uploaded with [fastlane](https://fastlane.tools).
-The iPhone/iPad app and the Mac app share one bundle identifier, so one App Store
-record covers both (universal purchase). The Mac App Store build is the sandboxed
-`PianoTutor-macOS` target in `project.yml`, not the SwiftPM build.
-
-| Command | What it does |
-| --- | --- |
-| `bundle exec fastlane ios beta` / `mac beta` | Build, sign and upload to TestFlight |
-| `bundle exec fastlane ios release` / `mac release` | Upload to the App Store; add `submit:true` to submit for review |
-| `bundle exec fastlane ios build` / `mac build` | Signed `.ipa` / `.pkg` in `build/fastlane`, no upload |
-| `bundle exec fastlane ios certificates` / `mac certificates` | Create or fetch the signing certificate and profile |
-
-The version shown in the store is `MARKETING_VERSION` in `project.yml`, which
-[Release Please](#releases) sets. The build number is set automatically to one
-more than the latest build on TestFlight. Store text and screenshots are edited in
-App Store Connect.
-
-### Releases
-
-Versions and the changelog come from
-[Release Please](https://github.com/googleapis/release-please), which reads
-[Conventional Commit](https://www.conventionalcommits.org) messages on `main`:
-
-| Commit or PR title | Effect on the next version (while below 1.0) |
-| --- | --- |
-| `fix: …` | patch: 0.1.0 → 0.1.1 |
-| `feat: …` | minor: 0.1.0 → 0.2.0 |
-| `feat!: …` or a `BREAKING CHANGE:` footer | minor while below 1.0, major after |
-| `docs:`, `chore:`, `ci:`, `refactor:`, `test:` … | none, and left out of the changelog |
-
-Pull requests are squash-merged, and the PR title becomes the commit message on
-`main`, so **the PR title is what counts**. The PR title check
-(`.github/workflows/pr-title.yml`) fails until the title has one of these
-prefixes: `feat`, `fix`, `perf`, `revert`, `refactor`, `docs`, `test`, `build`,
-`ci`, `chore`. A scope is optional: `fix(midi): Reconnect after sleep`. Commits on
-the branch itself can be worded any way you like.
-
-1. **Every push to `main`** that changes the app sends a build to TestFlight, with
-   the current version and a new build number.
-2. **Release Please keeps a release PR open** ("chore(main): release 0.2.0") with
-   the next version and the `CHANGELOG.md` entries. It updates as more commits land.
-3. **Merging the release PR** bumps `MARKETING_VERSION` in `project.yml`, tags
-   `v0.2.0`, creates a GitHub Release and uploads both apps to the App Store. Submit
-   the version for review in App Store Connect, or run the Release workflow by hand
-   with `release` and `submit`.
-
-To set the next version yourself, add `Release-As: 1.0.0` to the body of a commit.
-
-### One-time setup
-
-A step-by-step walkthrough of this setup is in
-[`docs/app-store-setup.md`](docs/app-store-setup.md).
-
-1. **App Store Connect.** Create the app record with the bundle identifier
-   (`com.liskovlabs.middlec`) and add both the iOS and macOS platforms.
-2. **API key.** Under Users and Access → Integrations → App Store Connect API,
-   create a key with the **Admin** role (match needs it to create certificates;
-   **App Manager** is enough once they exist). Save the `.p8` as
-   `~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8`.
-3. **Signing repository.** Create an empty **private** git repository for
-   [match](https://docs.fastlane.tools/actions/match/), which keeps the
-   certificates and profiles there, encrypted with a passphrase you choose.
-4. **Local settings.** Use Ruby 3.2 or later (`.ruby-version` asks for 3.2.0), then:
-
-   ```bash
-   bundle install
-   cp fastlane/.env.example fastlane/.env   # fill in the key, repo and passphrase
-   bundle exec fastlane ios certificates
-   bundle exec fastlane mac certificates
-   ```
-
-   This creates the Apple Distribution and Mac Installer Distribution certificates
-   and the App Store profiles, and stores them in the signing repository. The team
-   comes from `Support/iOS/Local.xcconfig` unless you set `TEAM_ID`.
-
-### GitHub Actions
-
-`.github/workflows/release.yml` runs the same lanes on GitHub.
-`.github/workflows/release-please.yml` calls it on every push to `main`, as
-described in [Releases](#releases). Run the Release workflow by hand from the
-Actions tab to choose a platform, upload to the App Store, or submit for review.
-
-Release Please opens its PR with the workflow's `GITHUB_TOKEN`, so under Settings →
-Actions → General, tick **Allow GitHub Actions to create and approve pull
-requests**. Pull requests opened that way don't start the Build workflow; that's
-fine for the release PR, which only changes the version and changelog.
-
-Add these repository secrets:
-
-| Secret | Value |
-| --- | --- |
-| `ASC_KEY_ID`, `ASC_ISSUER_ID` | From the App Store Connect API page |
-| `ASC_KEY_P8` | The contents of the `.p8` file |
-| `MATCH_GIT_URL` | HTTPS URL of the signing repository |
-| `MATCH_PASSWORD` | The match passphrase |
-| `MATCH_GIT_BASIC_AUTHORIZATION` | `echo -n "github-user:token" \| base64`, with a token that can read the signing repository |
-| `TEAM_ID` | Your Apple developer team ID |
-
-The bundle identifier defaults to `com.liskovlabs.middlec`. To release under a
-different one, add a repository **variable** (not a secret, so it stays readable in
-the logs) named `APP_BUNDLE_ID`.
-
-On CI, match only reads the signing repository. Create or renew certificates on
-your Mac with the `certificates` lanes.
+Releases are versioned by Release Please from Conventional Commit PR titles, and
+built, signed and uploaded to TestFlight and the App Store by fastlane on GitHub
+Actions. See [`docs/release-process.md`](docs/release-process.md) for the whole
+process, and [`docs/app-store-setup.md`](docs/app-store-setup.md) for the
+one-time setup.
 
 ## Connecting a Casio CT-S300
 

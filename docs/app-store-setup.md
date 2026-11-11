@@ -4,8 +4,7 @@ These steps prepare fastlane to build, sign and upload the iPhone/iPad and Mac
 apps to TestFlight and the App Store, from a Mac or from GitHub Actions. You only
 do them once. Steps 1 and 2 happen in Apple's web pages; the rest is terminal work.
 
-For the day-to-day release commands, see "Publishing to the App Store" in the
-[README](../README.md#publishing-to-the-app-store).
+For the day-to-day releases, see the [release process](release-process.md).
 
 ## Before you start
 
@@ -166,4 +165,4 @@ gh api -X PUT repos/<github-user>/piano-tutor/actions/permissions/workflow \
 
 From then on, every push to `main` that changes the app sends both apps to
 TestFlight, and merging the Release Please PR uploads the new version to the App
-Store. See [Releases](../README.md#releases) in the README.
+Store. See the [release process](release-process.md).
