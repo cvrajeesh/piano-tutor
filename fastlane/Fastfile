@@ -15,11 +15,12 @@
 
 default_platform(:ios)
 
-ROOT = File.expand_path("..", __dir__)
+FASTLANE_DIR = File.expand_path(__dir__)
+ROOT = File.dirname(FASTLANE_DIR)
 PROJECT = File.join(ROOT, "PianoTutor.xcodeproj")
 OUTPUT_DIR = File.join(ROOT, "build", "fastlane")
-METADATA_DIR = File.join(__dir__, "metadata")
-SCREENSHOTS_DIR = File.join(__dir__, "screenshots")
+METADATA_DIR = File.join(FASTLANE_DIR, "metadata")
+SCREENSHOTS_DIR = File.join(FASTLANE_DIR, "screenshots")
 # The store languages: one folder each in fastlane/metadata.
 LOCALES = Dir.children(METADATA_DIR)
              .select { |name| File.directory?(File.join(METADATA_DIR, name)) }
@@ -216,7 +217,7 @@ def upload_store(platform, file: nil, submit: false)
     metadata_path: METADATA_DIR,
     screenshots_path: File.join(SCREENSHOTS_DIR, PLATFORMS[platform][:screenshots]),
     overwrite_screenshots: true,
-    app_rating_config_path: File.join(__dir__, "age_rating.json"),
+    app_rating_config_path: File.join(FASTLANE_DIR, "age_rating.json"),
     app_review_information: review_contact,
     release_notes: notes ? LOCALES.to_h { |locale| [locale, notes] } : nil,
     force: true, # no HTML preview to confirm
@@ -244,7 +245,7 @@ lane :privacy do
     username: required_env("FASTLANE_USER"),
     team_id: ENV["FASTLANE_ITC_TEAM_ID"],
     app_identifier: bundle_id,
-    json_path: File.join(__dir__, "app_privacy_details.json")
+    json_path: File.join(FASTLANE_DIR, "app_privacy_details.json")
   )
 end
 
